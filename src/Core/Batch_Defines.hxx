@@ -27,14 +27,11 @@
 #define _BATCH_Defines_HXX_
 
 #ifdef WIN32
-# if defined BATCH_EXPORTS || defined SalomeBatch_EXPORTS
+# if defined Batch_EXPORTS
 #  define BATCH_EXPORT __declspec( dllexport )
 # else
 #  define BATCH_EXPORT __declspec( dllimport )
 # endif
-# define RM  "rm"
-# define RCP "rpc"
-# define RSH "rsh"
 #else
 # define BATCH_EXPORT
 #endif

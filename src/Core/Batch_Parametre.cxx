@@ -266,7 +266,7 @@ namespace Batch {
   }
 
   // Constructeur par recopie
-  Parametre::Parametre(const Parametre & PM)
+  Parametre::Parametre(const Parametre & PM) : map< string, Versatile >()
   {
     // inutile car l'objet est vierge : il vient d'etre cree
     // On efface toute la map

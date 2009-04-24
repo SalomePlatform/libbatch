@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * Job.hxx : 
+ * Job.hxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Date   : Septembre 2003
@@ -48,18 +48,18 @@ namespace Batch {
     Job(Batch::Environnement env);
     Job(Batch::Parametre param, Batch::Environnement env);
     virtual ~Job() {}
-    
+
     // Operateur pour l'affichage sur un stream
-    friend std::ostream & operator <<(std::ostream & os, const Job & job);
+    BATCH_EXPORT friend std::ostream & operator <<(std::ostream & os, const Job & job);
 
     // Accesseurs
     Batch::Parametre getParametre() const;
     void setParametre(const Batch::Parametre &);
-    
+
     // Accesseurs
     Batch::Environnement getEnvironnement() const;
     void setEnvironnement(const Batch::Environnement &);
-    
+
     // Methodes pour l'interfacage avec Python (SWIG)
     // TODO : supprimer ces methodes et transferer leur definitions dans SWIG
     std::string  __str__() const; // SWIG : affichage en Python

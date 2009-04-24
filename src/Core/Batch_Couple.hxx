@@ -51,7 +51,7 @@ namespace Batch {
     virtual ~Couple() {}
 
     // Operateur pour l'affichage sur un stream
-    friend std::ostream & operator << (std::ostream & os, const Couple & cp);
+    BATCH_EXPORT friend std::ostream & operator << (std::ostream & os, const Couple & cp);
 
     // Operateur d'affectation
     virtual Couple & operator =(const Couple &);

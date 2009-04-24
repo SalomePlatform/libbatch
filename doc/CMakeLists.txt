@@ -23,7 +23,7 @@
 SET (TEXI_FILE ${CMAKE_CURRENT_SOURCE_DIR}/Batch.texi)
 
 ADD_CUSTOM_TARGET(doc ALL
-                  ${MAKEINFO_EXECUTABLE} --html ${TEXI_FILE}
+                  ${MAKEINFO_EXECUTABLE} --html ${TEXI_FILE} -I ${CMAKE_CURRENT_SOURCE_DIR}
                   DEPENDS ${TEXI_FILE}
                  )
 

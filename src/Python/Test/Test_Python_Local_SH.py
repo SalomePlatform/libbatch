@@ -69,13 +69,20 @@ def work():
 
     # Wait for the end of the job
     state = 'Unknown'
-    while state != 'Done':
+    i=0
+    while state != 'Done' and i<10:
         time.sleep(0.1)
+        i+=1
         jinfo = jobid.queryJob()
         try:
             state = jinfo.getParametre()['STATE']
         except KeyError:
             pass
+        print "State is", state
+
+    if state != "Done":
+        print "Error: Job not finished after timeout"
+        return 1;
 
     print "Job", jobid, "is done"
 

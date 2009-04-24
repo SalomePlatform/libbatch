@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * PyVersatile.hxx : 
+ * PyVersatile.hxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Mail   : mailto:ivan.dutka-malen@der.edf.fr
@@ -41,9 +41,19 @@
 #include "Batch_ListIsFullException.hxx"
 #include "Batch_InvalidArgumentException.hxx"
 
+#ifdef WIN32
+# if defined _libBatch_Swig_EXPORTS
+#  define BATCH_SWIG_EXPORT __declspec( dllexport )
+# else
+#  define BATCH_SWIG_EXPORT __declspec( dllimport )
+# endif
+#else
+# define BATCH_SWIG_EXPORT
+#endif
+
 namespace Batch {
 
-  class BATCH_EXPORT PyVersatile : public Versatile
+  class BATCH_SWIG_EXPORT PyVersatile : public Versatile
   {
   public:
 		// Constructeur a partir d'un objet Versatile

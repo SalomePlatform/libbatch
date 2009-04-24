@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * GenericType.hxx : 
+ * GenericType.hxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Date   : Septembre 2003
@@ -47,7 +47,7 @@ namespace Batch {
     virtual ~GenericType() { _nb--; }
 
 		// Operateur pour l'affichage sur un stream
-    friend std::ostream & operator << (std::ostream & os, const GenericType & obj);
+    BATCH_EXPORT friend std::ostream & operator << (std::ostream & os, const GenericType & obj);
 
 		// Conversion en chaine
     virtual std::string affiche() const;
@@ -63,7 +63,7 @@ namespace Batch {
 
   private:
 		static int _nb; // nombre total d'objets GenericType et al.
-  
+
   };
 
 }

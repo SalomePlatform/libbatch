@@ -74,7 +74,8 @@ int main(int argc, char** argv)
     job.setParametre(p);
     // ... and its environment (SSH_AUTH_SOCK env var is important for ssh agent authentication)
     Environnement e;
-    e["SSH_AUTH_SOCK"] = getenv("SSH_AUTH_SOCK");
+    const char * sshAuthSock = getenv("SSH_AUTH_SOCK");
+    if (sshAuthSock != NULL) e["SSH_AUTH_SOCK"] = sshAuthSock;
     job.setEnvironnement(e);
     cout << job << endl;
 
@@ -107,7 +108,8 @@ int main(int argc, char** argv)
     }
 
   } catch (GenericException e) {
-    cerr << "Batch library exception of type " << e.type << ": " << e.message << endl;
+    cerr << "Error: " << e << endl;
+    return 1;
   }
 
   // test the result file

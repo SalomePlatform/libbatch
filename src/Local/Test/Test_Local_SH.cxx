@@ -49,43 +49,55 @@ int main(int argc, char** argv)
   // eventually remove any previous result
   remove("result.txt");
 
-  // Define the job...
-  Job job;
-  // ... and its parameters ...
-  Parametre p;
-  p["EXECUTABLE"] = "./copied-test-script.sh";
-  p["NAME"]       = "Test_Local_SH";
-  p["WORKDIR"]    = "/tmp";
-  p["INFILE"]     = Couple("seta.sh", "copied-seta.sh");
-  p["INFILE"]    += Couple("setb.sh", "copied-setb.sh");
-  p["INFILE"]    += Couple("test-script.sh", "copied-test-script.sh");
-  p["OUTFILE"]    = Couple("result.txt", "orig-result.txt");
-  job.setParametre(p);
-  // ... and its environment
-  Environnement e;
-  job.setEnvironnement(e);
-  cout << job << endl;
+  try {
+    // Define the job...
+    Job job;
+    // ... and its parameters ...
+    Parametre p;
+    p["EXECUTABLE"] = "./copied-test-script.sh";
+    p["NAME"]       = "Test_Local_SH";
+    p["WORKDIR"]    = "/tmp";
+    p["INFILE"]     = Couple("seta.sh", "copied-seta.sh");
+    p["INFILE"]    += Couple("setb.sh", "copied-setb.sh");
+    p["INFILE"]    += Couple("test-script.sh", "copied-test-script.sh");
+    p["OUTFILE"]    = Couple("result.txt", "orig-result.txt");
+    job.setParametre(p);
+    // ... and its environment
+    Environnement e;
+    job.setEnvironnement(e);
+    cout << job << endl;
 
-  // Get the catalog
-  BatchManagerCatalog& c = BatchManagerCatalog::getInstance();
+    // Get the catalog
+    BatchManagerCatalog& c = BatchManagerCatalog::getInstance();
 
-  // Create a BatchManager of type Local_SH on localhost
-  FactBatchManager * fbm = c("SH");
-  BatchManager * bm = (*fbm)("localhost");
+    // Create a BatchManager of type Local_SH on localhost
+    FactBatchManager * fbm = c("SH");
+    BatchManager * bm = (*fbm)("localhost");
 
-  // Submit the job to the BatchManager
-  JobId jobid = bm->submitJob(job);
-  cout << jobid.__repr__() << endl;
+    // Submit the job to the BatchManager
+    JobId jobid = bm->submitJob(job);
+    cout << jobid.__repr__() << endl;
 
-  // Wait for the end of the job
-  string state = "Unknown";
-  while (state != "Done") {
-    usleep(10000);
-    JobInfo jinfo = jobid.queryJob();
-    state = jinfo.getParametre()["STATE"].str();
+    // Wait for the end of the job
+    string state = "Unknown";
+    for (int i=0 ; i<10 && state != "Done" ; i++) {
+      usleep(100000);
+      Versatile paramState = jobid.queryJob().getParametre()["STATE"];
+      state = (paramState.size() > 0) ? paramState.str() : "Unknown";
+      cout << "Job state is: " << state << endl;
+    }
+
+    if (state != "Done") {
+      cerr << "Error: Job not finished after timeout" << endl;
+      return 1;
+    }
+
+    cout << "Job " << jobid.__repr__() << " is done" << endl;
+
+  } catch (GenericException e) {
+    cerr << "Error: " << e << endl;
+    return 1;
   }
-
-  cout << "Job " << jobid.__repr__() << " is done" << endl;
 
   // wait for 2 more seconds for the copy of output files and the cleanup
   // (there's no cleaner way to do that yet)

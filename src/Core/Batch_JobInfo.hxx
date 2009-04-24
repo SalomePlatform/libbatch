@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * JobInfo.hxx : 
+ * JobInfo.hxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Mail   : mailto:ivan.dutka-malen@der.edf.fr
@@ -52,13 +52,13 @@ namespace Batch {
     JobInfo(const JobInfo & jinfo) : _param(jinfo._param), _env(jinfo._env) {};
 
     // Operateur pour l'affichage sur un stream
-    friend std::ostream & operator <<(std::ostream & os, const JobInfo & ji);
+    BATCH_EXPORT friend std::ostream & operator <<(std::ostream & os, const JobInfo & ji);
 
     // Accesseurs
     // _CS_gbo Ajout explicite du namespace pour les besoins de swig (mauvaise gestion
     // des namespace par swig.
     virtual Batch::Parametre getParametre() const;
-    virtual Batch::Environnement getEnvironnement() const; 
+    virtual Batch::Environnement getEnvironnement() const;
 
     // Methodes pour l'interfacage avec Python (SWIG)
     // TODO : supprimer ces methodes et transferer leur definitions dans SWIG

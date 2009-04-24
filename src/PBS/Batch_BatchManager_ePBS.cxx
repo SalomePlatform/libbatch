@@ -64,6 +64,9 @@ namespace Batch {
   // Methode pour le controle des jobs : soumet un job au gestionnaire
   const JobId BatchManager_ePBS::submitJob(const Job & job)
   {
+#ifdef WIN32
+    throw NotYetImplementedException("PBS emulation not supported on Windows platform yet");
+#else
     int status;
     Parametre params = job.getParametre();
     const std::string dirForTmpFiles = params[TMPDIR];
@@ -130,6 +133,7 @@ namespace Batch {
 
     JobId id(this, strjob);
     return id;
+#endif  //WIN32
   }
 
   // Methode pour le controle des jobs : retire un job du gestionnaire

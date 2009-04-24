@@ -66,7 +66,7 @@ namespace Batch {
 
     // Forbid the use of copy constructor and assignment operator
     BatchManagerCatalog(const BatchManagerCatalog & orig) {}
-    BatchManagerCatalog& operator=(const BatchManagerCatalog & orig) {}
+    BatchManagerCatalog& operator=(const BatchManagerCatalog & orig) { return *this; }
 
   };
 

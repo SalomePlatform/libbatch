@@ -91,7 +91,7 @@ namespace Batch {
     std::string str() const throw(TypeMismatchException);
 
 		// Operateur pour l'affichage sur un stream
-    friend std::ostream & operator << (std::ostream & os, const Versatile & );
+    BATCH_EXPORT friend std::ostream & operator << (std::ostream & os, const Versatile & );
 
 		// Positionnement et recuperation du type de l'element interne
     void setType(DiscriminatorType) throw(TypeMismatchException);

@@ -27,7 +27,6 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules/)
 
 ENABLE_TESTING()
 
-find_package (PLATFORM)
 find_package (Threads)
 IF (NOT CMAKE_USE_PTHREADS_INIT)
     MESSAGE(FATAL_ERROR "Mandatory library pthread not found")

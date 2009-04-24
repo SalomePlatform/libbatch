@@ -50,6 +50,9 @@ namespace Batch {
                      const std::string & ch = "undefined") : type(tp), message(ch) {}
   };
 
+  // Operator for writing on a stream
+  BATCH_EXPORT std::ostream & operator <<(std::ostream & os, const GenericException & e);
+
 }
 
 #endif

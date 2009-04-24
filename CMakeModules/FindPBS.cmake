@@ -20,9 +20,6 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE (CheckIncludeFile)
-INCLUDE (CheckLibraryExists)
-
 IF (NOT PBS_FIND_QUIETLY)
     MESSAGE(STATUS "Looking for PBS...")
 ENDIF (NOT PBS_FIND_QUIETLY)
@@ -30,7 +27,9 @@ ENDIF (NOT PBS_FIND_QUIETLY)
 FIND_PATH(PBS_INCLUDE_DIR pbs_ifl.h)
 FIND_LIBRARY(PBS_LIBRARY pbs) 
 
-SET(PBS_FOUND ${PBS_INCLUDE_DIR} AND ${PBS_LIBRARY})
+IF (PBS_INCLUDE_DIR AND PBS_LIBRARY)
+    SET(PBS_FOUND True)
+ENDIF (PBS_INCLUDE_DIR AND PBS_LIBRARY)
 
 IF (PBS_FOUND)
 

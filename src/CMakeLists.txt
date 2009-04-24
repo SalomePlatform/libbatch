@@ -58,13 +58,16 @@ SET(HDR_FILES ${HDR_FILES_BUILD} CACHE INTERNAL "")
 SET(HDR_FILES_BUILD CACHE INTERNAL "")
 
 
-
 add_library (Batch SHARED ${SRC_FILES})
 
 include_directories(${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Core)
 
 target_link_libraries(Batch ${CMAKE_THREAD_LIBS_INIT})
+
+IF (WIN32)
+    target_link_libraries(Batch ws2_32)
+ENDIF (WIN32)
 
 # If necessary, activate all warnings (useful for debugging and code cleaning)
 # add_definitions(-Wall -Werror -ansi -pedantic)
@@ -82,6 +85,6 @@ ENDIF (BUILD_PBS_INTERFACE AND PBS_FOUND)
 INSTALL(TARGETS Batch DESTINATION lib)
 INSTALL(FILES ${HDR_FILES} DESTINATION include/Batch)
 
-IF (BUILD_PYTHON_WRAPPING AND PYTHON_INCLUDE_PATH AND PYTHON_LIBRARIES AND SWIG_FOUND)
+IF (BUILD_PYTHON_WRAPPING AND Python_FOUND AND SWIG_FOUND)
     add_subdirectory (Python)
-ENDIF (BUILD_PYTHON_WRAPPING AND PYTHON_INCLUDE_PATH AND PYTHON_LIBRARIES AND SWIG_FOUND)
+ENDIF (BUILD_PYTHON_WRAPPING AND Python_FOUND AND SWIG_FOUND)

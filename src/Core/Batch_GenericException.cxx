@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * GenericException.cxx : 
+ * GenericException.cxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Mail   : mailto:ivan.dutka-malen@der.edf.fr
@@ -29,9 +29,17 @@
  *
  */
 
+#include <iostream>
 #include "Batch_GenericException.hxx"
+
 using namespace std;
 
 namespace Batch {
+
+// Operator for writing on a stream
+ostream & operator <<(ostream & os, const GenericException & e)
+{
+  return os << e.type << ": " << e.message;
+}
 
 }

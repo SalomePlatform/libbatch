@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * BatchManager.cxx : 
+ * BatchManager.cxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Date   : Septembre 2003
@@ -61,8 +61,19 @@ namespace Batch {
 //   }
   BatchManager::BatchManager(const FactBatchManager * parent, const char * host) throw(InvalidArgumentException) : _hostname(host), jobid_map(), _parent(parent)
   {
+#ifdef WIN32
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);  // Initialize Winsock
+#endif
+
     // On verifie que le hostname est correct
-    if (!gethostbyname(_hostname.c_str())) { // hostname unknown from network
+    struct hostent* res = gethostbyname(_hostname.c_str());
+
+#ifdef WIN32
+    WSACleanup();  // Finalize Winsock
+#endif
+
+    if (!res) { // hostname unknown from network
       string msg = "hostname \"";
       msg += _hostname;
       msg += "\" unknown from the network";
@@ -109,7 +120,7 @@ namespace Batch {
 //   {
 //     // Nothing to do
 //   }
-   
+
 //   // Methode pour le controle des jobs : suspend un job en file d'attente
 //   void BatchManager::holdJob(const JobId & jobid)
 //   {
