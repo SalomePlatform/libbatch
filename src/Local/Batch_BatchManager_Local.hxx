@@ -34,7 +34,7 @@
 
 #include "Batch_Defines.hxx"
 
-#include <vector>
+#include <list>
 #include <map>
 #include <queue>
 #include <pthread.h>
@@ -56,6 +56,11 @@ namespace Batch {
   class BATCH_EXPORT BatchManager_Local : public BatchManager
   {
   private:
+#ifdef WIN32
+    typedef HANDLE Process;
+#else
+    typedef pid_t Process;
+#endif
     friend class ThreadAdapter;
     class ThreadAdapter{
     public:
@@ -68,8 +73,12 @@ namespace Batch {
       const Job_Local _job;
 
     private:
-      void pere(pid_t child);
+      void pere(Process child);
+#ifndef WIN32
       void fils();
+#else
+      Process launchWin32ChildProcess();
+#endif
 
     };
 
@@ -133,19 +142,27 @@ namespace Batch {
     std::map<Id, Child > _threads;
 
     // Methode abstraite qui renvoie la commande de copie du fichier source en destination
-    virtual std::string copy_command( const std::string & host_source,
-				      const std::string & source,
-				      const std::string & host_destination,
-				      const std::string & destination) const = 0;
+    virtual std::string copy_command( const std::string & user_source,
+                                      const std::string & host_source,
+                                      const std::string & source,
+                                      const std::string & user_destination,
+                                      const std::string & host_destination,
+                                      const std::string & destination) const = 0;
 
     // Methode abstraite qui renvoie la commande a executer
     virtual std::string exec_command(Parametre & param) const = 0;
 
     // Methode abstraite qui renvoie la commande d'effacement du fichier
-    virtual std::string remove_command( const std::string & host_destination,
-					const std::string & destination) const = 0;
+    virtual std::string remove_command( const std::string & user_destination,
+                                        const std::string & host_destination,
+                                        const std::string & destination) const = 0;
 
   private:
+    struct ThreadIdIdAssociation {
+      pthread_t threadId;
+      Id id;
+    };
+
     virtual pthread_t submit(const Job_Local & job);
     virtual void cancel(pthread_t thread_id);
     static  void kill_child_on_exit(void * p_pid);
@@ -155,10 +172,7 @@ namespace Batch {
     Id registerThread_id(pthread_t thread_id);
     pthread_mutex_t _thread_id_id_association_mutex;
     pthread_cond_t  _thread_id_id_association_cond;
-#ifndef WIN32 //TODO: porting of following functionality
-    //reason: pthread_t on win32 is a struct of pointer and int members
-    std::map<pthread_t, Id> _thread_id_id_association;
-#endif
+    std::list<struct ThreadIdIdAssociation> _thread_id_id_association;
 
 #ifdef SWIG
   public:

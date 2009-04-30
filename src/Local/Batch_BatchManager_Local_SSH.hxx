@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * BatchManager_Local_SSH.hxx : 
+ * BatchManager_Local_SSH.hxx :
  *
  * Auteur : Ivan DUTKA-MALEN - EDF R&D
  * Mail   : mailto:ivan.dutka-malen@der.edf.fr
@@ -62,18 +62,21 @@ namespace Batch {
     virtual ~BatchManager_Local_SSH();
 
   protected:
-    // Methode abstraite qui renvoie la commande de copie du fichier source en destination
-    virtual std::string copy_command( const std::string & host_source,
-				      const std::string & source,
-				      const std::string & host_destination,
-				      const std::string & destination) const;
+    // Methode qui renvoie la commande de copie du fichier source en destination
+    virtual std::string copy_command( const std::string & user_source,
+                                      const std::string & host_source,
+                                      const std::string & source,
+                                      const std::string & user_destination,
+                                      const std::string & host_destination,
+                                      const std::string & destination) const;
 
-    // Methode abstraite qui renvoie la commande a executer
+    // Methode qui renvoie la commande a executer
     virtual std::string exec_command(Parametre & param) const;
 
     // Methode qui renvoie la commande d'effacement du fichier
-    virtual std::string remove_command( const std::string & host_destination,
-					const std::string & destination) const;
+    virtual std::string remove_command( const std::string & user_destination,
+                                        const std::string & host_destination,
+                                        const std::string & destination) const;
 
   };
 

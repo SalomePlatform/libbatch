@@ -52,10 +52,6 @@
 
 #include "Batch_config.h"
 
-#ifndef RM
-#error "RM undefined. You must set RM to a valid path to a rm-like command."
-#endif
-
 #ifndef RCP
 #error "RCP undefined. You must set RCP to a valid path to a rcp-like command."
 #endif
@@ -81,22 +77,43 @@ namespace Batch {
 
 
   // Methode abstraite qui renvoie la commande de copie du fichier source en destination
-  string BatchManager_Local_RSH::copy_command(const string & host_source, const string & source, const string & host_destination, const string & destination) const
+  string BatchManager_Local_RSH::copy_command(const std::string & user_source,
+                                              const std::string & host_source,
+                                              const std::string & source,
+                                              const std::string & user_destination,
+                                              const std::string & host_destination,
+                                              const std::string & destination) const
   {
     ostringstream fullsource;
     if (host_source.size() != 0) {
-      fullsource << host_source << ":";
+      if (user_source.size() != 0) {
+#ifdef WIN32
+        fullsource << host_source << "." << user_source << ":";
+#else
+        fullsource << user_source << "@" << host_source << ":";
+#endif
+      } else {
+        fullsource << host_source << ":";
+      }
     }
     fullsource << source;
 
     ostringstream fulldestination;
     if (host_destination.size() != 0) {
-      fulldestination << host_destination << ":";
+      if (user_destination.size() != 0) {
+#ifdef WIN32
+        fulldestination << host_destination << "." << user_destination << ":";
+#else
+        fulldestination << user_destination << "@" << host_destination << ":";
+#endif
+      } else {
+        fulldestination << host_destination << ":";
+      }
     }
     fulldestination << destination;
 
     ostringstream copy_cmd;
-    copy_cmd << RCP << " " << fullsource.str() << " " << fulldestination.str();
+    copy_cmd << "\"" << RCP << "\" " << fullsource.str() << " " << fulldestination.str();
     return copy_cmd.str();
   }
 
@@ -104,8 +121,7 @@ namespace Batch {
   string BatchManager_Local_RSH::exec_command(Parametre & param) const
   {
     ostringstream exec_sub_cmd;
-    exec_sub_cmd << "cd " << param[WORKDIR] << ";";
-    exec_sub_cmd << param[EXECUTABLE];
+    exec_sub_cmd << "cd " << param[WORKDIR] << " && " << param[EXECUTABLE];
 
     if (param.find(ARGUMENTS) != param.end()) {
       Versatile V = param[ARGUMENTS];
@@ -139,12 +155,23 @@ namespace Batch {
   }
 
   // Methode qui renvoie la commande d'effacement du fichier
-  string BatchManager_Local_RSH::remove_command(const string & host_destination, const string & destination) const
+  string BatchManager_Local_RSH::remove_command(const std::string & user_destination,
+                                                const std::string & host_destination,
+                                                const std::string & destination) const
   {
-    string host = (host_destination.size()) ? host_destination : "localhost:";
+    string fulldestination = (host_destination.size()) ? host_destination : "localhost";
+    if (user_destination.size() != 0) {
+      fulldestination += " -l " + user_destination;
+    }
 
+    // We consider here that the remote system is UNIX-like and has a "rm" command. Using the
+    // RM macro would be pointless here since the remote system is different from the local one.
     ostringstream remove_cmd;
-    remove_cmd << RSH << " " << host << " \"" << RM << " " << destination << "\"";
+    remove_cmd << "\"" << RSH << "\" " << fulldestination;
+#ifdef WIN32
+    remove_cmd << " -n";
+#endif
+    remove_cmd << " rm " << destination;
     return remove_cmd.str();
   }
 }

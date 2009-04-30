@@ -70,7 +70,7 @@ def work():
     # Wait for the end of the job
     state = 'Unknown'
     i=0
-    while state != 'Done' and i<10:
+    while state != 'Done' and i<20:
         time.sleep(0.1)
         i+=1
         jinfo = jobid.queryJob()

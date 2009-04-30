@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     Parametre p;
     p["EXECUTABLE"] = "./copied-test-script.sh";
     p["NAME"]       = "Test_Local_SH";
-    p["WORKDIR"]    = "/tmp";
+    p["WORKDIR"]    = TEST_LOCAL_SH_WORK_DIR;
     p["INFILE"]     = Couple("seta.sh", "copied-seta.sh");
     p["INFILE"]    += Couple("setb.sh", "copied-setb.sh");
     p["INFILE"]    += Couple("test-script.sh", "copied-test-script.sh");
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 
     // Wait for the end of the job
     string state = "Unknown";
-    for (int i=0 ; i<10 && state != "Done" ; i++) {
+    for (int i=0 ; i<20 && state != "Done" ; i++) {
       usleep(100000);
       Versatile paramState = jobid.queryJob().getParametre()["STATE"];
       state = (paramState.size() > 0) ? paramState.str() : "Unknown";

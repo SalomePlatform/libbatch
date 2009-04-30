@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #ifdef WIN32
 # include <direct.h>
+#include "Batch_RunTimeException.hxx"
 #else
 # include <sys/wait.h>
 # include <unistd.h>
@@ -56,10 +57,10 @@ namespace Batch {
 
 
   // Constructeur
-  BatchManager_Local::BatchManager_Local(const FactBatchManager * parent, const char * host) throw(InvalidArgumentException,ConnexionFailureException) : BatchManager(parent, host), _connect(0), _threads_mutex(), _threads(), _thread_id_id_association_mutex(), _thread_id_id_association_cond()
-#ifndef WIN32 //TODO: porting of following functionality
-    ,_thread_id_id_association()
-#endif
+  BatchManager_Local::BatchManager_Local(const FactBatchManager * parent, const char * host)
+      throw(InvalidArgumentException,ConnexionFailureException)
+    : BatchManager(parent, host), _connect(0), _threads_mutex(), _threads(), _thread_id_id_association_mutex(),
+      _thread_id_id_association_cond(), _thread_id_id_association()
   {
     pthread_mutex_init(&_threads_mutex, NULL);
     pthread_mutex_init(&_thread_id_id_association_mutex, NULL);
@@ -268,17 +269,22 @@ namespace Batch {
   // Retourne l'Id enregistre dans l'association Thread_id / Id et le detruit immediatement
   BatchManager_Local::Id BatchManager_Local::getIdByThread_id(pthread_t thread_id)
   {
-    Id id = -1;
-
     // @@@ --------> SECTION CRITIQUE <-------- @@@
     pthread_mutex_lock(&_thread_id_id_association_mutex);
-#ifndef WIN32 //TODO: porting of following functionality
-    while (_thread_id_id_association.find(thread_id) == _thread_id_id_association.end())
-      pthread_cond_wait(&_thread_id_id_association_cond, &_thread_id_id_association_mutex);
+    bool threadIdFound = false;
+    std::list<struct ThreadIdIdAssociation>::iterator it;
+    while (!threadIdFound) {
+      for (it = _thread_id_id_association.begin() ;
+           it != _thread_id_id_association.end() && !pthread_equal(it->threadId, thread_id) ;
+           it++);
+      if (it == _thread_id_id_association.end())
+        pthread_cond_wait(&_thread_id_id_association_cond, &_thread_id_id_association_mutex);
+      else
+        threadIdFound = true;
+    }
 
-    id = _thread_id_id_association[thread_id];
-    _thread_id_id_association.erase(thread_id);
-#endif
+    Id id = it->id;
+    _thread_id_id_association.erase(it);
 
     pthread_mutex_unlock(&_thread_id_id_association_mutex);
     // @@@ --------> SECTION CRITIQUE <-------- @@@
@@ -295,15 +301,20 @@ namespace Batch {
 
     // @@@ --------> SECTION CRITIQUE <-------- @@@
     pthread_mutex_lock(&_thread_id_id_association_mutex);
-#ifndef WIN32 //TODO: porting of following functionality
-    if (_thread_id_id_association.find(thread_id) == _thread_id_id_association.end()) {
-      id = _thread_id_id_association[thread_id] = nextId();
+    std::list<struct ThreadIdIdAssociation>::iterator it;
+    for (it = _thread_id_id_association.begin() ;
+         it != _thread_id_id_association.end() && !pthread_equal(it->threadId, thread_id) ;
+         it++);
+    if (it == _thread_id_id_association.end()) {
+      struct ThreadIdIdAssociation newAssociation;
+      id = newAssociation.id = nextId();
+      newAssociation.threadId = thread_id;
+      _thread_id_id_association.push_back(newAssociation);
       pthread_cond_signal(&_thread_id_id_association_cond);
 
     } else {
       UNDER_LOCK( cerr << "ERROR : Pthread Inconstency. Two threads own the same thread_id." << endl );
     }
-#endif
     pthread_mutex_unlock(&_thread_id_id_association_mutex);
     // @@@ --------> SECTION CRITIQUE <-------- @@@
 
@@ -324,11 +335,12 @@ namespace Batch {
   // Methode d'execution du thread
   void * BatchManager_Local::ThreadAdapter::run(void * arg)
   {
-#ifndef WIN32 //TODO: porting of following functionality
+#ifndef WIN32
     // On bloque tous les signaux pour ce thread
     sigset_t setmask;
     sigfillset(&setmask);
     pthread_sigmask(SIG_BLOCK, &setmask, NULL);
+#endif
 
     // On autorise la terminaison differee du thread
     // (ces valeurs sont les valeurs par defaut mais on les force par precaution)
@@ -338,7 +350,7 @@ namespace Batch {
     // On enregistre la fonction de suppression du fils en cas d'arret du thread
     // Cette fontion sera automatiquement appelee lorsqu'une demande d'annulation
     // sera prise en compte par pthread_testcancel()
-    pid_t child;
+    Process child;
     pthread_cleanup_push(BatchManager_Local::kill_child_on_exit, static_cast<void *> (&child));
     pthread_cleanup_push(BatchManager_Local::delete_on_exit, arg);
 
@@ -376,6 +388,10 @@ namespace Batch {
     }
 
     string executionhost = string(param[EXECUTIONHOST]);
+    string user;
+    if ( (it = param.find(USER)) != param.end() ) {
+      user = string(it->second);
+    }
 
     if ( (it = param.find(INFILE)) != param.end() ) {
       Versatile V = (*it).second;
@@ -387,8 +403,12 @@ namespace Batch {
         string local    = cp.getLocal();
         string remote   = cp.getRemote();
 
-        string copy_cmd = p_ta->getBatchManager().copy_command("", local, executionhost, workdir + "/" + remote);
+        string copy_cmd = p_ta->getBatchManager().copy_command("", "", local, user,
+                                                               executionhost, workdir + "/" + remote);
         UNDER_LOCK( cout << "Copying : " << copy_cmd << endl );
+#ifdef WIN32
+        copy_cmd = string("\"") + copy_cmd + string("\"");
+#endif
 
         if (system(copy_cmd.c_str()) ) {
           // Echec de la copie
@@ -404,13 +424,13 @@ namespace Batch {
 
 
 
-#ifdef WIN32
-    //TODO
-    //Using CreateThread instead fork() POSIX function
-#else
     // On forke/exec un nouveau process pour pouvoir controler le fils
     // (plus finement qu'avec un appel system)
     // int rc = system(commande.c_str());
+#ifdef WIN32
+    child = p_ta->launchWin32ChildProcess();
+    p_ta->pere(child);
+#else
     child = fork();
     if (child < 0) { // erreur
       UNDER_LOCK( cerr << "Fork impossible (rc=" << child << ")" << endl );
@@ -424,7 +444,6 @@ namespace Batch {
 #endif
 
 
-
     // On copie les fichiers de sortie du fils
     if ( (it = param.find(OUTFILE)) != param.end() ) {
       Versatile V = (*it).second;
@@ -436,8 +455,12 @@ namespace Batch {
         string local    = cp.getLocal();
         string remote   = cp.getRemote();
 
-        string copy_cmd = p_ta->getBatchManager().copy_command(executionhost, workdir + "/" + remote, "", local);
+        string copy_cmd = p_ta->getBatchManager().copy_command(user, executionhost, workdir + "/" + remote,
+                                                               "", "", local);
         UNDER_LOCK( cout << "Copying : " << copy_cmd << endl );
+#ifdef WIN32
+        copy_cmd = string("\"") + copy_cmd + string("\"");
+#endif
 
         if (system(copy_cmd.c_str()) ) {
           // Echec de la copie
@@ -455,8 +478,11 @@ namespace Batch {
     if ( (rc == 0) || (child < 0) ) {
       std::vector<string>::const_iterator it;
       for(it=files_to_delete.begin(); it!=files_to_delete.end(); it++) {
-        string remove_cmd = p_ta->getBatchManager().remove_command(executionhost, *it);
+        string remove_cmd = p_ta->getBatchManager().remove_command(user, executionhost, *it);
         UNDER_LOCK( cout << "Removing : " << remove_cmd << endl );
+#ifdef WIN32
+        remove_cmd = string("\"") + remove_cmd + string("\"");
+#endif
         system(remove_cmd.c_str());
       }
     }
@@ -476,16 +502,14 @@ namespace Batch {
 
     UNDER_LOCK( cout << "Father is leaving" << endl );
     pthread_exit(NULL);
-#endif
     return NULL;
   }
 
 
 
 
-  void BatchManager_Local::ThreadAdapter::pere(pid_t child)
+  void BatchManager_Local::ThreadAdapter::pere(Process child)
   {
-#ifndef WIN32 //TODO: porting of following functionality
     time_t child_starttime = time(NULL);
 
     // On enregistre le fils dans la table des threads
@@ -499,12 +523,16 @@ namespace Batch {
     thread_id_sst << id;
     param[ID]         = thread_id_sst.str();
     param[STATE]      = "Running";
+#ifndef WIN32
     param[PID]        = child;
+#endif
 
     // @@@ --------> SECTION CRITIQUE <-------- @@@
     pthread_mutex_lock(&_bm._threads_mutex);
     _bm._threads[id].thread_id = thread_id;
+#ifndef WIN32
     _bm._threads[id].pid       = child;
+#endif
     _bm._threads[id].status    = RUNNING;
     _bm._threads[id].param     = param;
     _bm._threads[id].env       = env;
@@ -515,9 +543,21 @@ namespace Batch {
 
 
 
-
     // on boucle en attendant que le fils ait termine
     while (1) {
+#ifdef WIN32
+      DWORD exitCode;
+      BOOL res = GetExitCodeProcess(child, &exitCode);
+      if (exitCode != STILL_ACTIVE) {
+        pthread_mutex_lock(&_bm._threads_mutex);
+        _bm._threads[id].status       = DONE;
+        _bm._threads[id].param[STATE] = "Done";
+        pthread_mutex_unlock(&_bm._threads_mutex);
+        // @@@ --------> SECTION CRITIQUE <-------- @@@
+        UNDER_LOCK( cout << "Father sees his child is DONE: exit code = " << exitCode << endl );
+        break;
+      }
+#else
       int child_rc = 0;
       pid_t child_wait_rc = waitpid(child, &child_rc, WNOHANG /* | WUNTRACED */);
       if (child_wait_rc > 0) {
@@ -560,8 +600,7 @@ namespace Batch {
         UNDER_LOCK( cout << "Father sees his child is DEAD : " << child_wait_rc << " (Reason : " << strerror(errno) << ")" << endl );
         break;
       }
-
-
+#endif
 
       // On teste si le thread doit etre detruit
       pthread_testcancel();
@@ -615,7 +654,7 @@ namespace Batch {
     case NOP:
       UNDER_LOCK( cout << "Father does nothing to his child" << endl );
       break;
-
+#ifndef WIN32
     case HOLD:
       UNDER_LOCK( cout << "Father is sending SIGSTOP signal to his child" << endl );
       kill(child, SIGSTOP);
@@ -635,7 +674,7 @@ namespace Batch {
       UNDER_LOCK( cout << "Father is sending SIGKILL signal to his child" << endl );
       kill(child, SIGKILL);
       break;
-
+#endif
     case ALTER:
       break;
 
@@ -649,33 +688,26 @@ namespace Batch {
       // @@@ --------> SECTION CRITIQUE <-------- @@@
 
       // On fait une petite pause pour ne pas surcharger inutilement le processeur
+#ifdef WIN32
+      Sleep(1000);
+#else
       sleep(1);
-
-    }
 #endif
 
+    }
 
   }
 
 
 
+#ifndef WIN32
 
   void BatchManager_Local::ThreadAdapter::fils()
   {
-#ifndef WIN32 //TODO: porting of following functionality
     Parametre param = _job.getParametre();
     Parametre::iterator it;
 
     try {
-
-      // On se place dans le repertoire de travail
-      if ( (it = param.find(WORKDIR)) != param.end() ) {
-        string workdir = static_cast<string>( (*it).second );
-        chdir(workdir.c_str());
-      }
-
-
-
 
       // EXECUTABLE is MANDATORY, if missing, we exit with failure notification
       char * execpath = NULL;
@@ -718,8 +750,10 @@ namespace Batch {
 
 
 
+      // Create the environment for the new process. Note (RB): Here we change the environment for
+      // the process launched in local. It would seem more logical to set the environment for the
+      // remote process.
       Environnement env = _job.getEnvironnement();
-
 
       char ** envp = NULL;
       if(env.size() > 0) {
@@ -795,10 +829,92 @@ namespace Batch {
     }
 
     exit(99);
-#endif
   }
 
+#else
 
+  BatchManager_Local::Process BatchManager_Local::ThreadAdapter::launchWin32ChildProcess()
+  {
+    Parametre param = _job.getParametre();
+    Parametre::iterator it;
+    PROCESS_INFORMATION pi;
+
+    try {
+
+      // EXECUTABLE is MANDATORY, if missing, we throw an exception
+      string exec_command;
+      if (param.find(EXECUTABLE) != param.end()) {
+        exec_command = _bm.exec_command(param);
+      } else {
+        throw RunTimeException("Parameter \"EXECUTABLE\" is mandatory for local batch submission");
+      }
+
+      string name = (param.find(NAME) != param.end()) ? param[NAME] : param[EXECUTABLE];
+
+      if (param.find(ARGUMENTS) != param.end()) {
+        Versatile V = param[ARGUMENTS];
+
+        for(Versatile::const_iterator it=V.begin() ; it!=V.end() ; it++) {
+          StringType argt = * static_cast<StringType *>(*it);
+          exec_command += string(" ") + string(argt);
+        }
+      }
+
+
+      UNDER_LOCK( cout << "*** exec_command = " << exec_command << endl );
+
+
+      // Create the environment for the new process. Note (RB): Here we change the environment for
+      // the process launched in local. It would seem more logical to set the environment for the
+      // remote process.
+      // Note that if no environment is specified, we reuse the current environment.
+      Environnement env = _job.getEnvironnement();
+      char * chNewEnv = NULL;
+
+      if(env.size() > 0) {
+        chNewEnv = new char[4096];
+        LPTSTR lpszCurrentVariable = chNewEnv;
+        for(Environnement::const_iterator it=env.begin() ; it!=env.end() ; it++) {
+          const string  & key   = (*it).first;
+          const string  & value = (*it).second;
+          string envvar = key + "=" + value;
+          envvar.copy(lpszCurrentVariable, envvar.size());
+          lpszCurrentVariable[envvar.size()] = '\0';
+          lpszCurrentVariable += lstrlen(lpszCurrentVariable) + 1;
+        }
+        // Terminate the block with a NULL byte.
+        *lpszCurrentVariable = '\0';
+      }
+
+
+      STARTUPINFO si;
+      ZeroMemory( &si, sizeof(si) );
+      si.cb = sizeof(si);
+      ZeroMemory( &pi, sizeof(pi) );
+
+      // Copy the command to a non-const buffer
+      size_t str_size = exec_command.size();
+      char buffer[str_size+1];
+      exec_command.copy(buffer,str_size);
+      buffer[str_size]='\0';
+
+      // launch the new process
+      BOOL res = CreateProcess(NULL, buffer, NULL, NULL, FALSE,
+                               0, chNewEnv, NULL, &si, &pi);
+
+      if (!res) throw RunTimeException("Error while creating new process");
+
+      CloseHandle(pi.hThread);
+
+    } catch (GenericException & e) {
+
+      std::cerr << "Caught exception : " << e.type << " : " << e.message << std::endl;
+    }
+
+    return pi.hProcess;
+  }
+
+#endif
 
 
   void BatchManager_Local::kill_child_on_exit(void * p_pid)

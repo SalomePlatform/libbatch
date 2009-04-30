@@ -82,7 +82,12 @@ namespace Batch {
 
 
   // Methode abstraite qui renvoie la commande de copie du fichier source en destination
-  string BatchManager_Local_SSH::copy_command(const string & host_source, const string & source, const string & host_destination, const string & destination) const
+  string BatchManager_Local_SSH::copy_command(const std::string & user_source,
+                                              const std::string & host_source,
+                                              const std::string & source,
+                                              const std::string & user_destination,
+                                              const std::string & host_destination,
+                                              const std::string & destination) const
   {
     ostringstream fullsource;
     if (host_source.size() != 0) {
@@ -142,7 +147,9 @@ namespace Batch {
   }
 
   // Methode qui renvoie la commande d'effacement du fichier
-  string BatchManager_Local_SSH::remove_command(const string & host_destination, const string & destination) const
+  string BatchManager_Local_SSH::remove_command(const std::string & user_destination,
+                                                const std::string & host_destination,
+                                                const std::string & destination) const
   {
     string host = (host_destination.size()) ? host_destination : "localhost:";
 

@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p["EXECUTABLE"]    = "./copied-test-script.sh";
+    p["EXECUTABLE"]    = "source copied-test-script.sh";
     p["NAME"]          = "Test_Local_RSH";
     p["WORKDIR"]       = TEST_LOCAL_RSH_WORK_DIR;
     p["INFILE"]        = Couple("seta.sh", "copied-seta.sh");
@@ -62,6 +62,7 @@ int main(int argc, char** argv)
     p["INFILE"]       += Couple("test-script.sh", "copied-test-script.sh");
     p["OUTFILE"]       = Couple("result.txt", "orig-result.txt");
     p["EXECUTIONHOST"] = TEST_LOCAL_RSH_EXECUTION_HOST;
+    p["USER"]          = TEST_LOCAL_RSH_USER;
     job.setParametre(p);
     // ... and its environment
     Environnement e;

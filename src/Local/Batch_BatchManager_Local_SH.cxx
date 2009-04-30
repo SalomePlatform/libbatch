@@ -81,10 +81,15 @@ namespace Batch {
 
 
   // Methode qui renvoie la commande de copie du fichier source en destination
-  string BatchManager_Local_SH::copy_command(const string & host_source, const string & source, const string & host_destination, const string & destination) const
+  string BatchManager_Local_SH::copy_command(const std::string & user_source,
+                                             const std::string & host_source,
+                                             const std::string & source,
+                                             const std::string & user_destination,
+                                             const std::string & host_destination,
+                                             const std::string & destination) const
   {
     ostringstream copy_cmd;
-    copy_cmd << CP << " " << source << " " << destination;
+    copy_cmd << "\"" << CP << "\" \"" << source << "\" \"" << destination << "\"";
     return copy_cmd.str();
   }
 
@@ -92,16 +97,22 @@ namespace Batch {
   string BatchManager_Local_SH::exec_command(Parametre & param) const
   {
     ostringstream exec_sub_cmd;
-    exec_sub_cmd << param[EXECUTABLE];
+#ifdef WIN32
+    exec_sub_cmd << "\"";
+#endif
+    exec_sub_cmd << "cd " << param[WORKDIR] << " && " << param[EXECUTABLE];
 
     if (param.find(ARGUMENTS) != param.end()) {
       Versatile V = param[ARGUMENTS];
       for(Versatile::const_iterator it=V.begin(); it!=V.end(); it++) {
-	StringType argt = * static_cast<StringType *>(*it);
-	string     arg  = argt;
-	exec_sub_cmd << " " << arg;
+        StringType argt = * static_cast<StringType *>(*it);
+        string     arg  = argt;
+        exec_sub_cmd << " " << arg;
       }
     }
+#ifdef WIN32
+    exec_sub_cmd << "\"";
+#endif
 
     param[ARGUMENTS]  = "-c";
     param[ARGUMENTS] += exec_sub_cmd.str();
@@ -110,10 +121,12 @@ namespace Batch {
   }
 
   // Methode qui renvoie la commande d'effacement du fichier
-  string BatchManager_Local_SH::remove_command(const string & host_destination, const string & destination) const
+  string BatchManager_Local_SH::remove_command(const std::string & user_destination,
+                                               const std::string & host_destination,
+                                               const std::string & destination) const
   {
     ostringstream remove_cmd;
-    remove_cmd << RM << " " << destination;
+    remove_cmd << "\"" << RM << "\" \"" << destination << "\"";
     return remove_cmd.str();
   }
 

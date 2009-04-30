@@ -21,8 +21,13 @@
 #
 
 # Declare the configuration variables for the test scripts
+SET (TEST_LOCAL_SH_WORK_DIR "/tmp" CACHE STRING
+     "Work directory for SH Batch test (only necessary for test target)")
+
 SET (TEST_LOCAL_RSH_EXECUTION_HOST "localhost" CACHE STRING
      "Execution host for RSH Batch test (only necessary for test target)")
+SET (TEST_LOCAL_RSH_USER $ENV{USER} CACHE STRING
+     "User name on the execution host for RSH Batch test (only necessary for test target)")
 SET (TEST_LOCAL_RSH_WORK_DIR "/tmp" CACHE STRING
      "Work directory for RSH Batch test (only necessary for test target)")
 
