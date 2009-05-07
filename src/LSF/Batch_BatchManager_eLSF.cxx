@@ -277,7 +277,7 @@ namespace Batch {
     }
 
     ofstream tempOutputFile;
-    std::string TmpFileName = createAndOpenTemporaryFile(tempOutputFile);
+    std::string TmpFileName = createAndOpenTemporaryFile("LSF-script", tempOutputFile);
 
     tempOutputFile << "#! /bin/sh -f" << endl ;
     if (queue != "")

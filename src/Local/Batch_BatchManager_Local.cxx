@@ -849,8 +849,6 @@ namespace Batch {
         throw RunTimeException("Parameter \"EXECUTABLE\" is mandatory for local batch submission");
       }
 
-      string name = (param.find(NAME) != param.end()) ? param[NAME] : param[EXECUTABLE];
-
       if (param.find(ARGUMENTS) != param.end()) {
         Versatile V = param[ARGUMENTS];
 
@@ -859,7 +857,6 @@ namespace Batch {
           exec_command += string(" ") + string(argt);
         }
       }
-
 
       UNDER_LOCK( cout << "*** exec_command = " << exec_command << endl );
 
@@ -900,7 +897,7 @@ namespace Batch {
 
       // launch the new process
       BOOL res = CreateProcess(NULL, buffer, NULL, NULL, FALSE,
-                               0, chNewEnv, NULL, &si, &pi);
+                               DETACHED_PROCESS, chNewEnv, NULL, &si, &pi);
 
       if (!res) throw RunTimeException("Error while creating new process");
 

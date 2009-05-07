@@ -57,11 +57,14 @@ namespace Batch {
     std::string _username; // username to access _hostname
     MpiImpl *_mpiImpl; // Mpi implementation to launch executable in batch script
 
-    std::string createAndOpenTemporaryFile(std::ofstream & outputStream) const;
+    std::string generateTemporaryFileName(const std::string & prefix);
+    std::string createAndOpenTemporaryFile(const std::string & prefix, std::ofstream & outputStream);
     MpiImpl* FactoryMpiImpl(std::string mpiImpl) throw(EmulationException);
     void exportInputFiles(const Job & job);
+    const std::string & getTmpDir();
 
   private:
+    std::string tmpDirName; // Path to the directory for temporary files
 
   };
 

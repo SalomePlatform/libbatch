@@ -132,3 +132,30 @@ directory and type:
 $ cmake ../libBatch-X.X.X                             (X's are version numbers)
 $ make package                                             (for binary package)
 $ make package_source                                      (for source package)
+
+
+5. Note for the users of Microsoft Windows operating system
+
+
+The support for this library on Windows operating system is still partial and
+experimental. Some features are not and will not be implemented for this
+system. Nevertheless it is possible to compile the library and launch some
+batch jobs from a computer running Windows. This section only gives some
+guidelines, without any warranty, to install libBatch on Windows.
+
+First you will need to install a library providing pthread implementation. For
+this we tested Pthreads-win32 (http://sourceware.org/pthreads-win32/) but other
+implementations may exist.
+
+You will also need a compiler for Win32 platform. We tested MinGW and MSYS
+utilities (http://www.mingw.org/) but another compiler might also work.
+
+Then you will have to install and run CMake, and you should be able to compile
+libBatch and run some basic examples.
+
+If you need to use SSH protocol to submit jobs to your cluster, you will need
+a SSH implementation for Windows operating system. PuTTY is a good choice for
+that (http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html). Once
+installed, add the path to your PuTTY installation in the PATH environment
+variable and run CMake. The build system will detect it and the libBatch will
+use it for SSH-based transfers with the server.

@@ -132,7 +132,6 @@ namespace Batch {
       }
     }
 
-
     Versatile new_arguments;
     new_arguments.setMaxSize(0);
     new_arguments = string(param[EXECUTIONHOST]);

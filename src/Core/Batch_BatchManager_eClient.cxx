@@ -31,14 +31,16 @@
 
 #include "Batch_BatchManager_eClient.hxx"
 #include "Batch_RunTimeException.hxx"
-#include "Batch_NotYetImplementedException.hxx"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
+
+#ifdef WIN32
+#include <direct.h>
+#endif
+
+#include "Batch_config.h"
 
 using namespace std;
 
@@ -66,29 +68,31 @@ namespace Batch {
     Parametre params = job.getParametre();
     Versatile V = params[INFILE];
     Versatile::iterator Vit;
-    string command;
-    string copy_command;
     _username = string(params[USER]);
 
+    string command = "\"";
+    string copy_command = "\"";
+
     // Test protocol
-    if( _protocol == "rsh" )
-      copy_command = "rcp ";
-    else if( _protocol == "ssh" )
-      copy_command = "scp ";
-    else
+    if( _protocol == "rsh" ) {
+      command += RSH;
+      copy_command += RCP;
+    } else if( _protocol == "ssh" ) {
+      command += SSH;
+      copy_command += SCP;
+    } else
       throw EmulationException("Unknown protocol : only rsh and ssh are known !");
 
+    command += "\" ";
+    copy_command += "\" ";
+
     // First step : creating batch tmp files directory
-    command = _protocol;
-    command += " ";
     if(_username != ""){
-      command += _username;
-      command += "@";
+      command += _username + "@";
     }
     command += _hostname;
-    command += " \"mkdir -p ";
+    command += " mkdir -p ";
     command += string(params[TMPDIR]);
-    command += "\"" ;
     cerr << command.c_str() << endl;
     status = system(command.c_str());
     if(status) {
@@ -122,6 +126,35 @@ namespace Batch {
         ex_mess += oss.str();
         throw EmulationException(ex_mess.c_str());
       }
+
+#ifdef WIN32
+      // On Windows, we make the remote file executable afterward because pscp does not preserve
+      // access permissions on files
+      command = "\"";
+      if( _protocol == "rsh" ) {
+        command += RSH;
+      } else if( _protocol == "ssh" ) {
+        command += SSH;
+      } else
+        throw EmulationException("Unknown protocol : only rsh and ssh are known !");
+
+      command += "\" ";
+      if(_username != ""){
+        command += _username + "@";
+      }
+      command += _hostname;
+      command += " chmod u+x ";
+      command += string(params[TMPDIR]) + "/" + string(params[EXECUTABLE]);
+      cerr << command.c_str() << endl;
+      status = system(command.c_str());
+      if(status) {
+        std::ostringstream oss;
+        oss << status;
+        std::string ex_mess("Error of connection on remote host ! status = ");
+        ex_mess += oss.str();
+        throw EmulationException(ex_mess.c_str());
+      }
+#endif
     }
 
     // Third step : copy filesToExportList into
@@ -154,7 +187,6 @@ namespace Batch {
 
   void BatchManager_eClient::importOutputFiles( const Job & job, const string directory ) throw(EmulationException)
   {
-    string command;
     int status;
 
     Parametre params = job.getParametre();
@@ -164,12 +196,18 @@ namespace Batch {
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
-      if( _protocol == "rsh" )
-        command = "rcp ";
-      else if( _protocol == "ssh" )
-        command = "scp ";
-      else
-        throw EmulationException("Unknown protocol");
+
+      string command = "\"";
+
+      // Test protocol
+      if( _protocol == "rsh" ) {
+        command += RCP;
+      } else if( _protocol == "ssh" ) {
+        command += SCP;
+      } else
+        throw EmulationException("Unknown protocol : only rsh and ssh are known !");
+
+      command += "\" ";
 
       if (_username != ""){
         command += _username;
@@ -220,35 +258,121 @@ namespace Batch {
   }
 
   /**
+   * This method generates a temporary file name with the pattern "<tmpdir>/<prefix>-XXXXXX" where
+   * <tmpdir> is the directory for temporary files (see BatchManager_eClient::getTmpDir()) and the
+   * X's are replaced by random characters. Note that this method is less secure than
+   * BatchManager_eClient::createAndOpenTemporaryFile, so use the latter whenever possible.
+   * \param prefix the prefix to use for the temporary file.
+   * \return a name usable for a temporary file.
+   */
+  string BatchManager_eClient::generateTemporaryFileName(const string & prefix)
+  {
+    string fileName = getTmpDir() + "/" + prefix + "-XXXXXX";
+    char randstr[7];
+
+    do {
+      sprintf(randstr, "%06d", rand() % 1000000);
+      fileName.replace(fileName.size()-6, 6, randstr);
+    } while (access(fileName.c_str(), F_OK) == 0);
+
+    return fileName;
+  }
+
+  /**
    * This method creates a temporary file and opens an output stream to write into this file.
-   * The file is created with the pattern "/tmp/batch_XXXXXX" where the X's are replaced by random
+   * The file is created with the pattern "<tmpdir>/<prefix>-XXXXXX" where <tmpdir> is the directory
+   * for temporary files (see BatchManager_eClient::getTmpDir()) and the X's are replaced by random
    * characters. The caller is responsible for closing and deleting the file when it is no more used.
+   * \param prefix the prefix to use for the temporary file.
    * \param outputStream an output stream that will be opened for writing in the temporary file. If
    * the stream is already open, it will be closed first.
    * \return the name of the created file.
    */
-  string BatchManager_eClient::createAndOpenTemporaryFile(ofstream & outputStream) const
+  string BatchManager_eClient::createAndOpenTemporaryFile(const string & prefix, ofstream & outputStream)
   {
-    string fileName;
-#ifdef WIN32
-    throw NotYetImplementedException("Temporary file creation in Batch library has not been ported to Windows yet");
-#else
-    char * tmpFileName = strdup("/tmp/batch_XXXXXX");
-    int fd = mkstemp(tmpFileName);
-    if (fd == -1)
-    {
-      throw RunTimeException("Can't create temporary file");
-    }
-
     if (outputStream.is_open())
       outputStream.close();
-    outputStream.open(tmpFileName);
+
+#ifdef WIN32
+
+    string fileName = generateTemporaryFileName(prefix);
+    outputStream.open(fileName.c_str());
+
+#else
+
+    string fileName = getTmpDir() + "/" + prefix + "-XXXXXX";
+    char buf[fileName.size()+1];
+    fileName.copy(buf, fileName.size());
+    buf[fileName.size()] = '\0';
+
+    int fd = mkstemp(buf);
+    if (fd == -1)
+      throw RunTimeException(string("Can't create temporary file ") + fileName);
+    fileName = buf;
+
+    outputStream.open(fileName.c_str());
     close(fd);  // Close the file descriptor so that the file is not opened twice
 
-    fileName = tmpFileName;
-    delete[] tmpFileName;
 #endif
+
+    if (outputStream.fail())
+      throw RunTimeException(string("Can't open temporary file ") + fileName);
+
     return fileName;
+  }
+
+  /**
+   * This method finds the name of the directory to use for temporary files in libBatch. This name
+   * is <tempdir>/libBatch-<username>-XXXXXX. <tempdir> is found by looking for environment
+   * variables TEMP, TMP, TEMPDIR, TMPDIR, and defaults to "/tmp" if none of them is defined.
+   * <username> is found by looking for environment variables USER and USERNAME, and defaults to
+   * "unknown". XXXXXX represents random characters. The directory name is generated only once for
+   * each BatchManager_eClient instance, and the directory is created at this moment. Subsequent
+   * calls will always return the same path and the existence of the directory will not be
+   * rechecked.
+   * \return the name of the directory to use for temporary files.
+   */
+  const std::string & BatchManager_eClient::getTmpDir()
+  {
+    if (tmpDirName.empty()) {
+      char * baseDir = getenv("TEMP");
+      if (baseDir == NULL) baseDir = getenv("TMP");
+      if (baseDir == NULL) baseDir = getenv("TEMPDIR");
+      if (baseDir == NULL) baseDir = getenv("TMPDIR");
+      if (baseDir == NULL) baseDir = "/tmp";
+
+      char * userName = getenv("USER");
+      if (userName == NULL) userName = getenv("USERNAME");
+      if (userName == NULL) userName = "unknown";
+
+      string baseName = string(baseDir) + "/libBatch-" + userName + "-XXXXXX";
+      srand(time(NULL));
+
+#ifdef WIN32
+
+      char randstr[7];
+      do {
+        sprintf(randstr, "%06d", rand() % 1000000);
+        baseName.replace(baseName.size()-6, 6, randstr);
+      } while (access(baseName.c_str(), F_OK) == 0);
+      if (_mkdir(baseName.c_str()) != 0)
+        throw RunTimeException(string("Can't create temporary directory ") + baseName);
+      tmpDirName = baseName;
+
+#else
+
+      char buf[baseName.size()+1];
+      baseName.copy(buf, baseName.size());
+      buf[baseName.size()] = '\0';
+      if (mkdtemp(buf) == NULL)
+        throw RunTimeException(string("Can't create temporary directory ") + baseName);
+      tmpDirName = buf;
+
+#endif
+
+    }
+
+    return tmpDirName;
   }
 
 }

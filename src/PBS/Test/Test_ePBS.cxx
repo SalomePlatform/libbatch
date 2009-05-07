@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 
     // Wait for the end of the job
     string state = "Undefined";
-    for (int i=0 ; i<10 && state != "U"; i++) {
+    for (int i=0 ; i<60 && state != "U"; i++) {
       sleep(2);
       JobInfo jinfo = jobid.queryJob();
       state = jinfo.getParametre()["STATE"].str();

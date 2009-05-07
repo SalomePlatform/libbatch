@@ -33,6 +33,8 @@ SET (TEST_LOCAL_RSH_WORK_DIR "/tmp" CACHE STRING
 
 SET (TEST_LOCAL_SSH_EXECUTION_HOST "localhost" CACHE STRING
      "Execution host for SSH Batch test (only necessary for test target)")
+SET (TEST_LOCAL_SSH_USER $ENV{USER} CACHE STRING
+     "User name on the execution host for SSH Batch test (only necessary for test target)")
 SET (TEST_LOCAL_SSH_WORK_DIR "/tmp" CACHE STRING
      "Work directory for SSH Batch test (only necessary for test target)")
 

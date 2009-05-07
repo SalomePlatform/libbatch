@@ -91,12 +91,18 @@ namespace Batch {
   {
     ostringstream fullsource;
     if (host_source.size() != 0) {
+      if (user_source.size() != 0) {
+        fullsource << user_source << "@";
+      }
       fullsource << host_source << ":";
     }
     fullsource << source;
 
     ostringstream fulldestination;
     if (host_destination.size() != 0) {
+      if (user_destination.size() != 0) {
+        fulldestination << user_destination << "@";
+      }
       fulldestination << host_destination << ":";
     }
     fulldestination << destination;
@@ -104,7 +110,7 @@ namespace Batch {
     ostringstream copy_cmd;
     // Option -p is used to keep the same permissions for the destination file (particularly useful to keep scripts
     // executable when copying them)
-    copy_cmd << SCP << " -p " << fullsource.str() << " " << fulldestination.str();
+    copy_cmd << "\"" << SCP << "\" -p " << fullsource.str() << " " << fulldestination.str();
     return copy_cmd.str();
   }
 
@@ -112,8 +118,10 @@ namespace Batch {
   string BatchManager_Local_SSH::exec_command(Parametre & param) const
   {
     ostringstream exec_sub_cmd;
-    exec_sub_cmd << "cd " << param[WORKDIR] << ";";
-    exec_sub_cmd << param[EXECUTABLE];
+#ifdef WIN32
+    exec_sub_cmd << "\"";
+#endif
+    exec_sub_cmd << "cd " << param[WORKDIR] << " && " << param[EXECUTABLE];
 
     if (param.find(ARGUMENTS) != param.end()) {
       Versatile V = param[ARGUMENTS];
@@ -123,6 +131,9 @@ namespace Batch {
         exec_sub_cmd << " " << arg;
       }
     }
+#ifdef WIN32
+    exec_sub_cmd << "\"";
+#endif
 
 
     Versatile new_arguments;
@@ -151,10 +162,15 @@ namespace Batch {
                                                 const std::string & host_destination,
                                                 const std::string & destination) const
   {
-    string host = (host_destination.size()) ? host_destination : "localhost:";
+    string fulldestination = (host_destination.size()) ? host_destination : "localhost";
+    if (user_destination.size() != 0) {
+      fulldestination += " -l " + user_destination;
+    }
 
+    // We consider here that the remote system is UNIX-like and has a "rm" command. Using the
+    // RM macro would be pointless here since the remote system is different from the local one.
     ostringstream remove_cmd;
-    remove_cmd << SSH << " " << host << " \"" << RM << " " << destination << "\"";
+    remove_cmd << "\"" << SSH << "\" " << fulldestination << " \"rm " << destination << "\"";
     return remove_cmd.str();
   }
 }
