@@ -32,15 +32,23 @@
 #include "Batch_BatchManager_eClient.hxx"
 #include "Batch_RunTimeException.hxx"
 
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #ifdef WIN32
 #include <direct.h>
+#include <io.h>
 #endif
 
 #include "Batch_config.h"
+
+#ifdef MSVC
+#define EXISTS(path) _access_s(path, 0) == 0
+#else
+#define EXISTS(path) access(path, F_OK) == 0
+#endif
 
 using namespace std;
 
@@ -273,7 +281,7 @@ namespace Batch {
     do {
       sprintf(randstr, "%06d", rand() % 1000000);
       fileName.replace(fileName.size()-6, 6, randstr);
-    } while (access(fileName.c_str(), F_OK) == 0);
+    } while (EXISTS(fileName.c_str()));
 
     return fileName;
   }
@@ -354,7 +362,7 @@ namespace Batch {
       do {
         sprintf(randstr, "%06d", rand() % 1000000);
         baseName.replace(baseName.size()-6, 6, randstr);
-      } while (access(baseName.c_str(), F_OK) == 0);
+      } while (EXISTS(baseName.c_str()));
       if (_mkdir(baseName.c_str()) != 0)
         throw RunTimeException(string("Can't create temporary directory ") + baseName);
       tmpDirName = baseName;

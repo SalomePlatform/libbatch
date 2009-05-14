@@ -20,10 +20,33 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-import sys
-sys.path.append('${CMAKE_CURRENT_BINARY_DIR}/..')
+IF (NOT PThread_FIND_QUIETLY)
+    MESSAGE(STATUS "Looking for PThread...")
+ENDIF (NOT PThread_FIND_QUIETLY)
 
-EXEC_TEST_FULL_PATH = "${EXEC_TEST_FULL_PATH}"
-EXEC_TEST_NAME = "${EXEC_TEST_NAME}"
+FIND_PATH(PTHREAD_INCLUDE_DIR pthread.h)
+FIND_LIBRARY(PTHREAD_LIBRARY NAMES pthread pthreadVC2) 
 
-TEST_LOCAL_SH_WORK_DIR = "${TEST_LOCAL_SH_WORK_DIR}"
+IF (PTHREAD_INCLUDE_DIR AND PTHREAD_LIBRARY)
+    SET(PThread_FOUND True)
+ENDIF (PTHREAD_INCLUDE_DIR AND PTHREAD_LIBRARY)
+
+IF (PThread_FOUND)
+
+    IF (NOT PThread_FIND_QUIETLY)
+        MESSAGE(STATUS "Found PThread:")
+        MESSAGE(STATUS "PThread include directory: ${PTHREAD_INCLUDE_DIR}")
+        MESSAGE(STATUS "PThread library: ${PTHREAD_LIBRARY}")
+    ENDIF (NOT PThread_FIND_QUIETLY)
+
+ELSE (PThread_FOUND)
+
+    IF (PThread_FIND_REQUIRED)
+        MESSAGE(FATAL_ERROR "PThread not found")
+    ELSE (PThread_FIND_REQUIRED)
+        IF (NOT PThread_FIND_QUIETLY)
+            MESSAGE(STATUS "PThread not found")
+        ENDIF (NOT PThread_FIND_QUIETLY)
+    ENDIF (PThread_FIND_REQUIRED)
+
+ENDIF (PThread_FOUND)

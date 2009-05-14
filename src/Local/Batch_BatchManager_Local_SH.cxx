@@ -68,6 +68,18 @@ using namespace std;
 
 namespace Batch {
 
+  // Simple method to fix path strings depending on the platform. On Windows, it will replace
+  // forward slashes '/' by backslashes '\'. On Unix, the path is just copied without change.
+  string BatchManager_Local_SH::fixPath(const string & path) const
+  {
+    string fixedPath = path;
+#ifdef WIN32
+    for (int i=0 ; i<fixedPath.size() ; i++) {
+      if (fixedPath[i] == '/') fixedPath[i] = '\\';
+    }
+#endif
+    return fixedPath;
+  }
 
   // Constructeur
   BatchManager_Local_SH::BatchManager_Local_SH(const FactBatchManager * parent, const char * host) throw(InvalidArgumentException,ConnexionFailureException) : BatchManager_Local(parent, host)
@@ -89,7 +101,11 @@ namespace Batch {
                                              const std::string & destination) const
   {
     ostringstream copy_cmd;
-    copy_cmd << "\"" << CP << "\" \"" << source << "\" \"" << destination << "\"";
+    if (strchr(CP, ' ') == NULL)
+      copy_cmd << CP;
+    else
+      copy_cmd << "\"" << CP << "\"";
+    copy_cmd << " \"" << fixPath(source) << "\" \"" << fixPath(destination) << "\"";
     return copy_cmd.str();
   }
 
@@ -100,7 +116,14 @@ namespace Batch {
 #ifdef WIN32
     exec_sub_cmd << "\"";
 #endif
+#ifdef SH_COMMAND_IS_CMD
+    char drive[_MAX_DRIVE];
+    _splitpath_s(fixPath(param[WORKDIR]).c_str(), drive, _MAX_DRIVE, NULL, 0, NULL, 0, NULL, 0);
+    if (strlen(drive) > 0) exec_sub_cmd << drive << " && ";
+    exec_sub_cmd << "cd " << fixPath(param[WORKDIR]) << " && " << fixPath(param[EXECUTABLE]);
+#else
     exec_sub_cmd << "cd " << param[WORKDIR] << " && " << param[EXECUTABLE];
+#endif
 
     if (param.find(ARGUMENTS) != param.end()) {
       Versatile V = param[ARGUMENTS];
@@ -114,10 +137,14 @@ namespace Batch {
     exec_sub_cmd << "\"";
 #endif
 
+#ifdef SH_COMMAND_IS_CMD
+    param[ARGUMENTS]  = "/c";
+#else
     param[ARGUMENTS]  = "-c";
+#endif
     param[ARGUMENTS] += exec_sub_cmd.str();
 
-    return SH;
+    return fixPath(SH);
   }
 
   // Methode qui renvoie la commande d'effacement du fichier
@@ -126,7 +153,12 @@ namespace Batch {
                                                const std::string & destination) const
   {
     ostringstream remove_cmd;
-    remove_cmd << "\"" << RM << "\" \"" << destination << "\"";
+    if (strchr(RM, ' ') == NULL)
+      remove_cmd << RM;
+    else
+      remove_cmd << "\"" << RM << "\"";
+
+    remove_cmd << " \"" << fixPath(destination) << "\"";
     return remove_cmd.str();
   }
 

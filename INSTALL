@@ -147,8 +147,9 @@ First you will need to install a library providing pthread implementation. For
 this we tested Pthreads-win32 (http://sourceware.org/pthreads-win32/) but other
 implementations may exist.
 
-You will also need a compiler for Win32 platform. We tested MinGW and MSYS
-utilities (http://www.mingw.org/) but another compiler might also work.
+You will also need a compiler for Win32 platform. We tested MinGW with MSYS
+environment (http://www.mingw.org/), and Microsoft Visual C++ 2005 Express.
+Other compilers might also work but it is not guaranteed.
 
 Then you will have to install and run CMake, and you should be able to compile
 libBatch and run some basic examples.

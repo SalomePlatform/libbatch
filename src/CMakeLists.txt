@@ -38,7 +38,11 @@ MACRO(APPEND_CLASSES_TO_HDR_FILES)
     ENDFOREACH(CLASS ${ARGV})
 ENDMACRO(APPEND_CLASSES_TO_HDR_FILES)
 
+IF (MSVC)
+  add_definitions(/wd4251 /wd4290)  # Disable annoying Visual C++ warnings
+ENDIF (MSVC)
 
+include_directories(${PTHREAD_INCLUDE_DIR})
 
 add_subdirectory (Core)
 
@@ -60,10 +64,8 @@ SET(HDR_FILES_BUILD CACHE INTERNAL "")
 
 add_library (Batch SHARED ${SRC_FILES})
 
-include_directories(${CMAKE_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Core)
-
-target_link_libraries(Batch ${CMAKE_THREAD_LIBS_INIT})
+include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Core)
+target_link_libraries(Batch ${PTHREAD_LIBRARY})
 
 IF (WIN32)
     target_link_libraries(Batch ws2_32)

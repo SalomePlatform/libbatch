@@ -29,10 +29,6 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#  include <SALOMEconfig.h>
-#endif
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -47,6 +43,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <string.h>
+
 #include "Batch_IOMutex.hxx"
 #include "Batch_BatchManager_Local_RSH.hxx"
 

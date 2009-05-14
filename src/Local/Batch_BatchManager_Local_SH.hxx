@@ -62,6 +62,8 @@ namespace Batch {
     virtual ~BatchManager_Local_SH();
 
   protected:
+    std::string fixPath(const std::string & path) const;
+
     // Methode qui renvoie la commande de copie du fichier source en destination
     virtual std::string copy_command( const std::string & user_source,
                                       const std::string & host_source,

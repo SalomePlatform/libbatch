@@ -54,12 +54,15 @@ int main(int argc, char** argv)
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p["EXECUTABLE"] = "./copied-test-script.sh";
+    p["EXECUTABLE"] = string("./copied-") + EXEC_TEST_NAME;
+    p["ARGUMENTS"]  = "copied-seta.sh";
+    p["ARGUMENTS"] += "copied-setb.sh";
+    p["ARGUMENTS"] += "orig-result.txt";
     p["NAME"]       = "Test_Local_SH";
     p["WORKDIR"]    = TEST_LOCAL_SH_WORK_DIR;
     p["INFILE"]     = Couple("seta.sh", "copied-seta.sh");
     p["INFILE"]    += Couple("setb.sh", "copied-setb.sh");
-    p["INFILE"]    += Couple("test-script.sh", "copied-test-script.sh");
+    p["INFILE"]    += Couple(EXEC_TEST_NAME, string("copied-") + EXEC_TEST_NAME);
     p["OUTFILE"]    = Couple("result.txt", "orig-result.txt");
     job.setParametre(p);
     // ... and its environment

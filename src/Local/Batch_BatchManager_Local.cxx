@@ -890,15 +890,13 @@ namespace Batch {
       ZeroMemory( &pi, sizeof(pi) );
 
       // Copy the command to a non-const buffer
-      size_t str_size = exec_command.size();
-      char buffer[str_size+1];
-      exec_command.copy(buffer,str_size);
-      buffer[str_size]='\0';
+      char * buffer = strdup(exec_command.c_str());
 
       // launch the new process
       BOOL res = CreateProcess(NULL, buffer, NULL, NULL, FALSE,
-                               DETACHED_PROCESS, chNewEnv, NULL, &si, &pi);
+                               CREATE_NO_WINDOW, chNewEnv, NULL, &si, &pi);
 
+      if (buffer) free(buffer);
       if (!res) throw RunTimeException("Error while creating new process");
 
       CloseHandle(pi.hThread);

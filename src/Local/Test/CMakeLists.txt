@@ -38,6 +38,13 @@ SET (TEST_LOCAL_SSH_USER $ENV{USER} CACHE STRING
 SET (TEST_LOCAL_SSH_WORK_DIR "/tmp" CACHE STRING
      "Work directory for SSH Batch test (only necessary for test target)")
 
+# Build the executable to use for the local test program
+add_executable(Exec_Test Exec_Test.cxx)
+GET_TARGET_PROPERTY(EXEC_TEST_FULL_PATH_TEMP Exec_Test LOCATION)
+GET_FILENAME_COMPONENT(EXEC_TEST_NAME_TEMP ${EXEC_TEST_FULL_PATH_TEMP} NAME)
+SET(EXEC_TEST_FULL_PATH ${EXEC_TEST_FULL_PATH_TEMP} CACHE INTERNAL "")
+SET(EXEC_TEST_NAME ${EXEC_TEST_NAME_TEMP} CACHE INTERNAL "")
+
 # Configure the config file for all the test scripts
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_Local_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Test_Local_config.h)
 

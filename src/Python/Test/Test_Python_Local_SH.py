@@ -42,11 +42,12 @@ def work():
     job = Job()
     # ... and its parameters ...
     p = {}
-    p['EXECUTABLE'] = './copied-test-script.sh'
-    p['NAME'] = 'Test_Local_SH'
-    p['WORKDIR'] = '/tmp'
+    p['EXECUTABLE'] = './copied-' + config.EXEC_TEST_NAME
+    p["ARGUMENTS"]  = ["copied-seta.sh", "copied-setb.sh", "orig-result.txt"];
+    p['NAME'] = 'Test_Python_Local_SH'
+    p['WORKDIR'] = config.TEST_LOCAL_SH_WORK_DIR
     p['INFILE'] = [('seta.sh', 'copied-seta.sh'), ('setb.sh', 'copied-setb.sh'),
-                   ('test-script.sh', 'copied-test-script.sh')]
+                   (config.EXEC_TEST_FULL_PATH, 'copied-' + config.EXEC_TEST_NAME)]
     p['OUTFILE'] = [('result.txt', 'orig-result.txt')]
     job.setParametre(p)
     # ... and its environment

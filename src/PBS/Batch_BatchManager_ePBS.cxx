@@ -33,10 +33,16 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+
+#include "Batch_config.h"
+
+#ifdef MSVC
+#include <io.h>
+#else
 #include <libgen.h>
+#endif
 
 #include "Batch_BatchManager_ePBS.hxx"
-#include "Batch_config.h"
 
 using namespace std;
 
@@ -263,9 +269,19 @@ namespace Batch {
       string::size_type p1 = fileToExecute.find_last_of("/");
       string::size_type p2 = fileToExecute.find_last_of(".");
       rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
+
+#ifdef MSVC
+      char fname[_MAX_FNAME];
+      char ext[_MAX_EXT];
+      _splitpath_s(fileToExecute.c_str(), NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
+      string execBaseName = string(fname) + ext;
+#else
       char* basec=strdup(fileToExecute.c_str());
-      fileNameToExecute = "~/" + dirForTmpFiles + "/" + string(basename(basec));
+      string execBaseName = string(basename(basec));
       free(basec);
+#endif
+
+      fileNameToExecute = "~/" + dirForTmpFiles + "/" + execBaseName;
 
       int idx = dirForTmpFiles.find("Batch/");
       filelogtemp = dirForTmpFiles.substr(idx+6, dirForTmpFiles.length());

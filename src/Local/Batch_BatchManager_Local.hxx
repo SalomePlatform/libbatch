@@ -34,6 +34,10 @@
 
 #include "Batch_Defines.hxx"
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 #include <list>
 #include <map>
 #include <queue>

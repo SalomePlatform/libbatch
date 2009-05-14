@@ -23,6 +23,10 @@
 #ifndef BATCH_CONFIG_H
 #define BATCH_CONFIG_H
 
+/* Defines the compiler used on Windows */
+#cmakedefine MSVC
+#cmakedefine MINGW
+
 /* A path to a rcp-like command */
 #define RCP "@RCP@"
 
@@ -40,6 +44,7 @@
 
 /* A path to a sh-like command */
 #define SH "@SH@"
+#cmakedefine SH_COMMAND_IS_CMD
 
 /* A path to a ssh-like command */
 #define SSH "@SSH@"
