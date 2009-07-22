@@ -25,8 +25,6 @@ project (libBatch)
 cmake_minimum_required (VERSION 2.4)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules/)
 
-ENABLE_TESTING()
-
 find_package (PThread REQUIRED)
 find_package (Makeinfo)
 
@@ -34,6 +32,11 @@ SET (BUILD_LSF_INTERFACE TRUE CACHE BOOL "Build interface for LSF batch system")
 SET (BUILD_PBS_INTERFACE TRUE CACHE BOOL "Build interface for PBS batch system")
 SET (BUILD_LOCAL_SUBMISSION TRUE CACHE BOOL "Build classes for local submission")
 SET (BUILD_PYTHON_WRAPPING TRUE CACHE BOOL "Generate Python wrapping")
+SET (TEST_ENABLED FALSE CACHE BOOL "Enable testing")
+
+IF (TEST_ENABLED)
+    ENABLE_TESTING()
+ENDIF (TEST_ENABLED)
 
 IF (BUILD_LSF_INTERFACE)
     find_package (LSF)

@@ -38,4 +38,6 @@ INSTALL(FILES Batch_PyVersatile.hxx DESTINATION include/Batch)
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES libBatch_Swig.py)
 
-add_subdirectory(Test)
+IF (TEST_ENABLED)
+    add_subdirectory(Test)
+ENDIF (TEST_ENABLED)

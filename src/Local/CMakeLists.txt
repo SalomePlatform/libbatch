@@ -36,4 +36,6 @@ SET(CLASS_LIST Local/Batch_BatchManager_Local_RSH
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 APPEND_CLASSES_TO_HDR_FILES(${CLASS_LIST})
 
-add_subdirectory(Test)
+IF (TEST_ENABLED)
+    add_subdirectory(Test)
+ENDIF (TEST_ENABLED)
