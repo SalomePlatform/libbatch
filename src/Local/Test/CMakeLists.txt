@@ -20,24 +20,6 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Declare the configuration variables for the test scripts
-SET (TEST_LOCAL_SH_WORK_DIR "/tmp" CACHE STRING
-     "Work directory for SH Batch test (only necessary for test target)")
-
-SET (TEST_LOCAL_RSH_EXECUTION_HOST "localhost" CACHE STRING
-     "Execution host for RSH Batch test (only necessary for test target)")
-SET (TEST_LOCAL_RSH_USER $ENV{USER} CACHE STRING
-     "User name on the execution host for RSH Batch test (only necessary for test target)")
-SET (TEST_LOCAL_RSH_WORK_DIR "/tmp" CACHE STRING
-     "Work directory for RSH Batch test (only necessary for test target)")
-
-SET (TEST_LOCAL_SSH_EXECUTION_HOST "localhost" CACHE STRING
-     "Execution host for SSH Batch test (only necessary for test target)")
-SET (TEST_LOCAL_SSH_USER $ENV{USER} CACHE STRING
-     "User name on the execution host for SSH Batch test (only necessary for test target)")
-SET (TEST_LOCAL_SSH_WORK_DIR "/tmp" CACHE STRING
-     "Work directory for SSH Batch test (only necessary for test target)")
-
 # Build the executable to use for the local test program
 add_executable(Exec_Test Exec_Test.cxx)
 GET_TARGET_PROPERTY(EXEC_TEST_FULL_PATH_TEMP Exec_Test LOCATION)
@@ -55,17 +37,18 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test-script.sh ${CMAKE_CURRENT_BINARY
 
 # set the include directories
 include_directories(${CMAKE_SOURCE_DIR}/src/Core)
+include_directories(${CMAKE_SOURCE_DIR}/src/Core/Test)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build the test programs
 add_executable(Test_Local_SH Test_Local_SH.cxx)
-target_link_libraries(Test_Local_SH Batch)
+target_link_libraries(Test_Local_SH Batch SimpleParser)
 
 add_executable(Test_Local_RSH Test_Local_RSH.cxx)
-target_link_libraries(Test_Local_RSH Batch)
+target_link_libraries(Test_Local_RSH Batch SimpleParser)
 
 add_executable(Test_Local_SSH Test_Local_SSH.cxx)
-target_link_libraries(Test_Local_SSH Batch)
+target_link_libraries(Test_Local_SSH Batch SimpleParser)
 
 # Add the tests themselves
 ADD_TEST(Local_SH Test_Local_SH)

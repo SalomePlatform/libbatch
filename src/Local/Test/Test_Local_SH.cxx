@@ -34,7 +34,15 @@
 #include <Batch_BatchManagerCatalog.hxx>
 #include <Batch_FactBatchManager.hxx>
 #include <Batch_BatchManager.hxx>
+
 #include <Test_Local_config.h>
+#include <SimpleParser.hxx>
+
+#ifdef WIN32
+#include <Windows.h>
+#define sleep(seconds) Sleep((seconds)*1000)
+#define usleep(useconds) Sleep((useconds)/1000)
+#endif
 
 using namespace std;
 using namespace Batch;
@@ -50,6 +58,13 @@ int main(int argc, char** argv)
   remove("result.txt");
 
   try {
+    // Parse the test configuration file
+    SimpleParser parser;
+    parser.parseTestConfigFile();
+    const string & workdir = parser.getValue("TEST_LOCAL_SH_WORK_DIR");
+    int timeout = parser.getValueAsInt("TEST_LOCAL_SH_TIMEOUT");
+    int finalizationTime = parser.getValueAsInt("TEST_LOCAL_SH_FINALIZATION_TIME");
+
     // Define the job...
     Job job;
     // ... and its parameters ...
@@ -59,7 +74,7 @@ int main(int argc, char** argv)
     p["ARGUMENTS"] += "copied-setb.sh";
     p["ARGUMENTS"] += "orig-result.txt";
     p["NAME"]       = "Test_Local_SH";
-    p["WORKDIR"]    = TEST_LOCAL_SH_WORK_DIR;
+    p["WORKDIR"]    = workdir;
     p["INFILE"]     = Couple("seta.sh", "copied-seta.sh");
     p["INFILE"]    += Couple("setb.sh", "copied-setb.sh");
     p["INFILE"]    += Couple(EXEC_TEST_NAME, string("copied-") + EXEC_TEST_NAME);
@@ -83,7 +98,7 @@ int main(int argc, char** argv)
 
     // Wait for the end of the job
     string state = "Unknown";
-    for (int i=0 ; i<20 && state != "Done" ; i++) {
+    for (int i=0 ; i<timeout*10 && state != "Done" ; i++) {
       usleep(100000);
       Versatile paramState = jobid.queryJob().getParametre()["STATE"];
       state = (paramState.size() > 0) ? paramState.str() : "Unknown";
@@ -97,14 +112,17 @@ int main(int argc, char** argv)
 
     cout << "Job " << jobid.__repr__() << " is done" << endl;
 
+    // wait for the copy of output files and the cleanup
+    // (there's no cleaner way to do that yet)
+    sleep(finalizationTime);
+
   } catch (GenericException e) {
     cerr << "Error: " << e << endl;
     return 1;
+  } catch (ParserException e) {
+    cerr << "Parser error: " << e.what() << endl;
+    return 1;
   }
-
-  // wait for 2 more seconds for the copy of output files and the cleanup
-  // (there's no cleaner way to do that yet)
-  sleep(2);
 
   // test the result file
   string exp = "c = 12";

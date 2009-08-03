@@ -20,12 +20,22 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-import sys
-import os
-sys.path.append('${CMAKE_CURRENT_BINARY_DIR}/..')
+# Declare the configuration variable for the test scripts
+SET (TEST_CONFIG_FILE_ENV_VAR "BATCH_TEST_CONFIG_FILE" CACHE STRING
+     "Name of the environment variable containing the configuration file name for the tests (only necessary for test target)")
 
-EXEC_TEST_FULL_PATH = "${EXEC_TEST_FULL_PATH}"
-EXEC_TEST_NAME = "${EXEC_TEST_NAME}"
+# Configure the config file for the test scripts
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Test_config.h)
 
-configfile = os.environ["${TEST_CONFIG_FILE_ENV_VAR}"]
-execfile(configfile)
+# Set the include directories
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+# Build SimpleParser library
+add_library (SimpleParser STATIC SimpleParser.cxx)
+
+# Build the test program
+add_executable(Test_SimpleParser Test_SimpleParser.cxx)
+target_link_libraries(Test_SimpleParser SimpleParser)
+
+# Add the test itself
+ADD_TEST(SimpleParser Test_SimpleParser)

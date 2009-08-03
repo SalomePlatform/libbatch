@@ -34,7 +34,14 @@
 #include <Batch_BatchManagerCatalog.hxx>
 #include <Batch_FactBatchManager.hxx>
 #include <Batch_BatchManager.hxx>
-#include <Test_Local_config.h>
+
+#include <SimpleParser.hxx>
+
+#ifdef WIN32
+#include <Windows.h>
+#define sleep(seconds) Sleep((seconds)*1000)
+#define usleep(useconds) Sleep((useconds)/1000)
+#endif
 
 using namespace std;
 using namespace Batch;
@@ -50,19 +57,28 @@ int main(int argc, char** argv)
   remove("result.txt");
 
   try {
+    // Parse the test configuration file
+    SimpleParser parser;
+    parser.parseTestConfigFile();
+    const string & workdir = parser.getValue("TEST_LOCAL_SSH_WORK_DIR");
+    const string & exechost = parser.getValue("TEST_LOCAL_SSH_EXECUTION_HOST");
+    const string & user = parser.getValue("TEST_LOCAL_SSH_USER");
+    int timeout = parser.getValueAsInt("TEST_LOCAL_SSH_TIMEOUT");
+    int finalizationTime = parser.getValueAsInt("TEST_LOCAL_SSH_FINALIZATION_TIME");
+
     // Define the job...
     Job job;
     // ... and its parameters ...
     Parametre p;
     p["EXECUTABLE"]    = "source copied-test-script.sh";
     p["NAME"]          = "Test_Local_SSH";
-    p["WORKDIR"]       = TEST_LOCAL_SSH_WORK_DIR;
+    p["WORKDIR"]       = workdir;
     p["INFILE"]        = Couple("seta.sh", "copied-seta.sh");
     p["INFILE"]       += Couple("setb.sh", "copied-setb.sh");
     p["INFILE"]       += Couple("test-script.sh", "copied-test-script.sh");
     p["OUTFILE"]       = Couple("result.txt", "orig-result.txt");
-    p["EXECUTIONHOST"] = TEST_LOCAL_SSH_EXECUTION_HOST;
-    p["USER"]          = TEST_LOCAL_SSH_USER;
+    p["EXECUTIONHOST"] = exechost;
+    p["USER"]          = user;
     job.setParametre(p);
     // ... and its environment (SSH_AUTH_SOCK env var is important for ssh agent authentication)
     Environnement e;
@@ -84,7 +100,7 @@ int main(int argc, char** argv)
 
     // Wait for the end of the job
     string state = "Unknown";
-    for (int i=0 ; i<100 && state != "Done" ; i++) {
+    for (int i=0 ; i<timeout*10 && state != "Done" ; i++) {
       usleep(100000);
       Versatile paramState = jobid.queryJob().getParametre()["STATE"];
       state = (paramState.size() > 0) ? paramState.str() : "Unknown";
@@ -98,14 +114,17 @@ int main(int argc, char** argv)
 
     cout << "Job " << jobid.__repr__() << " is done" << endl;
 
+    // wait for the copy of output files and the cleanup
+    // (there's no cleaner way to do that yet)
+    sleep(finalizationTime);
+
   } catch (GenericException e) {
     cerr << "Error: " << e << endl;
     return 1;
+  } catch (ParserException e) {
+    cerr << "Parser error: " << e.what() << endl;
+    return 1;
   }
-
-  // wait for 5 more seconds for the copy of output files and the cleanup
-  // (there's no cleaner way to do that yet)
-  sleep(5);
 
   // test the result file
   string exp = "c = 12";

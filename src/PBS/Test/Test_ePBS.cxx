@@ -36,7 +36,14 @@
 #include <Batch_FactBatchManager_eClient.hxx>
 #include <Batch_BatchManager.hxx>
 #include <Batch_BatchManager_eClient.hxx>
-#include <Test_PBS_config.h>
+
+#include <SimpleParser.hxx>
+
+#ifdef WIN32
+#include <Windows.h>
+#define sleep(seconds) Sleep((seconds)*1000)
+#define usleep(useconds) Sleep((useconds)/1000)
+#endif
 
 using namespace std;
 using namespace Batch;
@@ -54,23 +61,32 @@ int main(int argc, char** argv)
   remove("result.txt");
 
   try {
+    // Parse the test configuration file
+    SimpleParser parser;
+    parser.parseTestConfigFile();
+    const string & homedir = parser.getValue("TEST_PBS_HOMEDIR");
+    const string & host = parser.getValue("TEST_PBS_HOST");
+    const string & user = parser.getValue("TEST_PBS_USER");
+    const string & queue = parser.getValue("TEST_PBS_QUEUE");
+    int timeout = parser.getValueAsInt("TEST_PBS_TIMEOUT");
+
     // Define the job...
     Job job;
     // ... and its parameters ...
     Parametre p;
     p["EXECUTABLE"]    = "./test-script.sh";
     p["NAME"]          = "Test_ePBS";
-    p["WORKDIR"]       = string(TEST_PBS_HOMEDIR) + "/tmp/Batch";
+    p["WORKDIR"]       = homedir + "/tmp/Batch";
     p["INFILE"]        = Couple("seta.sh", "tmp/Batch/seta.sh");
     p["INFILE"]       += Couple("setb.sh", "tmp/Batch/setb.sh");
     p["OUTFILE"]       = Couple("result.txt", "tmp/Batch/result.txt");
     p["TMPDIR"]        = "tmp/Batch/";
-    p["USER"]          = TEST_PBS_USER;
+    p["USER"]          = user;
     p["NBPROC"]        = 1;
     p["MAXWALLTIME"]   = 1;
     p["MAXRAMSIZE"]    = 4;
-    p["HOMEDIR"]       = TEST_PBS_HOMEDIR;
-    p["QUEUE"]         = TEST_PBS_QUEUE;
+    p["HOMEDIR"]       = homedir;
+    p["QUEUE"]         = queue;
     job.setParametre(p);
     // ... and its environment (SSH_AUTH_SOCK env var is important for ssh agent authentication)
     Environnement e;
@@ -84,7 +100,7 @@ int main(int argc, char** argv)
 
     // Create a BatchManager of type ePBS on localhost
     FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("ePBS"));
-    BatchManager_eClient * bm = (*fbm)(TEST_PBS_HOST, "ssh", "lam");
+    BatchManager_eClient * bm = (*fbm)(host.c_str(), "ssh", "lam");
 
     // Submit the job to the BatchManager
     JobId jobid = bm->submitJob(job);
@@ -92,7 +108,7 @@ int main(int argc, char** argv)
 
     // Wait for the end of the job
     string state = "Undefined";
-    for (int i=0 ; i<60 && state != "U"; i++) {
+    for (int i=0 ; i<timeout/2 && state != "U"; i++) {
       sleep(2);
       JobInfo jinfo = jobid.queryJob();
       state = jinfo.getParametre()["STATE"].str();
@@ -109,6 +125,9 @@ int main(int argc, char** argv)
 
   } catch (GenericException e) {
     cerr << "Error: " << e << endl;
+    return 1;
+  } catch (ParserException e) {
+    cerr << "Parser error: " << e.what() << endl;
     return 1;
   }
 

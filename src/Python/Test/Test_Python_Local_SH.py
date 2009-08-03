@@ -71,7 +71,7 @@ def work():
     # Wait for the end of the job
     state = 'Unknown'
     i=0
-    while state != 'Done' and i<20:
+    while state != 'Done' and i<config.TEST_LOCAL_SH_TIMEOUT*10:
         time.sleep(0.1)
         i+=1
         jinfo = jobid.queryJob()
@@ -87,9 +87,9 @@ def work():
 
     print "Job", jobid, "is done"
 
-    # wait for 2 more seconds for the copy of output files and the cleanup
+    # wait for the copy of output files and the cleanup
     # (there's no cleaner way to do that yet)
-    time.sleep(2)
+    time.sleep(config.TEST_LOCAL_SH_FINALIZATION_TIME)
 
     # test the result file
     exp = "c = 12"

@@ -21,19 +21,3 @@
 //
 
 #define EXEC_TEST_NAME "${EXEC_TEST_NAME}"
-
-#define TEST_LOCAL_SH_WORK_DIR "${TEST_LOCAL_SH_WORK_DIR}"
-
-#define TEST_LOCAL_RSH_EXECUTION_HOST "${TEST_LOCAL_RSH_EXECUTION_HOST}"
-#define TEST_LOCAL_RSH_USER "${TEST_LOCAL_RSH_USER}"
-#define TEST_LOCAL_RSH_WORK_DIR "${TEST_LOCAL_RSH_WORK_DIR}"
-
-#define TEST_LOCAL_SSH_EXECUTION_HOST "${TEST_LOCAL_SSH_EXECUTION_HOST}"
-#define TEST_LOCAL_SSH_USER "${TEST_LOCAL_SSH_USER}"
-#define TEST_LOCAL_SSH_WORK_DIR "${TEST_LOCAL_SSH_WORK_DIR}"
-
-#ifdef WIN32
-#include <Windows.h>
-#define sleep(seconds) Sleep((seconds)*1000)
-#define usleep(useconds) Sleep((useconds)/1000)
-#endif

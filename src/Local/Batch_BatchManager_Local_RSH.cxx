@@ -139,6 +139,10 @@ namespace Batch {
       new_arguments += string(param[USER]);
     }
 
+#ifdef WIN32
+    new_arguments += "-n";
+#endif
+
     new_arguments += exec_sub_cmd.str();
 
     param[ARGUMENTS] = new_arguments;

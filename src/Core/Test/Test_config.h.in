@@ -20,13 +20,4 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#define TEST_PBS_HOST "${TEST_PBS_HOST}"
-#define TEST_PBS_USER "${TEST_PBS_USER}"
-#define TEST_PBS_HOMEDIR "${TEST_PBS_HOMEDIR}"
-#define TEST_PBS_QUEUE "${TEST_PBS_QUEUE}"
-
-#ifdef WIN32
-#include <Windows.h>
-#define sleep(seconds) Sleep((seconds)*1000)
-#define usleep(useconds) Sleep((useconds)/1000)
-#endif
+#define TEST_CONFIG_FILE_ENV_VAR "${TEST_CONFIG_FILE_ENV_VAR}"
