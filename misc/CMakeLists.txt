@@ -1,4 +1,4 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#  Copyright (C) 2007-2009  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 #  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 #  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -17,16 +17,8 @@
 #  License along with this library; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
+#  See http://www.salome-platform.org/ or
+#  email : webmaster.salome@opencascade.com
 
-SET (TEXI_FILE ${CMAKE_CURRENT_SOURCE_DIR}/Batch.texi)
-
-ADD_CUSTOM_TARGET(doc ALL
-                  ${MAKEINFO_EXECUTABLE} --html ${TEXI_FILE} -I ${CMAKE_CURRENT_SOURCE_DIR}
-                  DEPENDS ${TEXI_FILE}
-                 )
-
-FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Batch)
-
-INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Batch/ DESTINATION share/Batch/doc)
+INSTALL(FILES check_libbatch.m4 FindLibBatch.cmake
+        DESTINATION share/Batch/misc)

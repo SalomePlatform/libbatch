@@ -1,0 +1,58 @@
+#  Copyright (C) 2007-2009  CEA/DEN, EDF R&D, OPEN CASCADE
+#
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+#  See http://www.salome-platform.org/ or
+#  email : webmaster.salome@opencascade.com
+
+# FindLibBatch
+# This module can be used to find libBatch and set the associated variables in
+# a project based on CMake. You can copy this file in your own project and
+# eventually modify it according to your own needs.
+#-----------------------------------------------------------------------------
+
+IF (NOT LibBatch_FIND_QUIETLY)
+    MESSAGE(STATUS "Looking for libBatch...")
+ENDIF (NOT LibBatch_FIND_QUIETLY)
+
+FIND_PATH(LIBBATCH_INCLUDE_DIR Batch/Batch_BatchManager.hxx)
+FIND_LIBRARY(LIBBATCH_LIBRARY Batch) 
+
+IF (LIBBATCH_INCLUDE_DIR AND LIBBATCH_LIBRARY)
+    SET(LibBatch_FOUND True)
+ENDIF (LIBBATCH_INCLUDE_DIR AND LIBBATCH_LIBRARY)
+
+IF (LibBatch_FOUND)
+
+    IF (NOT LibBatch_FIND_QUIETLY)
+        MESSAGE(STATUS "Found libBatch:")
+        MESSAGE(STATUS "libBatch include directory: ${LIBBATCH_INCLUDE_DIR}")
+        MESSAGE(STATUS "libBatch library: ${LIBBATCH_LIBRARY}")
+    ENDIF (NOT LibBatch_FIND_QUIETLY)
+
+ELSE (LibBatch_FOUND)
+
+    IF (LibBatch_FIND_REQUIRED)
+        MESSAGE(FATAL_ERROR "libBatch not found")
+    ELSE (LibBatch_FIND_REQUIRED)
+        IF (NOT LibBatch_FIND_QUIETLY)
+            MESSAGE(STATUS "libBatch not found")
+        ENDIF (NOT LibBatch_FIND_QUIETLY)
+    ENDIF (LibBatch_FIND_REQUIRED)
+
+ENDIF (LibBatch_FOUND)

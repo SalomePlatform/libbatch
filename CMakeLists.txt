@@ -62,6 +62,8 @@ IF (Makeinfo_FOUND)
     add_subdirectory (doc)
 ENDIF (Makeinfo_FOUND)
 
+add_subdirectory (misc)
+
 SET(CPACK_GENERATOR TGZ)
 SET(CPACK_SOURCE_GENERATOR TGZ ZIP)
 SET(CPACK_PACKAGE_VERSION_MAJOR 1)
