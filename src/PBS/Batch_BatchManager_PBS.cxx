@@ -90,12 +90,7 @@ namespace Batch {
     // On se connecte au serveur PBS
     _connect = pbs_connect(const_cast< char * >(_hostname.c_str()));
     if (_connect < 0) { // si erreur
-      char * errmsg = pbs_geterrmsg(_connect);
-      string msg = "PBS Server on host \"";
-      msg += _hostname;
-      msg += "\" : ";
-      msg += errmsg ? errmsg : "Reason unknown";
-      throw ConnexionFailureException(msg.c_str());
+      throw ConnexionFailureException(getErrorMessage("connect").c_str());
     }
   }
 
@@ -105,12 +100,21 @@ namespace Batch {
     // On se deconnecte du serveur PBS
     int rc = pbs_disconnect(_connect);
     if (rc < 0) { // si erreur
-      string msg = "PBS Server on host \"";
-      msg += _hostname;
-      msg += "\" : ";
-      msg += pbs_geterrmsg(_connect);
-      throw ConnexionFailureException(msg.c_str());
+      throw ConnexionFailureException(getErrorMessage("disconnect").c_str());
     }
+  }
+
+  string BatchManager_PBS::getErrorMessage(const char * operation) const
+  {
+    char * msg = pbs_geterrmsg(_connect);
+    stringstream sstr;
+    sstr << "PBS " << operation << " error (host \"" << _hostname << "\"): ";
+    if (msg != NULL) {
+      sstr << msg;
+    } else {
+      sstr << "code = " << pbs_errno << " (" << pbse_to_txt(pbs_errno) << ")";
+    }
+    return sstr.str();
   }
 
   // Methode pour le controle des jobs : soumet un job au gestionnaire
@@ -123,9 +127,7 @@ namespace Batch {
 			    jobpbs.getDestination(),
 			    NULL);
     if (!ref) { // si erreur
-      char * msg = pbs_geterrmsg(_connect);
-      if (!msg) msg = "unknown";
-      throw APIInternalFailureException(string("PBS submit error. Reason : ") + msg);
+      throw APIInternalFailureException(getErrorMessage("submit").c_str());
     }
 
     JobId id(this, string(ref));
@@ -139,9 +141,7 @@ namespace Batch {
     char * ref = const_cast< char * >(jobid.getReference().c_str());
     int rc = pbs_deljob(_connect, ref, 0);
     if (rc) { // si erreur
-      char * msg = pbs_geterrmsg(_connect);
-      if (!msg) msg = "unknown";
-      throw APIInternalFailureException(string("PBS deljob error. Reason : ") + msg);
+      throw APIInternalFailureException(getErrorMessage("deljob").c_str());
     }
   }
    
@@ -151,9 +151,7 @@ namespace Batch {
     char * ref = const_cast< char * >(jobid.getReference().c_str());
     int rc = pbs_holdjob(_connect, ref, USER_HOLD, 0);
     if (rc) { // si erreur
-      char * msg = pbs_geterrmsg(_connect);
-      if (!msg) msg = "unknown";
-      throw APIInternalFailureException(string("PBS holdjob error. Reason : ") + msg);
+      throw APIInternalFailureException(getErrorMessage("holdjob").c_str());
     }
   }
 
@@ -163,9 +161,7 @@ namespace Batch {
     char * ref = const_cast< char * >(jobid.getReference().c_str());
     int rc = pbs_rlsjob(_connect, ref, USER_HOLD, 0);
     if (rc) { // si erreur
-      char * msg = pbs_geterrmsg(_connect);
-      if (!msg) msg = "unknown";
-      throw APIInternalFailureException(string("PBS rlsjob error. Reason : ") + msg);
+      throw APIInternalFailureException(getErrorMessage("rlsjob").c_str());
     }
   }
 
@@ -182,9 +178,7 @@ namespace Batch {
 			  jobpbs.getAttributes(),
 			  NULL);
     if (rc) { // si erreur
-      char * msg = pbs_geterrmsg(_connect);
-      if (!msg) msg = "unknown";
-      throw APIInternalFailureException(string("PBS alterjob error. Reason : ") + msg);
+      throw APIInternalFailureException(getErrorMessage("alterjob").c_str());
     }
 		
   }

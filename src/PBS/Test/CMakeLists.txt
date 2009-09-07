@@ -31,7 +31,13 @@ include_directories(${CMAKE_SOURCE_DIR}/src/Core/Test)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# Build the test program and add the test
+# Build the test programs and add the tests
 add_executable(Test_ePBS Test_ePBS.cxx)
 target_link_libraries(Test_ePBS Batch SimpleParser)
 ADD_TEST(ePBS Test_ePBS)
+
+IF (BUILD_PBS_INTERFACE AND PBS_FOUND)
+    add_executable(Test_PBS Test_PBS.cxx)
+    target_link_libraries(Test_PBS Batch SimpleParser)
+    ADD_TEST(PBS Test_PBS)
+ENDIF (BUILD_PBS_INTERFACE AND PBS_FOUND)

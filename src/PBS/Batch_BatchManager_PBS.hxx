@@ -80,6 +80,8 @@ namespace Batch {
 
 
   protected:
+    std::string getErrorMessage(const char * operation) const;
+
     int _connect; // PBS connect id
 
   private:
