@@ -36,6 +36,7 @@
 #include "Batch_MpiImpl.hxx"
 #include "Batch_BatchManager.hxx"
 #include "Batch_EmulationException.hxx"
+#include "Batch_CommunicationProtocol.hxx"
 
 #include <string>
 
@@ -48,12 +49,12 @@ namespace Batch {
   public:
     // Constructeur et destructeur
     BatchManager_eClient(const Batch::FactBatchManager * parent, const char* host="localhost",
-                         const char* protocol="ssh", const char* mpiImpl="mpich1");
+                         CommunicationProtocolType protocolType = SSH, const char* mpiImpl="mpich1");
     virtual ~BatchManager_eClient();
     void importOutputFiles( const Job & job, const std::string directory ) throw(EmulationException);
 
   protected:
-    std::string _protocol; // protocol to access _hostname
+    const CommunicationProtocol & _protocol; // protocol to access _hostname
     std::string _username; // username to access _hostname
     MpiImpl *_mpiImpl; // Mpi implementation to launch executable in batch script
 

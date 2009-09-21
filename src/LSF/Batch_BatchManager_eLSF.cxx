@@ -32,23 +32,25 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
+
+#ifdef WIN32
+#include <io.h>
+#else
+#include <libgen.h>
+#endif
 
 #include "Batch_BatchManager_eLSF.hxx"
-#ifdef WIN32
-# include <time.h>
-# include <io.h>
-#else
-# include <libgen.h>
-#endif
+#include "Batch_JobInfo_eLSF.hxx"
 
 using namespace std;
 
 namespace Batch {
 
-  BatchManager_eLSF::BatchManager_eLSF(const FactBatchManager * parent, const char * host, const char * protocol, const char * mpiImpl) throw(InvalidArgumentException,ConnexionFailureException) : BatchManager_eClient(parent,host,protocol,mpiImpl)
+  BatchManager_eLSF::BatchManager_eLSF(const FactBatchManager * parent, const char * host,
+                                       CommunicationProtocolType protocolType, const char * mpiImpl)
+  : BatchManager_eClient(parent, host, protocolType, mpiImpl)
   {
     // Nothing to do
   }
@@ -81,34 +83,14 @@ namespace Batch {
     // build batch script for job
     buildBatchScript(job);
 
-    // define name of log file
-    string logFile="/tmp/logs/";
-    logFile += getenv("USER");
-    logFile += "/batchSalome_";
-    srand ( time(NULL) );
-    int ir = rand();
-    ostringstream oss;
-    oss << ir;
-    logFile += oss.str();
-    logFile += ".log";
-
-    string command;
+    // define name of log file (local)
+    string logFile = generateTemporaryFileName("LSF-submitlog");
 
     // define command to submit batch
-    command = _protocol;
-    command += " ";
-
-    if(_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"cd " ;
-    command += dirForTmpFiles ;
-    command += "; bsub < " ;
-    command += fileNameToExecute ;
-    command += "_Batch.sh\" > ";
+    string subCommand = string("cd ") + dirForTmpFiles + "; bsub < " +
+                        fileNameToExecute + "_Batch.sh";
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
     status = system(command.c_str());
@@ -138,23 +120,12 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> ref;
 
-    // define command to submit batch
-    string command;
-    command = _protocol;
-    command += " ";
-
-    if (_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"bkill " ;
-    command += iss.str();
-    command += "\"";
+    // define command to delete batch
+    string subCommand = string("bkill ") + iss.str();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
-    if(status)
+    if (status)
       throw EmulationException("Error of connection on remote host");
 
     cerr << "jobId = " << ref << "killed" << endl;
@@ -198,38 +169,17 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> id;
 
-    // define name of log file
-    string logFile="/tmp/logs/";
-    logFile += getenv("USER");
-    logFile += "/batchSalome_";
+    // define name of log file (local)
+    string logFile = generateTemporaryFileName(string("LSF-querylog-id") + jobid.getReference());
 
-    srand ( time(NULL) );
-    int ir = rand();
-    ostringstream oss;
-    oss << ir;
-    logFile += oss.str();
-    logFile += ".log";
-
-    string command;
-    int status;
-
-    // define command to submit batch
-    command = _protocol;
-    command += " ";
-
-    if (_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"bjobs " ;
-    command += iss.str();
-    command += "\" > ";
+    // define command to query batch
+    string subCommand = string("bjobs ") + iss.str();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if(status)
+    int status = system(command.c_str());
+    if (status)
       throw EmulationException("Error of connection on remote host");
 
     JobInfo_eLSF ji = JobInfo_eLSF(id,logFile);
@@ -247,7 +197,6 @@ namespace Batch {
   void BatchManager_eLSF::buildBatchScript(const Job & job)
   {
 #ifndef WIN32 //TODO: need for porting on Windows
-    int status;
     Parametre params = job.getParametre();
     Environnement env = job.getEnvironnement();
     const int nbproc = params[NBPROC];
@@ -317,28 +266,10 @@ namespace Batch {
       TmpFileName.c_str(), 0x1ED);
     cerr << TmpFileName.c_str() << endl;
 
-    string command;
-    if( _protocol == "rsh" )
-      command = "rcp ";
-    else if( _protocol == "ssh" )
-      command = "scp ";
-    else
-      throw EmulationException("Unknown protocol");
-    command += TmpFileName;
-    command += " ";
-    if(_username != ""){
-      command +=  _username;
-      command += "@";
-    }
-    command += _hostname;
-    command += ":";
-    command += dirForTmpFiles ;
-    command += "/" ;
-    command += rootNameToExecute ;
-    command += "_Batch.sh" ;
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if(status)
+    int status = _protocol.copyFile(TmpFileName, "", "",
+                                    dirForTmpFiles + "/" + rootNameToExecute + "_Batch.sh",
+                                    _hostname, _username);
+    if (status)
       throw EmulationException("Error of connection on remote host");
 
     remove(TmpFileName.c_str());

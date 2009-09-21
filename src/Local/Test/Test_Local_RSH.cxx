@@ -90,6 +90,10 @@ int main(int argc, char** argv)
 
     // Create a BatchManager of type Local_RSH on localhost
     FactBatchManager * fbm = c("RSH");
+    if (fbm == NULL) {
+      cerr << "Can't get RSH batch manager factory" << endl;
+      return 1;
+    }
     BatchManager * bm = (*fbm)("localhost");
 
     // Submit the job to the BatchManager

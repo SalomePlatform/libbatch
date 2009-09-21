@@ -50,7 +50,9 @@ namespace Batch {
     virtual ~FactBatchManager_ePBS();
 
     virtual BatchManager * operator() (const char * hostname) const;
-    virtual BatchManager_eClient * operator() (const char * hostname, const char * protocol, const char * mpiImpl) const;
+    virtual BatchManager_eClient * operator() (const char * hostname,
+                                               CommunicationProtocolType protocolType,
+                                               const char * mpiImpl) const;
 
   protected:
 

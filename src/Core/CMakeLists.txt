@@ -26,6 +26,7 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_BatchManagerCatalog
                Core/Batch_BoolType
                Core/Batch_CharType
+               Core/Batch_CommunicationProtocol
                Core/Batch_ConnexionFailureException
                Core/Batch_Couple
                Core/Batch_CoupleType
@@ -54,6 +55,24 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_TypeMismatchException
                Core/Batch_Versatile
    )
+
+IF (HAS_SH)
+    SET(CLASS_LIST ${CLASS_LIST}
+                   Core/Batch_CommunicationProtocolSH
+       )
+ENDIF (HAS_SH)
+
+IF (HAS_RSH)
+    SET(CLASS_LIST ${CLASS_LIST}
+                   Core/Batch_CommunicationProtocolRSH
+       )
+ENDIF (HAS_RSH)
+
+IF (HAS_SSH)
+    SET(CLASS_LIST ${CLASS_LIST}
+                   Core/Batch_CommunicationProtocolSSH
+       )
+ENDIF (HAS_SSH)
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 APPEND_CLASSES_TO_HDR_FILES(${CLASS_LIST})

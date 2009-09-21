@@ -51,7 +51,7 @@ using namespace Batch;
 int main(int argc, char** argv)
 {
   cout << "*******************************************************************************************" << endl;
-  cout << "This program tests the batch submission based on PBS emulation. Passwordless SSH" << endl;
+  cout << "This program tests the batch submission based on PBS emulation with SSH. Passwordless SSH" << endl;
   cout << "authentication must be used for this test to pass (this can be configured with ssh-agent" << endl;
   cout << "for instance). You also need to create a directory \"tmp/Batch\" in your home directory on" << endl;
   cout << "the PBS server before running this test." << endl;
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
     // ... and its parameters ...
     Parametre p;
     p["EXECUTABLE"]    = "./test-script.sh";
-    p["NAME"]          = "Test_ePBS";
+    p["NAME"]          = "Test_ePBS_SSH";
     p["WORKDIR"]       = homedir + "/tmp/Batch";
     p["INFILE"]        = Couple("seta.sh", "tmp/Batch/seta.sh");
     p["INFILE"]       += Couple("setb.sh", "tmp/Batch/setb.sh");
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 
     // Create a BatchManager of type ePBS on localhost
     FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("ePBS"));
-    BatchManager_eClient * bm = (*fbm)(host.c_str(), "ssh", "lam");
+    BatchManager_eClient * bm = (*fbm)(host.c_str(), SSH, "lam");
 
     // Submit the job to the BatchManager
     JobId jobid = bm->submitJob(job);

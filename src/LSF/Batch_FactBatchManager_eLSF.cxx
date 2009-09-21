@@ -28,10 +28,8 @@
  *
  */
 
-#include <string>
 #include "Batch_BatchManager_eLSF.hxx"
 #include "Batch_FactBatchManager_eLSF.hxx"
-//#include "utilities.h"
 
 namespace Batch {
 
@@ -54,10 +52,12 @@ namespace Batch {
     return new BatchManager_eLSF(this, hostname);
   }
 
-  BatchManager_eClient * FactBatchManager_eLSF::operator() (const char * hostname, const char * protocol, const char * mpiImpl) const
+  BatchManager_eClient * FactBatchManager_eLSF::operator() (const char * hostname,
+                                                            CommunicationProtocolType protocolType,
+                                                            const char * mpiImpl) const
   {
     // MESSAGE("Building new BatchManager_LSF on host '" << hostname << "'");
-    return new BatchManager_eLSF(this, hostname, protocol, mpiImpl);
+    return new BatchManager_eLSF(this, hostname, protocolType, mpiImpl);
   }
 
 }

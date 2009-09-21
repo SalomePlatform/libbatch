@@ -31,17 +31,12 @@
 #ifndef _FACTBATCHMANAGER_eLSF_H_
 #define _FACTBATCHMANAGER_eLSF_H_
 
-#include "Batch_Defines.hxx"
-
-#include <string>
-#include <map>
-#include "Batch_BatchManager_eClient.hxx"
-#include "Batch_FactBatchManager_eClient.hxx"
+#include <Batch_Defines.hxx>
+#include <Batch_BatchManager_eClient.hxx>
+#include <Batch_FactBatchManager_eClient.hxx>
 
 namespace Batch {
   
-  class BatchManager_eLSF;
-
   class BATCH_EXPORT FactBatchManager_eLSF : public FactBatchManager_eClient
   {
   public:
@@ -50,7 +45,9 @@ namespace Batch {
     virtual ~FactBatchManager_eLSF();
 
     virtual BatchManager * operator() (const char * hostname) const;
-    virtual BatchManager_eClient * operator() (const char * hostname, const char * protocol, const char * mpiImpl) const;
+    virtual BatchManager_eClient * operator() (const char * hostname,
+                                               CommunicationProtocolType protocolType,
+                                               const char * mpiImpl) const;
 
   protected:
 

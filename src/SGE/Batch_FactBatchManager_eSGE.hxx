@@ -38,8 +38,6 @@
 
 namespace Batch {
   
-  class BatchManager_eSGE;
-
   class BATCH_EXPORT FactBatchManager_eSGE : public FactBatchManager_eClient
   {
   public:
@@ -48,7 +46,9 @@ namespace Batch {
     virtual ~FactBatchManager_eSGE();
 
     virtual BatchManager * operator() (const char * hostname) const;
-    virtual BatchManager_eClient * operator() (const char * hostname, const char * protocol, const char * mpiImpl) const;
+    virtual BatchManager_eClient * operator() (const char * hostname,
+                                               CommunicationProtocolType protocolType,
+                                               const char * mpiImpl) const;
 
   protected:
 

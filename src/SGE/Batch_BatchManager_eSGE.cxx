@@ -33,20 +33,22 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
-#include "Batch_BatchManager_eSGE.hxx"
-#include <stdlib.h>
 #ifdef WIN32
-# include <time.h>
-# include <io.h>
+#include <io.h>
 #else
 #include <libgen.h>
 #endif
+
+#include "Batch_BatchManager_eSGE.hxx"
+#include "Batch_JobInfo_eSGE.hxx"
 
 using namespace std;
 
 namespace Batch {
 
-  BatchManager_eSGE::BatchManager_eSGE(const FactBatchManager * parent, const char * host, const char * protocol, const char * mpiImpl) throw(InvalidArgumentException,ConnexionFailureException) : BatchManager_eClient(parent,host,protocol,mpiImpl)
+  BatchManager_eSGE::BatchManager_eSGE(const FactBatchManager * parent, const char * host,
+                                       CommunicationProtocolType protocolType, const char * mpiImpl)
+  : BatchManager_eClient(parent, host, protocolType, mpiImpl)
   {
     // Nothing to do
   }
@@ -74,34 +76,14 @@ namespace Batch {
     // build batch script for job
     buildBatchScript(job);
 
-    // define name of log file
-    string logFile="/tmp/logs/";
-    logFile += getenv("USER");
-    logFile += "/batchSalome_";
-    srand ( time(NULL) );
-    int ir = rand();
-    ostringstream oss;
-    oss << ir;
-    logFile += oss.str();
-    logFile += ".log";
-
-    string command;
+    // define name of log file (local)
+    string logFile = generateTemporaryFileName("SGE-submitlog");
 
     // define command to submit batch
-    command = _protocol;
-    command += " ";
-
-    if(_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"cd " ;
-    command += dirForTmpFiles ;
-    command += "; qsub " ;
-    command += fileNameToExecute ;
-    command += "_Batch.sh\" > ";
+    string subCommand = string("cd ") + dirForTmpFiles + "; qsub " +
+                        fileNameToExecute + "_Batch.sh";
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
     status = system(command.c_str());
@@ -130,20 +112,9 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> ref;
 
-    // define command to submit batch
-    string command;
-    command = _protocol;
-    command += " ";
-
-    if (_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"qdel " ;
-    command += iss.str();
-    command += "\"";
+    // define command to delete batch
+    string subCommand = string("qdel ") + iss.str();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
     if(status)
@@ -190,36 +161,17 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> id;
 
-    // define name of log file
-    string logFile="/tmp/logs/";
-    logFile += getenv("USER");
-    logFile += "/batchSalome_";
+    // define name of log file (local)
+    string logFile = generateTemporaryFileName(string("SGE-querylog-id") + jobid.getReference());
 
-    ostringstream oss;
-    oss << this << "_" << id;
-    logFile += oss.str();
-    logFile += ".log";
-
-    string command;
-    int status;
-
-    // define command to submit batch
-    command = _protocol;
-    command += " ";
-
-    if (_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"qstat | grep " ;
-    command += iss.str();
-    command += "\" > ";
+    // define command to query batch
+    string subCommand = string("qstat | grep ") + iss.str();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if(status && status != 256)
+    int status = system(command.c_str());
+    if (status && status != 256)
       throw EmulationException("Error of connection on remote host");
 
     JobInfo_eSGE ji = JobInfo_eSGE(id,logFile);
@@ -236,7 +188,6 @@ namespace Batch {
   {
 #ifndef WIN32
     //TODO porting on Win32 platform
-    int status;
     Parametre params = job.getParametre();
     Environnement env = job.getEnvironnement();
     const long nbproc = params[NBPROC];
@@ -299,28 +250,10 @@ namespace Batch {
     chmod(TmpFileName.c_str(), 0x1ED);
     cerr << TmpFileName.c_str() << endl;
 
-    string command;
-    if( _protocol == "rsh" )
-      command = "rcp ";
-    else if( _protocol == "ssh" )
-      command = "scp ";
-    else
-      throw EmulationException("Unknown protocol");
-    command += TmpFileName;
-    command += " ";
-    if(_username != ""){
-      command +=  _username;
-      command += "@";
-    }
-    command += _hostname;
-    command += ":";
-    command += dirForTmpFiles ;
-    command += "/" ;
-    command += rootNameToExecute ;
-    command += "_Batch.sh" ;
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if(status)
+    int status = _protocol.copyFile(TmpFileName, "", "",
+                                    dirForTmpFiles + "/" + rootNameToExecute + "_Batch.sh",
+                                    _hostname, _username);
+    if (status)
       throw EmulationException("Error of connection on remote host");
 
     remove(TmpFileName.c_str());

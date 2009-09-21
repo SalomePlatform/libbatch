@@ -20,13 +20,7 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST Local/Batch_BatchManager_Local_RSH
-               Local/Batch_BatchManager_Local_SH
-               Local/Batch_BatchManager_Local_SSH
-               Local/Batch_BatchManager_Local
-               Local/Batch_FactBatchManager_Local_RSH
-               Local/Batch_FactBatchManager_Local_SH
-               Local/Batch_FactBatchManager_Local_SSH
+SET(CLASS_LIST Local/Batch_BatchManager_Local
                Local/Batch_FactBatchManager_Local
                Local/Batch_IOMutex
                Local/Batch_Job_Local

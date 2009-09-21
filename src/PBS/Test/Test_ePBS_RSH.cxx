@@ -20,7 +20,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * Test_Local_SSH.cxx :
+ * Test_ePBS.cxx :
  *
  * Author : Renaud BARATE - EDF R&D
  * Date   : April 2009
@@ -33,7 +33,9 @@
 #include <Batch_Job.hxx>
 #include <Batch_BatchManagerCatalog.hxx>
 #include <Batch_FactBatchManager.hxx>
+#include <Batch_FactBatchManager_eClient.hxx>
 #include <Batch_BatchManager.hxx>
+#include <Batch_BatchManager_eClient.hxx>
 
 #include <SimpleParser.hxx>
 
@@ -49,8 +51,10 @@ using namespace Batch;
 int main(int argc, char** argv)
 {
   cout << "*******************************************************************************************" << endl;
-  cout << "This program tests the local batch submission based on SSH. Passwordless SSH authentication" << endl;
-  cout << "must be used for this test to pass (this can be configured with ssh-agent for instance)." << endl;
+  cout << "This program tests the batch submission based on PBS emulation with RSH. Passwordless RSH" << endl;
+  cout << "authentication must be used for this test to pass (this can be configured with the .rhosts" << endl;
+  cout << "file). You also need to create a directory \"tmp/Batch\" in your home directory on the PBS" << endl;
+  cout << "server before running this test." << endl;
   cout << "*******************************************************************************************" << endl;
 
   // eventually remove any previous result
@@ -60,25 +64,29 @@ int main(int argc, char** argv)
     // Parse the test configuration file
     SimpleParser parser;
     parser.parseTestConfigFile();
-    const string & workdir = parser.getValue("TEST_LOCAL_SSH_WORK_DIR");
-    const string & exechost = parser.getValue("TEST_LOCAL_SSH_EXECUTION_HOST");
-    const string & user = parser.getValue("TEST_LOCAL_SSH_USER");
-    int timeout = parser.getValueAsInt("TEST_LOCAL_SSH_TIMEOUT");
-    int finalizationTime = parser.getValueAsInt("TEST_LOCAL_SSH_FINALIZATION_TIME");
+    const string & homedir = parser.getValue("TEST_EPBS_HOMEDIR");
+    const string & host = parser.getValue("TEST_EPBS_HOST");
+    const string & user = parser.getValue("TEST_EPBS_USER");
+    const string & queue = parser.getValue("TEST_EPBS_QUEUE");
+    int timeout = parser.getValueAsInt("TEST_EPBS_TIMEOUT");
 
     // Define the job...
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p["EXECUTABLE"]    = "source copied-test-script.sh";
-    p["NAME"]          = "Test_Local_SSH";
-    p["WORKDIR"]       = workdir;
-    p["INFILE"]        = Couple("seta.sh", "copied-seta.sh");
-    p["INFILE"]       += Couple("setb.sh", "copied-setb.sh");
-    p["INFILE"]       += Couple("test-script.sh", "copied-test-script.sh");
-    p["OUTFILE"]       = Couple("result.txt", "orig-result.txt");
-    p["EXECUTIONHOST"] = exechost;
+    p["EXECUTABLE"]    = "./test-script.sh";
+    p["NAME"]          = "Test_ePBS_RSH";
+    p["WORKDIR"]       = homedir + "/tmp/Batch";
+    p["INFILE"]        = Couple("seta.sh", "tmp/Batch/seta.sh");
+    p["INFILE"]       += Couple("setb.sh", "tmp/Batch/setb.sh");
+    p["OUTFILE"]       = Couple("result.txt", "tmp/Batch/result.txt");
+    p["TMPDIR"]        = "tmp/Batch/";
     p["USER"]          = user;
+    p["NBPROC"]        = 1;
+    p["MAXWALLTIME"]   = 1;
+    p["MAXRAMSIZE"]    = 4;
+    p["HOMEDIR"]       = homedir;
+    p["QUEUE"]         = queue;
     job.setParametre(p);
     // ... and its environment (SSH_AUTH_SOCK env var is important for ssh agent authentication)
     Environnement e;
@@ -90,37 +98,30 @@ int main(int argc, char** argv)
     // Get the catalog
     BatchManagerCatalog& c = BatchManagerCatalog::getInstance();
 
-    // Create a BatchManager of type Local_SSH on localhost
-    FactBatchManager * fbm = c("SSH");
-    if (fbm == NULL) {
-      cerr << "Can't get SSH batch manager factory" << endl;
-      return 1;
-    }
-    BatchManager * bm = (*fbm)("localhost");
+    // Create a BatchManager of type ePBS on localhost
+    FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("ePBS"));
+    BatchManager_eClient * bm = (*fbm)(host.c_str(), RSH, "lam");
 
     // Submit the job to the BatchManager
     JobId jobid = bm->submitJob(job);
     cout << jobid.__repr__() << endl;
 
     // Wait for the end of the job
-    string state = "Unknown";
-    for (int i=0 ; i<timeout*10 && state != "Done" ; i++) {
-      usleep(100000);
-      Versatile paramState = jobid.queryJob().getParametre()["STATE"];
-      state = (paramState.size() > 0) ? paramState.str() : "Unknown";
-      cout << "Job state is: " << state << endl;
+    string state = "Undefined";
+    for (int i=0 ; i<timeout/2 && state != "U"; i++) {
+      sleep(2);
+      JobInfo jinfo = jobid.queryJob();
+      state = jinfo.getParametre()["STATE"].str();
+      cout << "State is \"" << state << "\"" << endl;
     }
 
-    if (state != "Done") {
-      cerr << "Error: Job not finished after timeout" << endl;
+    if (state == "U") {
+      cout << "Job " << jobid.__repr__() << " is done" << endl;
+      bm->importOutputFiles(job, ".");
+    } else {
+      cerr << "Timeout while executing job" << endl;
       return 1;
     }
-
-    cout << "Job " << jobid.__repr__() << " is done" << endl;
-
-    // wait for the copy of output files and the cleanup
-    // (there's no cleaner way to do that yet)
-    sleep(finalizationTime);
 
   } catch (GenericException e) {
     cerr << "Error: " << e << endl;

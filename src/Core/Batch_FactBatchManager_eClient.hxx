@@ -29,25 +29,27 @@
  *
  */
 
-#ifndef _FACTBATCHMANAGER_eClient_H_
-#define _FACTBATCHMANAGER_eClient_H_
+#ifndef _FACTBATCHMANAGER_ECLIENT_H_
+#define _FACTBATCHMANAGER_ECLIENT_H_
 
 #include <string>
-#include <map>
+
 #include "Batch_FactBatchManager.hxx"
+#include "Batch_BatchManager_eClient.hxx"
+#include "Batch_CommunicationProtocol.hxx"
 
 namespace Batch {
-  
-  class BatchManager_eClient;
 
-  class FactBatchManager_eClient : public FactBatchManager
+  class BATCH_EXPORT FactBatchManager_eClient : public FactBatchManager
   {
   public:
     // Constructeur et destructeur
     FactBatchManager_eClient(const std::string & type);
     virtual ~FactBatchManager_eClient();
 
-    virtual Batch::BatchManager_eClient * operator() (const char * hostname,const char * protocol, const char * mpi) const = 0;
+    virtual Batch::BatchManager_eClient * operator() (const char * hostname,
+                                                      CommunicationProtocolType protocolType,
+                                                      const char * mpi) const = 0;
 
   protected:
 

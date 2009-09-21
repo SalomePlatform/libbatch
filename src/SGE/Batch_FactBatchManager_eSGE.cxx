@@ -28,10 +28,8 @@
  *
  */
 
-#include <string>
 #include "Batch_BatchManager_eSGE.hxx"
 #include "Batch_FactBatchManager_eSGE.hxx"
-//#include "utilities.h"
 
 namespace Batch {
 
@@ -56,10 +54,12 @@ namespace Batch {
     return new BatchManager_eSGE(this, hostname);
   }
 
-  BatchManager_eClient * FactBatchManager_eSGE::operator() (const char * hostname, const char * protocol, const char * mpiImpl) const
+  BatchManager_eClient * FactBatchManager_eSGE::operator() (const char * hostname,
+                                                            CommunicationProtocolType protocolType,
+                                                            const char * mpiImpl) const
   {
     // MESSAGE("Building new BatchManager_SGE on host '" << hostname << "'");
-    return new BatchManager_eSGE(this, hostname, protocol, mpiImpl);
+    return new BatchManager_eSGE(this, hostname, protocolType, mpiImpl);
   }
 
 

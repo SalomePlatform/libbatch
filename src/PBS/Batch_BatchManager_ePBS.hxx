@@ -29,34 +29,23 @@
  *
  */
 
-#ifndef _BATCHMANAGER_eLSF_H_
-#define _BATCHMANAGER_eLSF_H_
+#ifndef _BATCHMANAGER_EPBS_H_
+#define _BATCHMANAGER_EPBS_H_
 
-#include "Batch_Defines.hxx"
-
-#include "Batch_JobId.hxx"
-#include "Batch_JobInfo.hxx"
-#include "Batch_JobInfo_ePBS.hxx"
-#include "Batch_InvalidArgumentException.hxx"
-#include "Batch_ConnexionFailureException.hxx"
-#include "Batch_APIInternalFailureException.hxx"
-#include "Batch_NotYetImplementedException.hxx"
-#include "Batch_BatchManager.hxx"
-#include "Batch_BatchManager_eClient.hxx"
+#include <Batch_Defines.hxx>
+#include <Batch_JobId.hxx>
+#include <Batch_JobInfo.hxx>
+#include <Batch_FactBatchManager.hxx>
+#include <Batch_BatchManager_eClient.hxx>
 
 namespace Batch {
-
-  class Job;
-  class JobId;
-  class JobInfo;
-  class FactBatchManager;
 
   class BATCH_EXPORT BatchManager_ePBS : public BatchManager_eClient
   {
   public:
     // Constructeur et destructeur
     BatchManager_ePBS(const FactBatchManager * parent, const char * host="localhost",
-                      const char * protocol="ssh", const char * mpiImpl="nompi"); // connexion a la machine host
+                      CommunicationProtocolType protocolType = SSH, const char * mpiImpl="nompi"); // connexion a la machine host
     virtual ~BatchManager_ePBS();
 
     // Recupere le nom du serveur par defaut

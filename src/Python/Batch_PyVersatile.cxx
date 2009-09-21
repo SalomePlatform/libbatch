@@ -56,29 +56,29 @@ namespace Batch {
 
     if (PyList_Check(_PyO)) { // c'est une liste
       _maxsize = PyList_Size(_PyO);
-      for(int i=0; i<_maxsize; i++) {
-	PyObject * val = PyList_GetItem(_PyO, i);
-	if (PyString_Check(val)) {
-	  *this += PyString_AsString(val);
-					
-	} else if (PyTuple_Check(val) && 
-		   (PyTuple_Size(val) == 2) &&
-		   PyString_Check( PyTuple_GetItem(val,0) ) && 
-		   PyString_Check( PyTuple_GetItem(val,1) )   ) {
-	  *this += Couple( PyString_AsString( PyTuple_GetItem(val,0) ),
-			   PyString_AsString( PyTuple_GetItem(val,1) )
-			   );
-					
-	} else {
-	  PyErr_SetString(PyExc_RuntimeWarning, "PyVersatile::PyVersatile(const PyObject * PyO) : invalid PyObject");
-	}
+      for (size_type i=0; i<_maxsize; i++) {
+        PyObject * val = PyList_GetItem(_PyO, i);
+        if (PyString_Check(val)) {
+          *this += PyString_AsString(val);
+
+        } else if (PyTuple_Check(val) &&
+            (PyTuple_Size(val) == 2) &&
+            PyString_Check( PyTuple_GetItem(val,0) ) &&
+            PyString_Check( PyTuple_GetItem(val,1) )   ) {
+          *this += Couple( PyString_AsString( PyTuple_GetItem(val,0) ),
+                           PyString_AsString( PyTuple_GetItem(val,1) )
+                         );
+
+        } else {
+          PyErr_SetString(PyExc_RuntimeWarning, "PyVersatile::PyVersatile(const PyObject * PyO) : invalid PyObject");
+        }
       }
 
     } else if (PyString_Check(_PyO)) { // c'est une string
       const char * s = PyString_AsString(_PyO);
       Versatile V = string(s);
       *this = V;
-      
+
     } else if (PyInt_Check(_PyO)) { // c'est un int
       *this = PyInt_AsLong(_PyO);
 
@@ -97,90 +97,90 @@ namespace Batch {
     if (_maxsize != 1) { // une liste
       obj = PyList_New(0);
       for(Versatile::const_iterator it=begin(); it!=end(); it++) {
-//	char ch[2] = {0, 0};
-	string st;
-	Couple cp;
-// 	PyObject * tuple;
-	switch (_discriminator) {
-	  // 	case BOOL:
-	  // 	  PyList_Append(obj, PyInt_FromLong(* static_cast<BoolType *>(*it)));
-	  // 	  break;
+        //	char ch[2] = {0, 0};
+        string st;
+        Couple cp;
+        // 	PyObject * tuple;
+        switch (_discriminator) {
+        // 	case BOOL:
+        // 	  PyList_Append(obj, PyInt_FromLong(* static_cast<BoolType *>(*it)));
+        // 	  break;
 
-	  // 	case CHAR:
-	  // 	  *ch = * static_cast<CharType *>(*it);
-	  // 	  PyList_Append(obj, PyString_FromString(ch));
-	  // 	  break;
+        // 	case CHAR:
+        // 	  *ch = * static_cast<CharType *>(*it);
+        // 	  PyList_Append(obj, PyString_FromString(ch));
+        // 	  break;
 
-	  // 	case INT:
-	  // 	  PyList_Append(obj, PyInt_FromLong(* static_cast<IntType *>(*it)));
-	  // 	  break;
+        // 	case INT:
+        // 	  PyList_Append(obj, PyInt_FromLong(* static_cast<IntType *>(*it)));
+        // 	  break;
 
-	case LONG:
-	  PyList_Append(obj, PyInt_FromLong(* static_cast<LongType *>(*it)));
-	  break;
+        case LONG:
+          PyList_Append(obj, PyInt_FromLong(* static_cast<LongType *>(*it)));
+          break;
 
-	case STRING:
-	  st = * static_cast<StringType *>(*it);
-	  PyList_Append(obj, PyString_FromString(st.c_str()));
-	  break;
+        case STRING:
+          st = * static_cast<StringType *>(*it);
+          PyList_Append(obj, PyString_FromString(st.c_str()));
+          break;
 
-	case COUPLE:
-	  cp = * static_cast<CoupleType *>(*it);
-// 	  tuple = PyTuple_New(2);
-// 	  PyTuple_SetItem(tuple, 0, PyString_FromString( cp.getLocal().c_str()  ) );
-// 	  PyTuple_SetItem(tuple, 1, PyString_FromString( cp.getRemote().c_str() ) );
-// 	  PyList_Append(obj, tuple);
-	  PyList_Append(obj, Py_BuildValue("(ss)", cp.getLocal().c_str(), cp.getRemote().c_str() ));
-	  break;
+        case COUPLE:
+          cp = * static_cast<CoupleType *>(*it);
+          // 	  tuple = PyTuple_New(2);
+          // 	  PyTuple_SetItem(tuple, 0, PyString_FromString( cp.getLocal().c_str()  ) );
+          // 	  PyTuple_SetItem(tuple, 1, PyString_FromString( cp.getRemote().c_str() ) );
+          // 	  PyList_Append(obj, tuple);
+          PyList_Append(obj, Py_BuildValue("(ss)", cp.getLocal().c_str(), cp.getRemote().c_str() ));
+          break;
 
-	case UNDEFINED:
-	  PyList_Append(obj, Py_None);
-	  break;
-	}
+        case UNDEFINED:
+          PyList_Append(obj, Py_None);
+          break;
+        }
 
       }
 
     } else { // un scalaire
-//      char ch[2] = {0, 0};
+      //      char ch[2] = {0, 0};
       string st;
       Couple cp;
-//       PyObject * tuple;
+      //       PyObject * tuple;
       switch (_discriminator) {
-	//       case BOOL:
-	// 	obj = PyInt_FromLong(* static_cast<BoolType *>(front()));
-	// 	break;
+      //       case BOOL:
+      // 	obj = PyInt_FromLong(* static_cast<BoolType *>(front()));
+      // 	break;
 
-	//       case CHAR:
-	// 	*ch = * static_cast<CharType *>(front());
-	// 	obj = PyString_FromString(ch);
-	// 	break;
+      //       case CHAR:
+      // 	*ch = * static_cast<CharType *>(front());
+      // 	obj = PyString_FromString(ch);
+      // 	break;
 
-	//       case INT:
-	// 	obj = PyInt_FromLong(* static_cast<IntType *>(front()));
-	// 	break;
+      //       case INT:
+      // 	obj = PyInt_FromLong(* static_cast<IntType *>(front()));
+      // 	break;
 
       case LONG:
-	obj = PyInt_FromLong(* static_cast<LongType *>(front()));
-	break;
+        obj = PyInt_FromLong(* static_cast<LongType *>(front()));
+        break;
 
       case STRING:
-	st = * static_cast<StringType *>(front());
-	obj = PyString_FromString(st.c_str());
-	break;
+        st = * static_cast<StringType *>(front());
+        obj = PyString_FromString(st.c_str());
+        break;
 
       case COUPLE:
-	cp = * static_cast<CoupleType *>(front());
-// 	tuple = PyTuple_New(2);
-// 	PyTuple_SetItem(tuple, 0, PyString_FromString( cp.getLocal().c_str()  ) );
-// 	PyTuple_SetItem(tuple, 1, PyString_FromString( cp.getRemote().c_str() ) );
-// 	obj = PyList_New(0);
-// 	PyList_Append(obj, tuple);
-	obj = Py_BuildValue("[(ss)]", cp.getLocal().c_str(), cp.getRemote().c_str() );
-	break;
+        cp = * static_cast<CoupleType *>(front());
+        // 	tuple = PyTuple_New(2);
+        // 	PyTuple_SetItem(tuple, 0, PyString_FromString( cp.getLocal().c_str()  ) );
+        // 	PyTuple_SetItem(tuple, 1, PyString_FromString( cp.getRemote().c_str() ) );
+        // 	obj = PyList_New(0);
+        // 	PyList_Append(obj, tuple);
+        obj = Py_BuildValue("[(ss)]", cp.getLocal().c_str(), cp.getRemote().c_str() );
+        break;
 
       case UNDEFINED:
-	obj = Py_None;
-	break;
+        obj = Py_None;
+        break;
       }
     }
 

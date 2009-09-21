@@ -20,16 +20,16 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Configure the config file for all the test scripts
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.py.in ${CMAKE_CURRENT_BINARY_DIR}/config.py)
-
-# Just copy the test scripts to the binary dir
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/seta.sh ${CMAKE_CURRENT_BINARY_DIR}/seta.sh COPYONLY)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setb.sh ${CMAKE_CURRENT_BINARY_DIR}/setb.sh COPYONLY)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_Python_Local_SH.py
-               ${CMAKE_CURRENT_BINARY_DIR}/Test_Python_Local_SH.py COPYONLY)
-
-# Add the test
-IF (BUILD_LOCAL_SUBMISSION)
+IF (BUILD_LOCAL_SUBMISSION AND HAS_SH)
+    # Configure the config file for the test script
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.py.in ${CMAKE_CURRENT_BINARY_DIR}/config.py)
+    
+    # Just copy the test scripts to the binary dir
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/seta.sh ${CMAKE_CURRENT_BINARY_DIR}/seta.sh COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setb.sh ${CMAKE_CURRENT_BINARY_DIR}/setb.sh COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_Python_Local_SH.py
+                   ${CMAKE_CURRENT_BINARY_DIR}/Test_Python_Local_SH.py COPYONLY)
+    
+    # Add the test
     ADD_TEST(Python_Local_SH ${PYTHON_EXECUTABLE} Test_Python_Local_SH.py)
-ENDIF (BUILD_LOCAL_SUBMISSION)
+ENDIF (BUILD_LOCAL_SUBMISSION AND HAS_SH)

@@ -29,9 +29,6 @@
 *
 */
 
-#include "Batch_BatchManager_eClient.hxx"
-#include "Batch_RunTimeException.hxx"
-
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -42,7 +39,10 @@
 #include <io.h>
 #endif
 
-#include "Batch_config.h"
+#include <Batch_config.h>
+
+#include "Batch_BatchManager_eClient.hxx"
+#include "Batch_RunTimeException.hxx"
 
 #ifdef MSVC
 #define EXISTS(path) _access_s(path, 0) == 0
@@ -56,8 +56,8 @@ using namespace std;
 namespace Batch {
 
   BatchManager_eClient::BatchManager_eClient(const Batch::FactBatchManager * parent, const char* host,
-                                             const char* protocol, const char* mpiImpl)
-    : BatchManager(parent, host), _protocol(protocol), _username("")
+                                             CommunicationProtocolType protocolType, const char* mpiImpl)
+    : BatchManager(parent, host), _protocol(CommunicationProtocol::getInstance(protocolType)), _username("")
   {
     // instanciation of mpi implementation needed to launch executable in batch script
     _mpiImpl = FactoryMpiImpl(mpiImpl);
@@ -66,7 +66,6 @@ namespace Batch {
   // Destructeur
   BatchManager_eClient::~BatchManager_eClient()
   {
-    // Nothing to do
     delete _mpiImpl;
   }
 
@@ -78,29 +77,8 @@ namespace Batch {
     Versatile::iterator Vit;
     _username = string(params[USER]);
 
-    string command = "\"";
-    string copy_command = "\"";
-
-    // Test protocol
-    if( _protocol == "rsh" ) {
-      command += RSH;
-      copy_command += RCP;
-    } else if( _protocol == "ssh" ) {
-      command += SSH;
-      copy_command += SCP;
-    } else
-      throw EmulationException("Unknown protocol : only rsh and ssh are known !");
-
-    command += "\" ";
-    copy_command += "\" ";
-
-    // First step : creating batch tmp files directory
-    if(_username != ""){
-      command += _username + "@";
-    }
-    command += _hostname;
-    command += " mkdir -p ";
-    command += string(params[TMPDIR]);
+    string subCommand = string("mkdir -p ") + string(params[TMPDIR]);
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
     if(status) {
@@ -114,19 +92,9 @@ namespace Batch {
     // Second step : copy fileToExecute into
     // batch tmp files directory
     string executeFile = params[EXECUTABLE];
-    if( executeFile.size() > 0 ){
-      command = copy_command;
-      command += string(params[EXECUTABLE]);
-      command += " ";
-      if(_username != ""){
-        command += _username;
-        command += "@";
-      }
-      command += _hostname;
-      command += ":";
-      command += string(params[TMPDIR]);
-      cerr << command.c_str() << endl;
-      status = system(command.c_str());
+    if (executeFile.size() != 0) {
+      status = _protocol.copyFile(executeFile, "", "",
+                                  params[TMPDIR], _hostname, _username);
       if(status) {
         std::ostringstream oss;
         oss << status;
@@ -136,23 +104,11 @@ namespace Batch {
       }
 
 #ifdef WIN32
-      // On Windows, we make the remote file executable afterward because pscp does not preserve
-      // access permissions on files
-      command = "\"";
-      if( _protocol == "rsh" ) {
-        command += RSH;
-      } else if( _protocol == "ssh" ) {
-        command += SSH;
-      } else
-        throw EmulationException("Unknown protocol : only rsh and ssh are known !");
-
-      command += "\" ";
-      if(_username != ""){
-        command += _username + "@";
-      }
-      command += _hostname;
-      command += " chmod u+x ";
-      command += string(params[TMPDIR]) + "/" + string(params[EXECUTABLE]);
+      // On Windows, we make the remote file executable afterward because
+      // pscp does not preserve access permissions on files
+      subCommand = string("chmod u+x ") + string(params[TMPDIR]) + "/" +
+                   string(params[EXECUTABLE]);
+      command = _protocol.getExecCommand(subCommand, _hostname, _username);
       cerr << command.c_str() << endl;
       status = system(command.c_str());
       if(status) {
@@ -170,18 +126,8 @@ namespace Batch {
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple inputFile = cpt;
-      command = copy_command;
-      command += inputFile.getLocal();
-      command += " ";
-      if(_username != ""){
-        command += _username;
-        command += "@";
-      }
-      command += _hostname;
-      command += ":";
-      command += inputFile.getRemote();
-      cerr << command.c_str() << endl;
-      status = system(command.c_str());
+      status = _protocol.copyFile(inputFile.getLocal(), "", "",
+                                  inputFile.getRemote(), _hostname, _username);
       if(status) {
         std::ostringstream oss;
         oss << status;
@@ -195,8 +141,6 @@ namespace Batch {
 
   void BatchManager_eClient::importOutputFiles( const Job & job, const string directory ) throw(EmulationException)
   {
-    int status;
-
     Parametre params = job.getParametre();
     Versatile V = params[OUTFILE];
     Versatile::iterator Vit;
@@ -204,32 +148,9 @@ namespace Batch {
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
-
-      string command = "\"";
-
-      // Test protocol
-      if( _protocol == "rsh" ) {
-        command += RCP;
-      } else if( _protocol == "ssh" ) {
-        command += SCP;
-      } else
-        throw EmulationException("Unknown protocol : only rsh and ssh are known !");
-
-      command += "\" ";
-
-      if (_username != ""){
-        command += _username;
-        command += "@";
-      }
-      command += _hostname;
-      command += ":";
-      command += outputFile.getRemote();
-      command += " ";
-      command += directory;
-      cerr << command.c_str() << endl;
-      status = system(command.c_str());
-      if(status)
-      {
+      int status = _protocol.copyFile(outputFile.getRemote(), _hostname, _username,
+                                      directory, "", "");
+      if (status) {
         // Try to get what we can (logs files)
         // throw BatchException("Error of connection on remote host");
         std::string mess("Copy command failed ! status is :");
@@ -309,14 +230,17 @@ namespace Batch {
 #else
 
     string fileName = getTmpDir() + "/" + prefix + "-XXXXXX";
-    char buf[fileName.size()+1];
+    char * buf = new char[fileName.size()+1];
     fileName.copy(buf, fileName.size());
     buf[fileName.size()] = '\0';
 
     int fd = mkstemp(buf);
-    if (fd == -1)
+    if (fd == -1) {
+      delete[] buf;
       throw RunTimeException(string("Can't create temporary file ") + fileName);
+    }
     fileName = buf;
+    delete[] buf;
 
     outputStream.open(fileName.c_str());
     close(fd);  // Close the file descriptor so that the file is not opened twice
@@ -369,12 +293,15 @@ namespace Batch {
 
 #else
 
-      char buf[baseName.size()+1];
+      char * buf = new char[baseName.size() + 1];
       baseName.copy(buf, baseName.size());
       buf[baseName.size()] = '\0';
-      if (mkdtemp(buf) == NULL)
+      if (mkdtemp(buf) == NULL) {
+        delete[] buf;
         throw RunTimeException(string("Can't create temporary directory ") + baseName);
+      }
       tmpDirName = buf;
+      delete[] buf;
 
 #endif
 

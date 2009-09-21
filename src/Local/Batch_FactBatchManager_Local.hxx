@@ -26,27 +26,32 @@
  * Date   : Septembre 2004
  * Projet : SALOME 2
  *
+ * Refactored by Renaud Barate (EDF R&D) in September 2009 to use
+ * CommunicationProtocol classes and merge Local_SH, Local_RSH and Local_SSH batch
+ * managers.
+ *
  */
 
 #ifndef _FACTBATCHMANAGER_LOCAL_H_
 #define _FACTBATCHMANAGER_LOCAL_H_
 
-#include "Batch_FactBatchManager.hxx"
+#include <Batch_FactBatchManager.hxx>
+#include <Batch_CommunicationProtocol.hxx>
 
 namespace Batch {
   
-  class BatchManager_Local;
-
   class FactBatchManager_Local : public FactBatchManager
   {
   public:
     // Constructeur et destructeur
-    FactBatchManager_Local();
+    FactBatchManager_Local(const char * name, CommunicationProtocolType protocolType);
     virtual ~FactBatchManager_Local();
 
-    virtual BatchManager * operator() (const char * hostname) const = 0;
+    virtual BatchManager * operator() (const char * hostname) const;
 
   protected:
+
+    CommunicationProtocolType _protocolType;
 
   private:
 

@@ -90,6 +90,10 @@ int main(int argc, char** argv)
 
     // Create a BatchManager of type Local_SH on localhost
     FactBatchManager * fbm = c("SH");
+    if (fbm == NULL) {
+      cerr << "Can't get SH batch manager factory" << endl;
+      return 1;
+    }
     BatchManager * bm = (*fbm)("localhost");
 
     // Submit the job to the BatchManager

@@ -34,7 +34,7 @@
 #include <sstream>
 #include <sys/stat.h>
 
-#include "Batch_config.h"
+#include <Batch_config.h>
 
 #ifdef MSVC
 #include <io.h>
@@ -43,14 +43,15 @@
 #endif
 
 #include "Batch_BatchManager_ePBS.hxx"
+#include "Batch_JobInfo_ePBS.hxx"
 
 using namespace std;
 
 namespace Batch {
 
   BatchManager_ePBS::BatchManager_ePBS(const FactBatchManager * parent, const char * host,
-                                       const char * protocol, const char * mpiImpl)
-    : BatchManager_eClient(parent, host, protocol, mpiImpl)
+                                       CommunicationProtocolType protocolType, const char * mpiImpl)
+    : BatchManager_eClient(parent, host, protocolType, mpiImpl)
   {
     // Nothing to do
   }
@@ -82,34 +83,9 @@ namespace Batch {
     string logFile = generateTemporaryFileName("PBS-submitlog");
 
     // define command to submit batch
-    string command = "\"";
-
-    // Test protocol
-    if( _protocol == "rsh" )
-      command += RSH;
-    else if( _protocol == "ssh" )
-      command += SSH;
-    else
-      throw EmulationException("Unknown protocol : only rsh and ssh are known !");
-
-    command += "\" ";
-
-    if(_username != ""){
-      command += _username + "@";
-    }
-
-    command += _hostname + " ";
-#ifndef WIN32
-    command += "\"";
-#endif
-    command += "cd " ;
-    command += dirForTmpFiles ;
-    command += "; qsub " ;
-    command += fileNameToExecute ;
-    command += "_Batch.sh";
-#ifndef WIN32
-    command += "\"";
-#endif
+    string subCommand = string("cd ") + dirForTmpFiles + "; qsub " +
+                        fileNameToExecute + "_Batch.sh";
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
@@ -118,12 +94,13 @@ namespace Batch {
       throw EmulationException("Error of connection on remote host");
 
     // read id of submitted job in log file
-    char line[128];
-    FILE *fp = fopen(logFile.c_str(),"r");
-    fgets( line, 128, fp);
-    fclose(fp);
+    ifstream idfile(logFile.c_str());
+    string sline;
+    idfile >> sline;
+    idfile.close();
+    if (sline.size() == 0)
+      throw EmulationException("Error in the submission of the job on the remote host");
 
-    string sline(line);
     size_t pos = sline.find(".");
     string strjob;
     if(pos == string::npos)
@@ -143,23 +120,12 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> ref;
 
-    // define command to submit batch
-    string command;
-    command = _protocol;
-    command += " ";
-
-    if (_username != ""){
-      command += _username;
-      command += "@";
-    }
-
-    command += _hostname;
-    command += " \"qdel " ;
-    command += iss.str();
-    command += "\"";
+    // define command to delete batch
+    string subCommand = string("qdel ") + iss.str();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
-    if(status)
+    if (status)
       throw EmulationException("Error of connection on remote host");
 
     cerr << "jobId = " << ref << "killed" << endl;
@@ -207,31 +173,8 @@ namespace Batch {
     string logFile = generateTemporaryFileName(string("PBS-querylog-id") + jobid.getReference());
 
     // define command to query batch
-    string command = "\"";
-
-    // Test protocol
-    if( _protocol == "rsh" )
-      command += RSH;
-    else if( _protocol == "ssh" )
-      command += SSH;
-    else
-      throw EmulationException("Unknown protocol : only rsh and ssh are known !");
-
-    command += "\" ";
-
-    if (_username != ""){
-      command += _username + "@";
-    }
-
-    command += _hostname + " ";
-#ifndef WIN32
-    command += "\"";
-#endif
-    command += "qstat -f " ;
-    command += iss.str();
-#ifndef WIN32
-    command += "\"";
-#endif
+    string subCommand = string("qstat -f ") + iss.str();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
@@ -251,7 +194,6 @@ namespace Batch {
 
   void BatchManager_ePBS::buildBatchScript(const Job & job)
   {
-    int status;
     Parametre params = job.getParametre();
     Environnement env = job.getEnvironnement();
     const long nbproc = params[NBPROC];
@@ -330,33 +272,10 @@ namespace Batch {
       TmpFileName.c_str(), 0x1ED);
     cerr << TmpFileName.c_str() << endl;
 
-    string command = "\"";
-
-    // Test protocol
-    if( _protocol == "rsh" ) {
-      command += RCP;
-    } else if( _protocol == "ssh" ) {
-      command += SCP;
-    } else
-      throw EmulationException("Unknown protocol : only rsh and ssh are known !");
-
-    command += "\" ";
-
-    command += TmpFileName;
-    command += " ";
-    if(_username != ""){
-      command +=  _username;
-      command += "@";
-    }
-    command += _hostname;
-    command += ":";
-    command += dirForTmpFiles ;
-    command += "/" ;
-    command += rootNameToExecute ;
-    command += "_Batch.sh" ;
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if(status)
+    int status = _protocol.copyFile(TmpFileName, "", "",
+                                    dirForTmpFiles + "/" + rootNameToExecute + "_Batch.sh",
+                                    _hostname, _username);
+    if (status)
       throw EmulationException("Error of connection on remote host");
 
     remove(TmpFileName.c_str());

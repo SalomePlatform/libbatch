@@ -20,16 +20,6 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Build the executable to use for the local test program
-add_executable(Exec_Test Exec_Test.cxx)
-GET_TARGET_PROPERTY(EXEC_TEST_FULL_PATH_TEMP Exec_Test LOCATION)
-GET_FILENAME_COMPONENT(EXEC_TEST_NAME_TEMP ${EXEC_TEST_FULL_PATH_TEMP} NAME)
-SET(EXEC_TEST_FULL_PATH ${EXEC_TEST_FULL_PATH_TEMP} CACHE INTERNAL "")
-SET(EXEC_TEST_NAME ${EXEC_TEST_NAME_TEMP} CACHE INTERNAL "")
-
-# Configure the config file for all the test scripts
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_Local_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Test_Local_config.h)
-
 # Just copy the test scripts to the binary dir
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/seta.sh ${CMAKE_CURRENT_BINARY_DIR}/seta.sh COPYONLY)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setb.sh ${CMAKE_CURRENT_BINARY_DIR}/setb.sh COPYONLY)
@@ -40,17 +30,33 @@ include_directories(${CMAKE_SOURCE_DIR}/src/Core)
 include_directories(${CMAKE_SOURCE_DIR}/src/Core/Test)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-# Build the test programs
-add_executable(Test_Local_SH Test_Local_SH.cxx)
-target_link_libraries(Test_Local_SH Batch SimpleParser)
+# Build the test programs and add the tests
+IF (HAS_SH)
 
-add_executable(Test_Local_RSH Test_Local_RSH.cxx)
-target_link_libraries(Test_Local_RSH Batch SimpleParser)
+    # Build the executable to use for the local test program
+    add_executable(Exec_Test Exec_Test.cxx)
+    GET_TARGET_PROPERTY(EXEC_TEST_FULL_PATH_TEMP Exec_Test LOCATION)
+    GET_FILENAME_COMPONENT(EXEC_TEST_NAME_TEMP ${EXEC_TEST_FULL_PATH_TEMP} NAME)
+    SET(EXEC_TEST_FULL_PATH ${EXEC_TEST_FULL_PATH_TEMP} CACHE INTERNAL "")
+    SET(EXEC_TEST_NAME ${EXEC_TEST_NAME_TEMP} CACHE INTERNAL "")
+    
+    # Configure the config file for the test
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_Local_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Test_Local_config.h)
 
-add_executable(Test_Local_SSH Test_Local_SSH.cxx)
-target_link_libraries(Test_Local_SSH Batch SimpleParser)
+    add_executable(Test_Local_SH Test_Local_SH.cxx)
+    target_link_libraries(Test_Local_SH Batch SimpleParser)
+    ADD_TEST(Local_SH Test_Local_SH)
 
-# Add the tests themselves
-ADD_TEST(Local_SH Test_Local_SH)
-ADD_TEST(Local_RSH Test_Local_RSH)
-ADD_TEST(Local_SSH Test_Local_SSH)
+ENDIF (HAS_SH)
+
+IF (HAS_SSH)
+    add_executable(Test_Local_SSH Test_Local_SSH.cxx)
+    target_link_libraries(Test_Local_SSH Batch SimpleParser)
+    ADD_TEST(Local_SSH Test_Local_SSH)
+ENDIF (HAS_SSH)
+
+IF (HAS_RSH)
+    add_executable(Test_Local_RSH Test_Local_RSH.cxx)
+    target_link_libraries(Test_Local_RSH Batch SimpleParser)
+    ADD_TEST(Local_RSH Test_Local_RSH)
+ENDIF (HAS_RSH)

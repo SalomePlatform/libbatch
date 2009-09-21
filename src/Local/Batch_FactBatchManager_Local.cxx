@@ -26,19 +26,36 @@
  * Date   : Septembre 2004
  * Projet : SALOME 2
  *
+ * Refactored by Renaud Barate (EDF R&D) in September 2009 to use
+ * CommunicationProtocol classes and merge Local_SH, Local_RSH and Local_SSH batch
+ * managers.
+ *
  */
 
-#include <string>
+#include <Batch_config.h>
+
 #include "Batch_BatchManager_Local.hxx"
 #include "Batch_FactBatchManager_Local.hxx"
-//#include "utilities.h"
 
 namespace Batch {
 
-//   static FactBatchManager_Local sFBM_Local;
+#ifdef HAS_SH
+  static FactBatchManager_Local sFBM_Local_SH("SH", SH);
+#endif
+
+#ifdef HAS_RSH
+  static FactBatchManager_Local sFBM_Local_RSH("RSH", RSH);
+#endif
+
+#ifdef HAS_SSH
+  static FactBatchManager_Local sFBM_Local_SSH("SSH", SSH);
+#endif
 
   // Constructeur
-  FactBatchManager_Local::FactBatchManager_Local() : FactBatchManager("Local")
+  FactBatchManager_Local::FactBatchManager_Local(const char * name,
+                                                 CommunicationProtocolType protocolType)
+    : FactBatchManager(name),
+      _protocolType(protocolType)
   {
     // Nothing to do
   }
@@ -50,11 +67,10 @@ namespace Batch {
   }
 
   // Functor
-//   BatchManager * FactBatchManager_Local::operator() (const char * hostname) const
-//   {
-//     // MESSAGE("Building new BatchManager_Local on host '" << hostname << "'");
-//     return new BatchManager_Local(this, hostname);
-//   }
-
+  BatchManager * FactBatchManager_Local::operator() (const char * hostname) const
+  {
+    // MESSAGE("Building new BatchManager_Local on host '" << hostname << "'");
+    return new BatchManager_Local(this, hostname, _protocolType);
+  }
 
 }

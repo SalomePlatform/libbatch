@@ -27,12 +27,17 @@
  * Date   : Thu Nov  6 10:17:22 2003
  * Projet : Salome 2
  *
+ * Refactored by Renaud Barate (EDF R&D) in September 2009 to use
+ * CommunicationProtocol classes and merge Local_SH, Local_RSH and Local_SSH batch
+ * managers.
+ *
  */
 
 #ifndef _BATCHMANAGER_LOCAL_H_
 #define _BATCHMANAGER_LOCAL_H_
 
-#include "Batch_Defines.hxx"
+#include <Batch_Defines.hxx>
+#include <Batch_CommunicationProtocol.hxx>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -119,11 +124,18 @@ namespace Batch {
 
   public:
     // Constructeur et destructeur
-    BatchManager_Local(const FactBatchManager * parent, const char * host="localhost") throw(InvalidArgumentException,ConnexionFailureException); // connexion a la machine host
+    BatchManager_Local(const FactBatchManager * parent,
+                       const char * host="localhost",
+                       CommunicationProtocolType protocolType = SSH)
+        throw(InvalidArgumentException,
+              ConnexionFailureException); // connexion a la machine host
     virtual ~BatchManager_Local();
 
     // Recupere le nom du serveur par defaut
     // static string BatchManager_Local::getDefaultServer();
+
+    // Get the underlying communication protocol
+    const CommunicationProtocol & getProtocol() const;
 
     // Methodes pour le controle des jobs
     virtual const JobId submitJob(const Job & job); // soumet un job au gestionnaire
@@ -145,21 +157,10 @@ namespace Batch {
     pthread_mutex_t _threads_mutex;
     std::map<Id, Child > _threads;
 
-    // Methode abstraite qui renvoie la commande de copie du fichier source en destination
-    virtual std::string copy_command( const std::string & user_source,
-                                      const std::string & host_source,
-                                      const std::string & source,
-                                      const std::string & user_destination,
-                                      const std::string & host_destination,
-                                      const std::string & destination) const = 0;
+    const CommunicationProtocol & _protocol;
 
-    // Methode abstraite qui renvoie la commande a executer
-    virtual std::string exec_command(Parametre & param) const = 0;
-
-    // Methode abstraite qui renvoie la commande d'effacement du fichier
-    virtual std::string remove_command( const std::string & user_destination,
-                                        const std::string & host_destination,
-                                        const std::string & destination) const = 0;
+    // Methode qui renvoie la commande a executer
+    std::vector<std::string> exec_command(const Parametre & param) const;
 
   private:
     struct ThreadIdIdAssociation {
