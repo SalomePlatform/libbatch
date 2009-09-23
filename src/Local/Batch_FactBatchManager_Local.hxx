@@ -35,8 +35,8 @@
 #ifndef _FACTBATCHMANAGER_LOCAL_H_
 #define _FACTBATCHMANAGER_LOCAL_H_
 
-#include <Batch_FactBatchManager.hxx>
-#include <Batch_CommunicationProtocol.hxx>
+#include "Batch_FactBatchManager.hxx"
+#include "Batch_CommunicationProtocol.hxx"
 
 namespace Batch {
   

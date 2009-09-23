@@ -62,7 +62,6 @@ namespace Batch {
   // Constructeur
   BatchManager_Local::BatchManager_Local(const FactBatchManager * parent, const char * host,
                                          CommunicationProtocolType protocolType)
-      throw(InvalidArgumentException,ConnexionFailureException)
     : BatchManager(parent, host), _connect(0), _threads_mutex(), _threads(),
       _protocol(CommunicationProtocol::getInstance(protocolType)),
       _thread_id_id_association_mutex(), _thread_id_id_association_cond(), _thread_id_id_association()

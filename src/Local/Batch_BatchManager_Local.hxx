@@ -36,8 +36,8 @@
 #ifndef _BATCHMANAGER_LOCAL_H_
 #define _BATCHMANAGER_LOCAL_H_
 
-#include <Batch_Defines.hxx>
-#include <Batch_CommunicationProtocol.hxx>
+#include "Batch_Defines.hxx"
+#include "Batch_CommunicationProtocol.hxx"
 
 #ifdef WIN32
 #include <Windows.h>
@@ -52,10 +52,6 @@
 #include "Batch_JobInfo.hxx"
 #include "Batch_JobInfo_Local.hxx"
 #include "Batch_Job_Local.hxx"
-#include "Batch_InvalidArgumentException.hxx"
-#include "Batch_ConnexionFailureException.hxx"
-#include "Batch_APIInternalFailureException.hxx"
-#include "Batch_NotYetImplementedException.hxx"
 #include "Batch_BatchManager.hxx"
 
 namespace Batch {
@@ -126,9 +122,7 @@ namespace Batch {
     // Constructeur et destructeur
     BatchManager_Local(const FactBatchManager * parent,
                        const char * host="localhost",
-                       CommunicationProtocolType protocolType = SSH)
-        throw(InvalidArgumentException,
-              ConnexionFailureException); // connexion a la machine host
+                       CommunicationProtocolType protocolType = SSH); // connexion a la machine host
     virtual ~BatchManager_Local();
 
     // Recupere le nom du serveur par defaut

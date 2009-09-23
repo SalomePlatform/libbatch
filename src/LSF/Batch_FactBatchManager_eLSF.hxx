@@ -31,9 +31,9 @@
 #ifndef _FACTBATCHMANAGER_eLSF_H_
 #define _FACTBATCHMANAGER_eLSF_H_
 
-#include <Batch_Defines.hxx>
-#include <Batch_BatchManager_eClient.hxx>
-#include <Batch_FactBatchManager_eClient.hxx>
+#include "Batch_Defines.hxx"
+#include "Batch_BatchManager_eClient.hxx"
+#include "Batch_FactBatchManager_eClient.hxx"
 
 namespace Batch {
   

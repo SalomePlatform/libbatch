@@ -32,11 +32,11 @@
 #ifndef _BATCHMANAGER_EPBS_H_
 #define _BATCHMANAGER_EPBS_H_
 
-#include <Batch_Defines.hxx>
-#include <Batch_JobId.hxx>
-#include <Batch_JobInfo.hxx>
-#include <Batch_FactBatchManager.hxx>
-#include <Batch_BatchManager_eClient.hxx>
+#include "Batch_Defines.hxx"
+#include "Batch_JobId.hxx"
+#include "Batch_JobInfo.hxx"
+#include "Batch_FactBatchManager.hxx"
+#include "Batch_BatchManager_eClient.hxx"
 
 namespace Batch {
 
