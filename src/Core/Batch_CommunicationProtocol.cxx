@@ -26,6 +26,7 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
+#include <stdlib.h>
 #include <iostream>
 
 #include <Batch_config.h>
@@ -48,13 +49,13 @@ namespace Batch {
   const CommunicationProtocol & CommunicationProtocol::getInstance(CommunicationProtocolType protocolType)
   {
     if (protocolType == SH) {
-    #ifdef HAS_SH
-          static CommunicationProtocolSH instanceSH;
-          return instanceSH;
-    #else
-          throw RunTimeException("Can't use SH protocol (SH tools were "
-                                 "not found on the system at compile time).");
-    #endif
+#ifdef HAS_SH
+      static CommunicationProtocolSH instanceSH;
+      return instanceSH;
+#else
+      throw RunTimeException("Can't use SH protocol (SH tools were "
+                             "not found on the system at compile time).");
+#endif
     } else if (protocolType == RSH) {
 #ifdef HAS_RSH
       static CommunicationProtocolRSH instanceRSH;

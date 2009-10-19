@@ -29,6 +29,9 @@
 *
 */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <ctime>
 #include <iostream>
 #include <fstream>
