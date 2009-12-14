@@ -56,7 +56,8 @@ namespace Batch {
 
   BatchManager_eClient * FactBatchManager_eSGE::operator() (const char * hostname,
                                                             CommunicationProtocolType protocolType,
-                                                            const char * mpiImpl) const
+                                                            const char * mpiImpl,
+							    int nb_proc_per_node) const
   {
     // MESSAGE("Building new BatchManager_SGE on host '" << hostname << "'");
     return new BatchManager_eSGE(this, hostname, protocolType, mpiImpl);

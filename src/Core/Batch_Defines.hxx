@@ -36,4 +36,10 @@
 # define BATCH_EXPORT
 #endif
 
+#ifdef WIN32
+#define BATCH_CHMOD(name, mode) _chmod(name, mode)
+#else
+#define BATCH_CHMOD(name, mode) chmod(name, mode)
+#endif
+
 #endif

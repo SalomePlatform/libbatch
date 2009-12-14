@@ -38,6 +38,9 @@
 #include <string>
 #include <sys/stat.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #ifdef WIN32
 #include <io.h>
 #else
@@ -53,7 +56,8 @@ namespace Batch {
 
   BatchManager_eLSF::BatchManager_eLSF(const FactBatchManager * parent, const char * host,
                                        CommunicationProtocolType protocolType, const char * mpiImpl)
-  : BatchManager_eClient(parent, host, protocolType, mpiImpl)
+  : BatchManager_eClient(parent, host, protocolType, mpiImpl),
+    BatchManager(parent, host)
   {
     // Nothing to do
   }
@@ -69,36 +73,42 @@ namespace Batch {
   {
     int status;
     Parametre params = job.getParametre();
-    const std::string dirForTmpFiles = params[TMPDIR];
+    const std::string workDir = params[WORKDIR];
     const string fileToExecute = params[EXECUTABLE];
-    std::string fileNameToExecute;
-    if( fileToExecute.size() > 0 ){
-      string::size_type p1 = fileToExecute.find_last_of("/");
-      string::size_type p2 = fileToExecute.find_last_of(".");
-      fileNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
-    }
-    else
-      fileNameToExecute = "command";
+    string::size_type p1 = fileToExecute.find_last_of("/");
+    string::size_type p2 = fileToExecute.find_last_of(".");
+    std::string fileNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
 
     // export input files on cluster
+    cerr << "Export des fichiers en entree" << endl;
     exportInputFiles(job);
 
     // build batch script for job
+    cerr << "Construction du script de batch" << endl;
     buildBatchScript(job);
+    cerr << "Script envoye" << endl;
 
     // define name of log file (local)
     string logFile = generateTemporaryFileName("LSF-submitlog");
 
     // define command to submit batch
-    string subCommand = string("cd ") + dirForTmpFiles + "; bsub < " +
-                        fileNameToExecute + "_Batch.sh";
+    string subCommand = string("cd ") + workDir + "; bsub < " + fileNameToExecute + "_Batch.sh";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
+    command += " 2>&1";
     cerr << command.c_str() << endl;
     status = system(command.c_str());
     if(status)
-      throw EmulationException("Error of connection on remote host");
+    {
+      ifstream error_message(logFile.c_str());
+      std::string mess;
+      std::string temp;
+      while(std::getline(error_message, temp))
+	mess += temp;
+      error_message.close();
+      throw EmulationException("Error of connection on remote host, error was: " + mess);
+    }
 
     // read id of submitted job in log file
     char line[128];
@@ -201,33 +211,41 @@ namespace Batch {
   {
 #ifndef WIN32 //TODO: need for porting on Windows
     Parametre params = job.getParametre();
-    Environnement env = job.getEnvironnement();
-    const int nbproc = params[NBPROC];
-    const long edt = params[MAXWALLTIME];
-    const long mem = params[MAXRAMSIZE];
-    const string workDir = params[WORKDIR];
-    const std::string dirForTmpFiles = params[TMPDIR];
-    const string fileToExecute = params[EXECUTABLE];
-    const string home = params[HOMEDIR];
-    const std::string queue = params[QUEUE];
-    std::string rootNameToExecute;
-    std::string fileNameToExecute;
-    std::string filelogtemp;
-    if( fileToExecute.size() > 0 ){
-      string::size_type p1 = fileToExecute.find_last_of("/");
-      string::size_type p2 = fileToExecute.find_last_of(".");
-      rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
-      char* basec=strdup(fileToExecute.c_str());
-      fileNameToExecute = "~/" + dirForTmpFiles + "/" + string(basename(basec));
-      free(basec);
 
-      int idx = dirForTmpFiles.find("Batch/");
-      filelogtemp = dirForTmpFiles.substr(idx+6, dirForTmpFiles.length());
-    }
-    else{
-      rootNameToExecute = "command";
-    }
+    // Job Parameters
+    string workDir       = "";
+    string fileToExecute = "";
+    int nbproc		 = 0;
+    int edt		 = 0;
+    int mem              = 0;
+    string queue         = "";
 
+    // Mandatory parameters
+    if (params.find(WORKDIR) != params.end()) 
+      workDir = params[WORKDIR].str();
+    else 
+      throw EmulationException("params[WORKDIR] is not defined ! Please defined it, cannot submit this job");
+    if (params.find(EXECUTABLE) != params.end()) 
+      fileToExecute = params[EXECUTABLE].str();
+    else 
+      throw EmulationException("params[EXECUTABLE] is not defined ! Please defined it, cannot submit this job");
+
+    // Optional parameters
+    if (params.find(NBPROC) != params.end()) 
+      nbproc = params[NBPROC];
+    if (params.find(MAXWALLTIME) != params.end()) 
+      edt = params[MAXWALLTIME];
+    if (params.find(MAXRAMSIZE) != params.end()) 
+      mem = params[MAXRAMSIZE];
+    if (params.find(QUEUE) != params.end()) 
+      queue = params[QUEUE].str();
+
+    string::size_type p1 = fileToExecute.find_last_of("/");
+    string::size_type p2 = fileToExecute.find_last_of(".");
+    string rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
+    string fileNameToExecute = fileToExecute.substr(p1+1);
+ 
+    // Create batch submit file
     ofstream tempOutputFile;
     std::string TmpFileName = createAndOpenTemporaryFile("LSF-script", tempOutputFile);
 
@@ -239,43 +257,53 @@ namespace Batch {
     if( mem > 0 )
       tempOutputFile << "#BSUB -M " << mem*1024 << endl ;
     tempOutputFile << "#BSUB -n " << nbproc << endl ;
-    if( fileToExecute.size() > 0 ){
-      tempOutputFile << "#BSUB -o " << home << "/" << dirForTmpFiles << "/output.log." << filelogtemp << endl ;
-      tempOutputFile << "#BSUB -e " << home << "/" << dirForTmpFiles << "/error.log." << filelogtemp << endl ;
-    }
+    size_t pos = workDir.find("$HOME");
+    string baseDir;
+    if( pos != string::npos )
+      baseDir = getHomeDir(workDir) + workDir.substr(pos+5,workDir.length()-5);
     else{
-      tempOutputFile << "#BSUB -o " << dirForTmpFiles << "/" << env["LOGFILE"] << ".output.log" << endl ;
-      tempOutputFile << "#BSUB -e " << dirForTmpFiles << "/" << env["LOGFILE"] << ".error.log" << endl ;
+      pos = workDir.find("~");
+      if( pos != string::npos )
+	baseDir = getHomeDir(workDir) + workDir.substr(pos+1,workDir.length()-1);
+      else
+	baseDir = workDir;
     }
-    if( workDir.size() > 0 )
-      tempOutputFile << "cd " << workDir << endl ;
-    if( fileToExecute.size() > 0 ){
-      tempOutputFile << _mpiImpl->boot("",nbproc);
-      tempOutputFile << _mpiImpl->run("",nbproc,fileNameToExecute);
-      tempOutputFile << _mpiImpl->halt();
-    }
-    else{
-      tempOutputFile << "source " << env["SOURCEFILE"] << endl ;
-      tempOutputFile << env["COMMAND"];
-    }
+    tempOutputFile << "#BSUB -o " << baseDir << "/logs/output.log." << rootNameToExecute << endl ;
+    tempOutputFile << "#BSUB -e " << baseDir << "/logs/error.log." << rootNameToExecute << endl ;
 
+    tempOutputFile << "cd " << workDir << endl ;
+
+    // generate nodes file
+    tempOutputFile << "bool=0" << endl;
+    tempOutputFile << "for i in $LSB_MCPU_HOSTS; do" << endl;
+    tempOutputFile << "  if test $bool = 0; then" << endl;
+    tempOutputFile << "    n=$i" << endl;
+    tempOutputFile << "    bool=1" << endl;
+    tempOutputFile << "  else" << endl;
+    tempOutputFile << "    for ((j=0;j<$i;j++)); do" << endl;
+    tempOutputFile << "      echo $n >> nodesFile" << endl;
+    tempOutputFile << "    done" << endl;
+    tempOutputFile << "    bool=0" << endl;
+    tempOutputFile << "  fi" << endl;
+    tempOutputFile << "done" << endl;
+
+    // Abstraction of PBS_NODEFILE - TODO
+    tempOutputFile << "export LIBBATCH_NODEFILE=nodesFile" << endl;
+
+    // Launch the executable
+    tempOutputFile << "./" + fileNameToExecute << endl;
     tempOutputFile.flush();
     tempOutputFile.close();
-#ifdef WIN32
-    _chmod(
-#else
-    chmod(
-#endif
-      TmpFileName.c_str(), 0x1ED);
-    cerr << TmpFileName.c_str() << endl;
+
+    BATCH_CHMOD(TmpFileName.c_str(), 0x1ED);
+    cerr << "Batch script file generated is: " << TmpFileName.c_str() << endl;
 
     int status = _protocol.copyFile(TmpFileName, "", "",
-                                    dirForTmpFiles + "/" + rootNameToExecute + "_Batch.sh",
+                                    workDir + "/" + rootNameToExecute + "_Batch.sh",
                                     _hostname, _username);
     if (status)
       throw EmulationException("Error of connection on remote host");
 
-    remove(TmpFileName.c_str());
 #endif
 
   }
@@ -291,6 +319,26 @@ namespace Batch {
     else
       oss << h << ":0" << m;
     return oss.str();
+  }
+
+  std::string BatchManager_eLSF::getHomeDir(std::string tmpdir)
+  {
+    std::string home;
+    int idx = tmpdir.find("Batch/");
+    std::string filelogtemp = tmpdir.substr(idx+6, tmpdir.length());
+    filelogtemp = "/tmp/logs" + filelogtemp + "_home";
+
+    string subCommand = string("echo $HOME");
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username) + " > " + filelogtemp;
+    cerr << command.c_str() << endl;
+    int status = system(command.c_str());
+    if (status)
+      throw EmulationException("Error of launching home command on remote host");
+
+    std::ifstream file_home(filelogtemp.c_str());
+    std::getline(file_home, home);
+    file_home.close();
+    return home;
   }
 
 }

@@ -141,7 +141,6 @@ int SimpleParser::getValueAsInt(const string & key) const throw(ParserException)
 
 ostream & operator <<(ostream & os, const SimpleParser & parser) throw()
 {
-  os << "Configuration map:" << endl;
   if (parser._configmap.empty()) {
     os << "Empty map" << endl;
   } else {

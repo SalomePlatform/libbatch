@@ -102,6 +102,7 @@ namespace Batch {
     fullDestination += destinationPath;
 
     cmd.push_back(RCP_COMMAND);
+    cmd.push_back("-r");
     cmd.push_back(fullSource);
     cmd.push_back(fullDestination);
 

@@ -67,23 +67,28 @@ namespace Batch {
       if (sourceUser.size() != 0) {
         fullSource += sourceUser + "@";
       }
-      fullSource += sourceHost + ":";
+      fullSource += sourceHost + ":'";
     }
     fullSource += sourcePath;
+    if (sourceHost.size() != 0)
+      fullSource += "'";
 
     string fullDestination;
     if (destinationHost.size() != 0) {
       if (destinationUser.size() != 0) {
         fullDestination += destinationUser + "@";
       }
-      fullDestination += destinationHost + ":";
+      fullDestination += destinationHost + ":'";
     }
     fullDestination += destinationPath;
+    if (destinationHost.size() != 0)
+      fullDestination += "'";
 
     // Option -p is used to keep the same permissions for the destination file
     // (particularly useful to keep scripts executable when copying them)
     cmd.push_back(SCP_COMMAND);
     cmd.push_back("-p");
+    cmd.push_back("-r");
     cmd.push_back(fullSource);
     cmd.push_back(fullDestination);
 

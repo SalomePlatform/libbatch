@@ -5,4 +5,5 @@ source setb.sh
 
 c=`expr $a "*" $b`
 
-echo "c = $c" > result.txt
+echo "MYENVVAR = $MYENVVAR" > result.txt
+echo "c = $c" >> result.txt

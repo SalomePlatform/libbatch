@@ -36,6 +36,10 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+
+#include <stdlib.h>
+#include <string.h>
+
 #ifdef WIN32
 #include <io.h>
 #else
@@ -51,7 +55,8 @@ namespace Batch {
 
   BatchManager_eSGE::BatchManager_eSGE(const FactBatchManager * parent, const char * host,
                                        CommunicationProtocolType protocolType, const char * mpiImpl)
-  : BatchManager_eClient(parent, host, protocolType, mpiImpl)
+  : BatchManager_eClient(parent, host, protocolType, mpiImpl),
+    BatchManager(parent, host)
   {
     // Nothing to do
   }
@@ -67,7 +72,7 @@ namespace Batch {
   {
     int status;
     Parametre params = job.getParametre();
-    const std::string dirForTmpFiles = params[TMPDIR];
+    const std::string workDir = params[WORKDIR];
     const string fileToExecute = params[EXECUTABLE];
     string::size_type p1 = fileToExecute.find_last_of("/");
     string::size_type p2 = fileToExecute.find_last_of(".");
@@ -83,15 +88,23 @@ namespace Batch {
     string logFile = generateTemporaryFileName("SGE-submitlog");
 
     // define command to submit batch
-    string subCommand = string("cd ") + dirForTmpFiles + "; qsub " +
-                        fileNameToExecute + "_Batch.sh";
+    string subCommand = string("cd ") + workDir + "; qsub " + fileNameToExecute + "_Batch.sh";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
+    command += " 2>&1";
     cerr << command.c_str() << endl;
     status = system(command.c_str());
     if(status)
-      throw EmulationException("Error of connection on remote host");
+    {
+      ifstream error_message(logFile.c_str());
+      std::string mess;
+      std::string temp;
+      while(std::getline(error_message, temp))
+	mess += temp;
+      error_message.close();
+      throw EmulationException("Error of connection on remote host, error was: " + mess);
+    }
 
     // read id of submitted job in log file
     char line[128];
@@ -191,32 +204,43 @@ namespace Batch {
   {
 #ifndef WIN32
     //TODO porting on Win32 platform
+    std::cerr << "BuildBatchScript" << std::endl;
     Parametre params = job.getParametre();
-    Environnement env = job.getEnvironnement();
-    const long nbproc = params[NBPROC];
-    const long edt = params[MAXWALLTIME];
-    const long mem = params[MAXRAMSIZE];
-    const string workDir = params[WORKDIR];
-    const std::string dirForTmpFiles = params[TMPDIR];
-    const string fileToExecute = params[EXECUTABLE];
-    const string home = params[HOMEDIR];
-    const std::string queue = params[QUEUE];
-    std::string rootNameToExecute;
-    std::string fileNameToExecute;
-    std::string filelogtemp;
-    if( fileToExecute.size() > 0 ){
-      string::size_type p1 = fileToExecute.find_last_of("/");
-      string::size_type p2 = fileToExecute.find_last_of(".");
-      rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
-      fileNameToExecute = "~/" + dirForTmpFiles + "/" + string(basename((char *) fileToExecute.c_str()));
 
-      int idx = dirForTmpFiles.find("Batch/");
-      filelogtemp = dirForTmpFiles.substr(idx+6, dirForTmpFiles.length());
-    }
-    else{
-      rootNameToExecute = "command";
-    }
+    // Job Parameters
+    string workDir       = "";
+    string fileToExecute = "";
+    int nbproc		 = 0;
+    int edt		 = 0;
+    int mem              = 0;
+    string queue         = "";
 
+    // Mandatory parameters
+    if (params.find(WORKDIR) != params.end()) 
+      workDir = params[WORKDIR].str();
+    else 
+      throw EmulationException("params[WORKDIR] is not defined ! Please defined it, cannot submit this job");
+    if (params.find(EXECUTABLE) != params.end()) 
+      fileToExecute = params[EXECUTABLE].str();
+    else 
+      throw EmulationException("params[EXECUTABLE] is not defined ! Please defined it, cannot submit this job");
+
+    // Optional parameters
+    if (params.find(NBPROC) != params.end()) 
+      nbproc = params[NBPROC];
+    if (params.find(MAXWALLTIME) != params.end()) 
+      edt = params[MAXWALLTIME];
+    if (params.find(MAXRAMSIZE) != params.end()) 
+      mem = params[MAXRAMSIZE];
+    if (params.find(QUEUE) != params.end()) 
+      queue = params[QUEUE].str();
+
+    string::size_type p1 = fileToExecute.find_last_of("/");
+    string::size_type p2 = fileToExecute.find_last_of(".");
+    string rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
+    string fileNameToExecute = fileToExecute.substr(p1+1);
+
+    // Create batch submit file
     ofstream tempOutputFile;
     std::string TmpFileName = createAndOpenTemporaryFile("SGE-script", tempOutputFile);
 
@@ -228,38 +252,27 @@ namespace Batch {
       tempOutputFile << "#$ -l h_rt=" << getWallTime(edt) << endl ;
     if( mem > 0 )
       tempOutputFile << "#$ -l h_vmem=" << mem << "M" << endl ;
-    if( fileToExecute.size() > 0 ){
-      tempOutputFile << "#$ -o " << home << "/" << dirForTmpFiles << "/output.log." << filelogtemp << endl ;
-      tempOutputFile << "#$ -e " << home << "/" << dirForTmpFiles << "/error.log." << filelogtemp << endl ;
-    }
-    else{
-      tempOutputFile << "#$ -o " << dirForTmpFiles << "/" << env["LOGFILE"] << ".output.log" << endl ;
-      tempOutputFile << "#$ -e " << dirForTmpFiles << "/" << env["LOGFILE"] << ".error.log" << endl ;
-    }
-    if( workDir.size() > 0 )
-      tempOutputFile << "cd " << workDir << endl ;
-    if( fileToExecute.size() > 0 ){
-      tempOutputFile << _mpiImpl->boot("",nbproc);
-      tempOutputFile << _mpiImpl->run("${TMPDIR}/machines",nbproc,fileNameToExecute);
-      tempOutputFile << _mpiImpl->halt();
-    }
-    else{
-      tempOutputFile << "source " << env["SOURCEFILE"] << endl ;
-      tempOutputFile << env["COMMAND"];
-    }
+    tempOutputFile << "#$ -o " << workDir << "/logs/output.log." << rootNameToExecute << endl ;
+    tempOutputFile << "#$ -e " << workDir << "/logs/error.log." << rootNameToExecute << endl ;
 
+    // Abstraction of PBS_NODEFILE - TODO
+    tempOutputFile << "export LIBBATCH_NODEFILE=$TMPDIR/machines" << endl;
+
+    // Launch the executable
+    tempOutputFile << "cd " << workDir << endl ;
+    tempOutputFile << "./" + fileNameToExecute << endl;
     tempOutputFile.flush();
     tempOutputFile.close();
-    chmod(TmpFileName.c_str(), 0x1ED);
-    cerr << TmpFileName.c_str() << endl;
+
+    BATCH_CHMOD(TmpFileName.c_str(), 0x1ED);
+    cerr << "Batch script file generated is: " << TmpFileName.c_str() << endl;
 
     int status = _protocol.copyFile(TmpFileName, "", "",
-                                    dirForTmpFiles + "/" + rootNameToExecute + "_Batch.sh",
+                                    workDir + "/" + rootNameToExecute + "_Batch.sh",
                                     _hostname, _username);
     if (status)
       throw EmulationException("Error of connection on remote host");
 
-    remove(TmpFileName.c_str());
 #endif //WIN32
   }
 

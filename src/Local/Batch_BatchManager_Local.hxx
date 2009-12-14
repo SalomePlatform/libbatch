@@ -58,7 +58,7 @@ namespace Batch {
 
   class FactBatchManager;
 
-  class BATCH_EXPORT BatchManager_Local : public BatchManager
+  class BATCH_EXPORT BatchManager_Local : virtual public BatchManager
   {
   private:
 #ifdef WIN32

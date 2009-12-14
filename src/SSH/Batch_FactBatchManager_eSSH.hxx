@@ -20,44 +20,38 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * FactBatchManager_eClient.hxx : emulation of client
+ * FactBatchManager_eSSH.hxx : 
  *
- * Auteur : Bernard SECHER - CEA DEN
- * Mail   : mailto:bernard.secher@cea.fr
- * Date   : Thu Apr 24 10:17:22 2008
- * Projet : PAL Salome 
- *
+ * Auteur : André RIBES : EDF R&D
+ * Date   : Octobre 2009
  */
 
-#ifndef _FACTBATCHMANAGER_ECLIENT_H_
-#define _FACTBATCHMANAGER_ECLIENT_H_
+#ifndef _FACTBATCHMANAGER_eSSH_H_
+#define _FACTBATCHMANAGER_eSSH_H_
+
+#include "Batch_Defines.hxx"
 
 #include <string>
-
-#include "Batch_FactBatchManager.hxx"
+#include <map>
 #include "Batch_BatchManager_eClient.hxx"
-#include "Batch_CommunicationProtocol.hxx"
+#include "Batch_FactBatchManager_eClient.hxx"
 
 namespace Batch {
+  
+  class BatchManager_eSSH;
 
-  class BATCH_EXPORT FactBatchManager_eClient : public FactBatchManager
+  class BATCH_EXPORT FactBatchManager_eSSH : public FactBatchManager_eClient
   {
   public:
-    // Constructeur et destructeur
-    FactBatchManager_eClient(const std::string & type);
-    virtual ~FactBatchManager_eClient();
+    FactBatchManager_eSSH();
+    virtual ~FactBatchManager_eSSH();
 
-    virtual Batch::BatchManager_eClient * operator() (const char * hostname,
-                                                      CommunicationProtocolType protocolType,
-                                                      const char * mpi,
-						      int nb_proc_per_node = 1) const = 0;
-
-  protected:
-
-  private:
-
+    virtual BatchManager * operator() (const char * hostname) const; // From FactBacthManager
+    virtual BatchManager_eClient * operator() (const char * hostname,
+                                               CommunicationProtocolType protocolType,
+                                               const char * mpiImpl,
+					       int nb_proc_per_node = 1) const; // From FactBatchManager_eClient
   };
-
 }
 
 #endif

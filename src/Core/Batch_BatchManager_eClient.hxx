@@ -44,7 +44,7 @@ namespace Batch {
 
   class Job;
 
-  class BATCH_EXPORT BatchManager_eClient : public BatchManager
+  class BATCH_EXPORT BatchManager_eClient : virtual public BatchManager
   {
   public:
     // Constructeur et destructeur

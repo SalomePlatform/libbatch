@@ -105,9 +105,9 @@ namespace Batch {
     std::string getName() const;
     void setName(const std::string & name);
 
-  protected:
 		// Efface tous les elements internes de l'objet
     virtual void eraseAll();
+  protected:
 
     DiscriminatorType _discriminator; // type de l'element interne
     size_type _maxsize; // nombre max d'elements internes

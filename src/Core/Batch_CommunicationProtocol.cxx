@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
 
 #include <Batch_config.h>
 
@@ -126,9 +127,9 @@ namespace Batch {
     for (unsigned int i=0 ; i<commandArgs.size() ; i++) {
       if (i != 0) commandStr += " ";
 
-      // if the argument contains spaces, we surround it with double quotes
+      // if the argument contains spaces, we surround it with quotes
       if (commandArgs[i].find(' ') != string::npos) {
-        commandStr += string("\"") + commandArgs[i] + "\"";
+        commandStr += string("\'") + commandArgs[i] + "\'";
       } else {
         commandStr += commandArgs[i];
       }

@@ -75,6 +75,9 @@ namespace Batch {
   {
     vector<string> cmd;
     cmd.push_back(CP_COMMAND);
+#ifndef WIN32
+    cmd.push_back("-r");
+#endif
     cmd.push_back(fixPath(sourcePath));
     cmd.push_back(fixPath(destinationPath));
     return cmd;

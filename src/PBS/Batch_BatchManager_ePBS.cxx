@@ -22,7 +22,7 @@
 /*
  * BatchManager_ePBS.cxx : emulation of PBS client
  *
- * Auteur : Bernard SECHER - CEA DEN
+ * Auteur : Bernard SECHER - CEA DEN, André RIBES - EDF R&D
  * Mail   : mailto:bernard.secher@cea.fr
  * Date   : Thu Apr 24 10:17:22 2008
  * Projet : PAL Salome
@@ -37,6 +37,8 @@
 #include <sstream>
 #include <sys/stat.h>
 
+#include <stdlib.h>
+#include <string.h>
 #include <Batch_config.h>
 
 #ifdef MSVC
@@ -53,10 +55,13 @@ using namespace std;
 namespace Batch {
 
   BatchManager_ePBS::BatchManager_ePBS(const FactBatchManager * parent, const char * host,
-                                       CommunicationProtocolType protocolType, const char * mpiImpl)
-    : BatchManager_eClient(parent, host, protocolType, mpiImpl)
+                                       CommunicationProtocolType protocolType, const char * mpiImpl, 
+				       int nb_proc_per_node)
+    : BatchManager_eClient(parent, host, protocolType, mpiImpl),
+    BatchManager(parent, host)
   {
     // Nothing to do
+    _nb_proc_per_node = nb_proc_per_node;
   }
 
   // Destructeur
@@ -70,7 +75,7 @@ namespace Batch {
   {
     int status;
     Parametre params = job.getParametre();
-    const std::string dirForTmpFiles = params[TMPDIR];
+    const std::string workDir = params[WORKDIR];
     const string fileToExecute = params[EXECUTABLE];
     string::size_type p1 = fileToExecute.find_last_of("/");
     string::size_type p2 = fileToExecute.find_last_of(".");
@@ -86,15 +91,23 @@ namespace Batch {
     string logFile = generateTemporaryFileName("PBS-submitlog");
 
     // define command to submit batch
-    string subCommand = string("cd ") + dirForTmpFiles + "; qsub " +
-                        fileNameToExecute + "_Batch.sh";
+    string subCommand = string("cd ") + workDir + "; qsub " + fileNameToExecute + "_Batch.sh";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
+    command += " 2>&1";
     cerr << command.c_str() << endl;
     status = system(command.c_str());
     if(status)
-      throw EmulationException("Error of connection on remote host");
+    {
+      ifstream error_message(logFile.c_str());
+      std::string mess;
+      std::string temp;
+      while(std::getline(error_message, temp))
+	mess += temp;
+      error_message.close();
+      throw EmulationException("Error of connection on remote host, error was: " + mess);
+    }
 
     // read id of submitted job in log file
     ifstream idfile(logFile.c_str());
@@ -197,91 +210,89 @@ namespace Batch {
 
   void BatchManager_ePBS::buildBatchScript(const Job & job)
   {
+    std::cerr << "BuildBatchScript" << std::endl;
     Parametre params = job.getParametre();
     Environnement env = job.getEnvironnement();
-    const long nbproc = params[NBPROC];
-    const long edt = params[MAXWALLTIME];
-    const long mem = params[MAXRAMSIZE];
-    const string workDir = params[WORKDIR];
-    const std::string dirForTmpFiles = params[TMPDIR];
-    const string fileToExecute = params[EXECUTABLE];
-    const string home = params[HOMEDIR];
-    const std::string queue = params[QUEUE];
-    std::string rootNameToExecute;
-    std::string fileNameToExecute;
-    std::string filelogtemp;
-    if( fileToExecute.size() > 0 ){
-      string::size_type p1 = fileToExecute.find_last_of("/");
-      string::size_type p2 = fileToExecute.find_last_of(".");
-      rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
 
-#ifdef MSVC
-      char fname[_MAX_FNAME];
-      char ext[_MAX_EXT];
-      _splitpath_s(fileToExecute.c_str(), NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
-      string execBaseName = string(fname) + ext;
-#else
-      char* basec=strdup(fileToExecute.c_str());
-      string execBaseName = string(basename(basec));
-      free(basec);
-#endif
+    // Job Parameters
+    string workDir       = "";
+    string fileToExecute = "";
+    int nbproc		 = 0;
+    int edt		 = 0;
+    int mem              = 0;
+    string queue         = "";
 
-      fileNameToExecute = "~/" + dirForTmpFiles + "/" + execBaseName;
+    // Mandatory parameters
+    if (params.find(WORKDIR) != params.end()) 
+      workDir = params[WORKDIR].str();
+    else 
+      throw EmulationException("params[WORKDIR] is not defined ! Please defined it, cannot submit this job");
+    if (params.find(EXECUTABLE) != params.end()) 
+      fileToExecute = params[EXECUTABLE].str();
+    else 
+      throw EmulationException("params[EXECUTABLE] is not defined ! Please defined it, cannot submit this job");
 
-      int idx = dirForTmpFiles.find("Batch/");
-      filelogtemp = dirForTmpFiles.substr(idx+6, dirForTmpFiles.length());
-    }
-    else{
-      rootNameToExecute = "command";
-    }
+    // Optional parameters
+    if (params.find(NBPROC) != params.end()) 
+      nbproc = params[NBPROC];
+    if (params.find(MAXWALLTIME) != params.end()) 
+      edt = params[MAXWALLTIME];
+    if (params.find(MAXRAMSIZE) != params.end()) 
+      mem = params[MAXRAMSIZE];
+    if (params.find(QUEUE) != params.end()) 
+      queue = params[QUEUE].str();
 
+    string::size_type p1 = fileToExecute.find_last_of("/");
+    string::size_type p2 = fileToExecute.find_last_of(".");
+    string rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
+    string fileNameToExecute = fileToExecute.substr(p1+1);
+
+    // Create batch submit file
     ofstream tempOutputFile;
     std::string TmpFileName = createAndOpenTemporaryFile("PBS-script", tempOutputFile);
 
     tempOutputFile << "#! /bin/sh -f" << endl;
+    if (nbproc > 0)
+    {
+      // Division - arrondi supérieur
+      int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
+      tempOutputFile << "#PBS -l nodes=" << nodes_requested << ":ppn=" << _nb_proc_per_node << endl;
+    }
     if (queue != "")
-      tempOutputFile << "#BSUB -q " << queue << endl;
+      tempOutputFile << "#PBS -q " << queue << endl;
     if( edt > 0 )
-      tempOutputFile << "#PBS -l walltime=" << edt*60 << endl ;
+      tempOutputFile << "#PBS -l walltime=" << edt*60 << endl;
     if( mem > 0 )
-      tempOutputFile << "#PBS -l mem=" << mem << "mb" << endl ;
-    if( fileToExecute.size() > 0 ){
-      tempOutputFile << "#PBS -o " << home << "/" << dirForTmpFiles << "/output.log." << filelogtemp << endl ;
-      tempOutputFile << "#PBS -e " << home << "/" << dirForTmpFiles << "/error.log." << filelogtemp << endl ;
-    }
-    else{
-      tempOutputFile << "#PBS -o " << dirForTmpFiles << "/" << env["LOGFILE"] << ".output.log" << endl ;
-      tempOutputFile << "#PBS -e " << dirForTmpFiles << "/" << env["LOGFILE"] << ".error.log" << endl ;
-    }
-    if( workDir.size() > 0 )
-      tempOutputFile << "cd " << workDir << endl ;
-    if( fileToExecute.size() > 0 ){
-      tempOutputFile << _mpiImpl->boot("${PBS_NODEFILE}",nbproc);
-      tempOutputFile << _mpiImpl->run("${PBS_NODEFILE}",nbproc,fileNameToExecute);
-      tempOutputFile << _mpiImpl->halt();
-    }
-    else{
-      tempOutputFile << "source " << env["SOURCEFILE"] << endl ;
-      tempOutputFile << env["COMMAND"];
+      tempOutputFile << "#PBS -l mem=" << mem << "kb" << endl;
+    tempOutputFile << "#PBS -o " << workDir << "/logs/output.log." << rootNameToExecute << endl;
+    tempOutputFile << "#PBS -e " << workDir << "/logs/error.log."  << rootNameToExecute << endl;
+
+    // Define environment for the job
+    if (!env.empty()) {
+      tempOutputFile << "#PBS -v ";
+      Environnement::const_iterator iter;
+      for (iter = env.begin() ; iter != env.end() ; ++iter) {
+        tempOutputFile << iter->first << "=" << iter->second << ",";
+      }
+      tempOutputFile << endl;
     }
 
+    // Abstraction of PBS_NODEFILE - TODO
+    tempOutputFile << "export LIBBATCH_NODEFILE=$PBS_NODEFILE" << endl;
+
+    // Launch the executable
+    tempOutputFile << "cd " << workDir << endl;
+    tempOutputFile << "./" + fileNameToExecute << endl;
     tempOutputFile.flush();
     tempOutputFile.close();
-#ifdef WIN32
-    _chmod(
-#else
-    chmod(
-#endif
-      TmpFileName.c_str(), 0x1ED);
-    cerr << TmpFileName.c_str() << endl;
+
+    BATCH_CHMOD(TmpFileName.c_str(), 0x1ED);
+    cerr << "Batch script file generated is: " << TmpFileName.c_str() << endl;
 
     int status = _protocol.copyFile(TmpFileName, "", "",
-                                    dirForTmpFiles + "/" + rootNameToExecute + "_Batch.sh",
+                                    workDir + "/" + rootNameToExecute + "_Batch.sh",
                                     _hostname, _username);
     if (status)
-      throw EmulationException("Error of connection on remote host");
-
-    remove(TmpFileName.c_str());
+      throw EmulationException("Error of connection on remote host, cannot copy batch submission file");
   }
-
 }

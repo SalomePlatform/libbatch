@@ -20,41 +20,32 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * FactBatchManager_eClient.hxx : emulation of client
+ * JobInfo_eSSH.hxx :  emulation of SSH client
  *
- * Auteur : Bernard SECHER - CEA DEN
- * Mail   : mailto:bernard.secher@cea.fr
- * Date   : Thu Apr 24 10:17:22 2008
- * Projet : PAL Salome 
- *
+ * Auteur : André RIBES - EDF R&D
+ * Date   : Octobre 2009
  */
 
-#ifndef _FACTBATCHMANAGER_ECLIENT_H_
-#define _FACTBATCHMANAGER_ECLIENT_H_
+#ifndef _JOBINFO_SSH_H_
+#define _JOBINFO_SSH_H_
 
 #include <string>
-
-#include "Batch_FactBatchManager.hxx"
-#include "Batch_BatchManager_eClient.hxx"
-#include "Batch_CommunicationProtocol.hxx"
+#include "Batch_RunTimeException.hxx"
+#include "Batch_JobInfo.hxx"
 
 namespace Batch {
 
-  class BATCH_EXPORT FactBatchManager_eClient : public FactBatchManager
+  class JobInfo_eSSH : public JobInfo
   {
   public:
-    // Constructeur et destructeur
-    FactBatchManager_eClient(const std::string & type);
-    virtual ~FactBatchManager_eClient();
+    // Constructeurs et destructeur
+    JobInfo_eSSH(int id, std::string status);
+    virtual ~JobInfo_eSSH();
 
-    virtual Batch::BatchManager_eClient * operator() (const char * hostname,
-                                                      CommunicationProtocolType protocolType,
-                                                      const char * mpi,
-						      int nb_proc_per_node = 1) const = 0;
-
-  protected:
-
-  private:
+    // Methodes pour l'interfacage avec Python (SWIG)
+    // TODO : supprimer ces methodes et transferer leur definitions dans SWIG
+    std::string  __str__() const; // SWIG : affichage en Python
+    std::string  __repr__() const { return __str__(); }; // SWIG : affichage en Python
 
   };
 

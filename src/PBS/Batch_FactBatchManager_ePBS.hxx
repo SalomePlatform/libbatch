@@ -52,7 +52,8 @@ namespace Batch {
     virtual BatchManager * operator() (const char * hostname) const;
     virtual BatchManager_eClient * operator() (const char * hostname,
                                                CommunicationProtocolType protocolType,
-                                               const char * mpiImpl) const;
+                                               const char * mpiImpl,
+					       int nb_proc_per_node = 1) const;
 
   protected:
 

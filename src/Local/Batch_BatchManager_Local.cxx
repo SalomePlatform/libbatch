@@ -443,6 +443,9 @@ namespace Batch {
         string local    = cp.getLocal();
         string remote   = cp.getRemote();
 
+	std::cerr << workdir << std::endl;
+	std::cerr << remote << std::endl;
+
         int status = p_ta->getBatchManager().getProtocol().copyFile(local, "", "",
                                                                     workdir + "/" + remote,
                                                                     executionhost, user);
@@ -463,6 +466,8 @@ namespace Batch {
     // On forke/exec un nouveau process pour pouvoir controler le fils
     // (plus finement qu'avec un appel system)
     // int rc = system(commande.c_str());
+    //char *const parmList[] = {"/usr/bin/ssh", "localhost", "-l", "aribes", "sleep 10 && echo end", NULL};
+    //execv("/usr/bin/ssh", parmList);
 #ifdef WIN32
     child = p_ta->launchWin32ChildProcess();
     p_ta->pere(child);
@@ -594,6 +599,14 @@ namespace Batch {
       int child_rc = 0;
       pid_t child_wait_rc = waitpid(child, &child_rc, WNOHANG /* | WUNTRACED */);
       if (child_wait_rc > 0) {
+	 UNDER_LOCK( cout << "Status is: " << WIFEXITED( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WEXITSTATUS( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WIFSIGNALED( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WTERMSIG( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WCOREDUMP( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WIFSTOPPED( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WSTOPSIG( child_rc) << endl);
+	 UNDER_LOCK( cout << "Status is: " << WIFCONTINUED( child_rc) << endl);
         if (WIFSTOPPED(child_rc)) {
           // NOTA : pour rentrer dans cette section, il faut que le flag WUNTRACED
           // soit positionne dans l'appel a waitpid ci-dessus. Ce flag est couramment
@@ -740,6 +753,10 @@ namespace Batch {
     Parametre param = _job.getParametre();
     Parametre::iterator it;
 
+      //char *const parmList[] = {"/usr/bin/ssh", "localhost", "-l", "aribes", "sleep 1 && echo end", NULL};
+      //int result = execv("/usr/bin/ssh", parmList);
+      //UNDER_LOCK( cout << "*** debug_command = " << result << endl );
+      //UNDER_LOCK( cout << "*** debug_command = " << strerror(errno) << endl );
     try {
 
       // EXECUTABLE is MANDATORY, if missing, we exit with failure notification
@@ -761,6 +778,7 @@ namespace Batch {
       argv[command.size()] = NULL;
 
       UNDER_LOCK( cout << "*** debug_command = " << comstr << endl );
+      UNDER_LOCK( cout << "*** debug_command = " << argv[0] << endl );
 
       // Create the environment for the new process. Note (RB): Here we change the environment for
       // the process launched in local. It would seem more logical to set the environment for the
@@ -784,6 +802,10 @@ namespace Batch {
         envp[i] = NULL;
       }
 
+      //char *const parmList[] = {"/usr/bin/ssh", "localhost", "-l", "aribes", "sleep 1 && echo end", NULL};
+      //int result = execv("/usr/bin/ssh", parmList);
+      //UNDER_LOCK( cout << "*** debug_command = " << result << endl );
+      //UNDER_LOCK( cout << "*** debug_command = " << strerror(errno) << endl );
 
 
 
@@ -813,6 +835,10 @@ namespace Batch {
       }
 
 
+      //char *const parmList[] = {"/usr/bin/ssh", "localhost", "-l", "aribes", "sleep 1 && echo end", NULL};
+      //int result = execv("/usr/bin/ssh", parmList);
+      //UNDER_LOCK( cout << "*** debug_command = " << result << endl );
+      //UNDER_LOCK( cout << "*** debug_command = " << strerror(errno) << endl );
 
       // On cree une session pour le fils de facon a ce qu'il ne soit pas
       // detruit lorsque le shell se termine (le shell ouvre une session et
@@ -827,8 +853,8 @@ namespace Batch {
 
 
       // On execute la commande du fils
-      execve(argv[0], argv, envp);
-
+      int result = execve(argv[0], argv, envp);
+      UNDER_LOCK( cout << "*** debug_command = " << strerror(errno) << endl );
       // No need to deallocate since nothing happens after a successful exec
 
       // Normalement on ne devrait jamais arriver ici

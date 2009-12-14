@@ -53,6 +53,7 @@ ENDIF (BUILD_LOCAL_SUBMISSION)
 add_subdirectory (LSF)
 add_subdirectory (PBS)
 add_subdirectory (SGE)
+add_subdirectory (SSH)
 
 # Make a copy of the built value and clear the built value for the next run of cmake
 SET(SRC_FILES ${SRC_FILES_BUILD} CACHE INTERNAL "")
@@ -65,6 +66,7 @@ SET(HDR_FILES_BUILD CACHE INTERNAL "")
 add_library (Batch SHARED ${SRC_FILES})
 
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Local)
 target_link_libraries(Batch ${PTHREAD_LIBRARY})
 
 IF (WIN32)

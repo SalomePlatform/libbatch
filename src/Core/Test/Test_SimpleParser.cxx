@@ -55,6 +55,7 @@ int main(int argc, char** argv)
   }
 
   // Print the configuration
+  cout << "Configuration map:" << endl;
   cout << parser << endl;
 
   return 0;

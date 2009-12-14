@@ -20,10 +20,10 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * Test_PBS.cxx :
+ * Test_ePBS.cxx :
  *
  * Author : Renaud BARATE - EDF R&D
- * Date   : September 2009
+ * Date   : April 2009
  *
  */
 
@@ -33,13 +33,14 @@
 #include <Batch_Job.hxx>
 #include <Batch_BatchManagerCatalog.hxx>
 #include <Batch_FactBatchManager.hxx>
+#include <Batch_FactBatchManager_eClient.hxx>
 #include <Batch_BatchManager.hxx>
+#include <Batch_BatchManager_eClient.hxx>
 
 #include <SimpleParser.hxx>
 
 #ifdef WIN32
 #include <Windows.h>
-#include <direct.h>
 #define sleep(seconds) Sleep((seconds)*1000)
 #define usleep(useconds) Sleep((useconds)/1000)
 #endif
@@ -49,10 +50,33 @@ using namespace Batch;
 
 const int MAX_SLEEP_TIME = 600;
 
+void print_usage()
+{
+  cout << "usage: Test_ePBS PROTOCOL" << endl;
+  cout << "    PROTOCOL      \"SSH\" or \"RSH\"" << endl;
+}
+
 int main(int argc, char** argv)
 {
+  // Parse argument
+  if (argc != 2) {
+    print_usage();
+    return 1;
+  }
+  CommunicationProtocolType protocol;
+  if (strcmp(argv[1], "SSH") == 0)
+    protocol = SSH;
+  else if (strcmp(argv[1], "RSH") == 0)
+    protocol = RSH;
+  else {
+    print_usage();
+    return 1;
+  }
+
   cout << "*******************************************************************************************" << endl;
-  cout << "This program tests the batch submission based on PBS." << endl;
+  cout << "This program tests the batch submission based on PBS emulation. Passwordless authentication" << endl;
+  cout << "must be used for this test to pass. For SSH, this can be configured with ssh-agent for" << endl;
+  cout << "instance. For RSH, this can be configured with the .rhosts file." << endl;
   cout << "*******************************************************************************************" << endl;
 
   // eventually remove any previous result
@@ -62,34 +86,28 @@ int main(int argc, char** argv)
     // Parse the test configuration file
     SimpleParser parser;
     parser.parseTestConfigFile();
-    const string & host = parser.getValue("TEST_PBS_HOST");
-    const string & user = parser.getValue("TEST_PBS_USER");
-    const string & queue = parser.getValue("TEST_PBS_QUEUE");
-    int timeout = parser.getValueAsInt("TEST_PBS_TIMEOUT");
-
-    char * cwd =
-#ifdef WIN32
-      _getcwd(NULL, 0);
-#else
-      new char [PATH_MAX];
-    getcwd(cwd, PATH_MAX);
-#endif
-    string workdir = cwd;
-    delete [] cwd;
+    const string & homedir = parser.getValue("TEST_EPBS_HOMEDIR");
+    const string & host = parser.getValue("TEST_EPBS_HOST");
+    const string & user = parser.getValue("TEST_EPBS_USER");
+    const string & queue = parser.getValue("TEST_EPBS_QUEUE");
+    int timeout = parser.getValueAsInt("TEST_EPBS_TIMEOUT");
 
     // Define the job...
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p["EXECUTABLE"]    = "test-script.sh";
-    p["NAME"]          = "Test_PBS";
-    p["INFILE"]        = Couple(workdir + "/seta.sh", "seta.sh");
-    p["INFILE"]       += Couple(workdir + "/setb.sh", "setb.sh");
-    p["OUTFILE"]       = Couple(workdir + "/result.txt", "result.txt");
+    p["EXECUTABLE"]    = "./test-script.sh";
+    p["NAME"]          = string("Test_ePBS_") + argv[1];
+    p["WORKDIR"]       = homedir + "/tmp/Batch";
+    p["INFILE"]        = Couple("seta.sh", "tmp/Batch/seta.sh");
+    p["INFILE"]       += Couple("setb.sh", "tmp/Batch/setb.sh");
+    p["OUTFILE"]       = Couple("result.txt", "tmp/Batch/result.txt");
+    p["TMPDIR"]        = "tmp/Batch/";
     p["USER"]          = user;
     p["NBPROC"]        = 1;
     p["MAXWALLTIME"]   = 1;
-    p["MAXRAMSIZE"]    = 4;
+    p["MAXRAMSIZE"]    = 1000;
+    p["HOMEDIR"]       = homedir;
     p["QUEUE"]         = queue;
     job.setParametre(p);
     // ... and its environment
@@ -102,8 +120,8 @@ int main(int argc, char** argv)
     BatchManagerCatalog& c = BatchManagerCatalog::getInstance();
 
     // Create a BatchManager of type ePBS on localhost
-    FactBatchManager * fbm = c("PBS");
-    BatchManager * bm = (*fbm)(host.c_str());
+    FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("ePBS"));
+    BatchManager_eClient * bm = (*fbm)(host.c_str(), protocol, "lam");
 
     // Submit the job to the BatchManager
     JobId jobid = bm->submitJob(job);
@@ -135,6 +153,7 @@ int main(int argc, char** argv)
 
     if (state == "U" || state == "C") {
       cout << "Job " << jobid.__repr__() << " is done" << endl;
+      bm->importOutputFiles(job, ".");
     } else {
       cerr << "Timeout while executing job" << endl;
       return 1;

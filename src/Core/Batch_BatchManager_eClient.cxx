@@ -37,6 +37,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <stdlib.h>
+
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
@@ -69,7 +71,8 @@ namespace Batch {
   // Destructeur
   BatchManager_eClient::~BatchManager_eClient()
   {
-    delete _mpiImpl;
+    if (_mpiImpl)
+      delete _mpiImpl;
   }
 
   void BatchManager_eClient::exportInputFiles(const Job& job)
@@ -80,7 +83,7 @@ namespace Batch {
     Versatile::iterator Vit;
     _username = string(params[USER]);
 
-    string subCommand = string("mkdir -p ") + string(params[TMPDIR]);
+    string subCommand = string("mkdir -p ") + string(params[TMPDIR]) + string("/logs");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
@@ -147,6 +150,7 @@ namespace Batch {
     Parametre params = job.getParametre();
     Versatile V = params[OUTFILE];
     Versatile::iterator Vit;
+    _username = string(params[USER]);
 
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
@@ -162,6 +166,17 @@ namespace Batch {
         mess += status_str.str();
         cerr << mess << endl;
       }
+    }
+
+    // Copy logs
+    int status = _protocol.copyFile(string(params[TMPDIR]) + string("/logs"), _hostname, _username,
+				    directory, "", "");
+    if (status) {
+      std::string mess("Copy logs directory failed ! status is :");
+      ostringstream status_str;
+      status_str << status;
+      mess += status_str.str();
+      cerr << mess << endl;
     }
 
   }
@@ -181,7 +196,7 @@ namespace Batch {
     else if(mpiImpl == "prun")
       return new MpiImpl_PRUN();
     else if(mpiImpl == "nompi")
-      throw EmulationException("you must specify an mpi implementation for batch manager");
+      return NULL;
     else{
       ostringstream oss;
       oss << mpiImpl << " : not yet implemented";

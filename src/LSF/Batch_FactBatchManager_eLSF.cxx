@@ -54,7 +54,8 @@ namespace Batch {
 
   BatchManager_eClient * FactBatchManager_eLSF::operator() (const char * hostname,
                                                             CommunicationProtocolType protocolType,
-                                                            const char * mpiImpl) const
+                                                            const char * mpiImpl,
+							    int nb_proc_per_node) const
   {
     // MESSAGE("Building new BatchManager_LSF on host '" << hostname << "'");
     return new BatchManager_eLSF(this, hostname, protocolType, mpiImpl);

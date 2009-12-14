@@ -20,44 +20,52 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * FactBatchManager_eClient.hxx : emulation of client
+ * JobInfo_eSSH.cxx :  emulation of SSH client
  *
- * Auteur : Bernard SECHER - CEA DEN
- * Mail   : mailto:bernard.secher@cea.fr
- * Date   : Thu Apr 24 10:17:22 2008
- * Projet : PAL Salome 
- *
+ * Auteur : André RIBES - EDF R&D
+ * Date   : Octobre 2009
  */
 
-#ifndef _FACTBATCHMANAGER_ECLIENT_H_
-#define _FACTBATCHMANAGER_ECLIENT_H_
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include "Batch_Parametre.hxx"
+#include "Batch_Environnement.hxx"
+#include "Batch_RunTimeException.hxx"
+#include "Batch_APIInternalFailureException.hxx"
+#include "Batch_JobInfo_eSSH.hxx"
 
-#include <string>
-
-#include "Batch_FactBatchManager.hxx"
-#include "Batch_BatchManager_eClient.hxx"
-#include "Batch_CommunicationProtocol.hxx"
+using namespace std;
 
 namespace Batch {
 
-  class BATCH_EXPORT FactBatchManager_eClient : public FactBatchManager
+  // Constructeurs
+  JobInfo_eSSH::JobInfo_eSSH(int id, string status) : JobInfo()
   {
-  public:
-    // Constructeur et destructeur
-    FactBatchManager_eClient(const std::string & type);
-    virtual ~FactBatchManager_eClient();
+    // On remplit les membres _param et _env
+    ostringstream oss;
+    oss << id;
+    _param[ID] = oss.str();
+    _param[STATE] = status;
+  }
 
-    virtual Batch::BatchManager_eClient * operator() (const char * hostname,
-                                                      CommunicationProtocolType protocolType,
-                                                      const char * mpi,
-						      int nb_proc_per_node = 1) const = 0;
+  // Destructeur
+  JobInfo_eSSH::~JobInfo_eSSH()
+  {
+    // Nothing to do
+  }
 
-  protected:
+  // Methode pour l'interfacage avec Python (SWIG) : affichage en Python
+  string JobInfo_eSSH::__str__() const
+  {
+    ostringstream sst;
+    sst << "<JobInfo_eSSH (" << this << ") :" << endl;
+    sst << " ID = " <<_param[ID] << endl;
+    sst << " STATE = " <<_param[STATE] << endl;
 
-  private:
+    return sst.str();
+  }
 
-  };
 
 }
-
-#endif

@@ -45,7 +45,8 @@ namespace Batch {
   public:
     // Constructeur et destructeur
     BatchManager_ePBS(const FactBatchManager * parent, const char * host="localhost",
-                      CommunicationProtocolType protocolType = SSH, const char * mpiImpl="nompi"); // connexion a la machine host
+                      CommunicationProtocolType protocolType = SSH, const char * mpiImpl="nompi",
+		      int nb_proc_per_node=1); // connexion a la machine host
     virtual ~BatchManager_ePBS();
 
     // Recupere le nom du serveur par defaut
@@ -70,6 +71,7 @@ namespace Batch {
     void buildBatchScript(const Job & job);
 
   private:
+    int _nb_proc_per_node;
 
 #ifdef SWIG
   public:

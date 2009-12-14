@@ -32,16 +32,15 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Build the test programs and add the tests
+add_executable(Test_ePBS Test_ePBS.cxx)
+target_link_libraries(Test_ePBS Batch SimpleParser)
+
 IF (HAS_SSH)
-    add_executable(Test_ePBS_SSH Test_ePBS_SSH.cxx)
-    target_link_libraries(Test_ePBS_SSH Batch SimpleParser)
-    ADD_TEST(ePBS_SSH Test_ePBS_SSH)
+    ADD_TEST(ePBS_SSH Test_ePBS SSH)
 ENDIF (HAS_SSH)
 
 IF (HAS_RSH)
-    add_executable(Test_ePBS_RSH Test_ePBS_RSH.cxx)
-    target_link_libraries(Test_ePBS_RSH Batch SimpleParser)
-    ADD_TEST(ePBS_RSH Test_ePBS_RSH)
+    ADD_TEST(ePBS_RSH Test_ePBS RSH)
 ENDIF (HAS_RSH)
 
 IF (BUILD_PBS_INTERFACE AND PBS_FOUND)

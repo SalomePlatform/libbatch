@@ -20,44 +20,34 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * FactBatchManager_eClient.hxx : emulation of client
+ * FactBatchManager_eSSH.cxx :
  *
- * Auteur : Bernard SECHER - CEA DEN
- * Mail   : mailto:bernard.secher@cea.fr
- * Date   : Thu Apr 24 10:17:22 2008
- * Projet : PAL Salome 
- *
+ * Auteur : André RIBES : EDF R&D 
+ * Date   : Octobre 2009
  */
 
-#ifndef _FACTBATCHMANAGER_ECLIENT_H_
-#define _FACTBATCHMANAGER_ECLIENT_H_
-
 #include <string>
+#include "Batch_BatchManager_eSSH.hxx"
+#include "Batch_FactBatchManager_eSSH.hxx"
 
-#include "Batch_FactBatchManager.hxx"
-#include "Batch_BatchManager_eClient.hxx"
-#include "Batch_CommunicationProtocol.hxx"
+Batch::FactBatchManager_eSSH::FactBatchManager_eSSH() : FactBatchManager_eClient("eSSH") {}
 
-namespace Batch {
+Batch::FactBatchManager_eSSH::~FactBatchManager_eSSH() {}
 
-  class BATCH_EXPORT FactBatchManager_eClient : public FactBatchManager
-  {
-  public:
-    // Constructeur et destructeur
-    FactBatchManager_eClient(const std::string & type);
-    virtual ~FactBatchManager_eClient();
-
-    virtual Batch::BatchManager_eClient * operator() (const char * hostname,
-                                                      CommunicationProtocolType protocolType,
-                                                      const char * mpi,
-						      int nb_proc_per_node = 1) const = 0;
-
-  protected:
-
-  private:
-
-  };
-
+Batch::BatchManager * 
+Batch::FactBatchManager_eSSH::operator() (const char * hostname) const
+{
+  return new Batch::BatchManager_eSSH(this, hostname);
 }
 
-#endif
+Batch::BatchManager_eClient * 
+Batch::FactBatchManager_eSSH::operator() (const char * hostname,
+				   CommunicationProtocolType protocolType,
+				   const char * mpiImpl,
+				   int nb_proc_per_node) const
+{
+  //protocolType and mpiImpl are ignored.
+  std::cerr << "[Batch::FactBatchManager_eSSH] creating new Batch::BatchManager_eSSH with hostname = " << hostname << std::endl;
+
+  return new Batch::BatchManager_eSSH(this, hostname);
+}
