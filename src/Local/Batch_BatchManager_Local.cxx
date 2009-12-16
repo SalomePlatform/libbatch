@@ -606,7 +606,9 @@ namespace Batch {
 	 UNDER_LOCK( cout << "Status is: " << WCOREDUMP( child_rc) << endl);
 	 UNDER_LOCK( cout << "Status is: " << WIFSTOPPED( child_rc) << endl);
 	 UNDER_LOCK( cout << "Status is: " << WSTOPSIG( child_rc) << endl);
-	 UNDER_LOCK( cout << "Status is: " << WIFCONTINUED( child_rc) << endl);
+#ifdef WIFCONTINUED
+	 UNDER_LOCK( cout << "Status is: " << WIFCONTINUED( child_rc) << endl); // not compilable on sarge
+#endif
         if (WIFSTOPPED(child_rc)) {
           // NOTA : pour rentrer dans cette section, il faut que le flag WUNTRACED
           // soit positionne dans l'appel a waitpid ci-dessus. Ce flag est couramment
