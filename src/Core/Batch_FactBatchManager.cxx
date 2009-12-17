@@ -41,9 +41,11 @@ namespace Batch {
   FactBatchManager::FactBatchManager(const string & _t) : type(_t)
   {
     BatchManagerCatalog::getInstance().addFactBatchManager(type.c_str(), this);
+    /*
     ostringstream msg;
     msg << "FactBatchManager of type '" << type << "' inserted into catalog";
     cerr << msg.str().c_str() << endl;
+    */
   }
 
   // Destructeur

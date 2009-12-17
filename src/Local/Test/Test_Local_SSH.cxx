@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 
 #include <Batch_Job.hxx>
 #include <Batch_BatchManagerCatalog.hxx>
