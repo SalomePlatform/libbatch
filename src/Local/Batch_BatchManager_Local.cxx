@@ -560,7 +560,7 @@ namespace Batch {
     ostringstream thread_id_sst;
     thread_id_sst << id;
     param[ID]         = thread_id_sst.str();
-    param[STATE]      = "Running";
+    param[STATE]      = Batch::RUNNING;
 #ifndef WIN32
     param[PID]        = child;
 #endif
@@ -589,7 +589,7 @@ namespace Batch {
       if (exitCode != STILL_ACTIVE) {
         pthread_mutex_lock(&_bm._threads_mutex);
         _bm._threads[id].status       = DONE;
-        _bm._threads[id].param[STATE] = "Done";
+        _bm._threads[id].param[STATE] = Batch::FINISHED;
         pthread_mutex_unlock(&_bm._threads_mutex);
         // @@@ --------> SECTION CRITIQUE <-------- @@@
         UNDER_LOCK( cout << "Father sees his child is DONE: exit code = " << exitCode << endl );
@@ -619,7 +619,7 @@ namespace Batch {
           // @@@ --------> SECTION CRITIQUE <-------- @@@
           pthread_mutex_lock(&_bm._threads_mutex);
           _bm._threads[id].status       = STOPPED;
-          _bm._threads[id].param[STATE] = "Stopped";
+          _bm._threads[id].param[STATE] = Batch::PAUSED;
           pthread_mutex_unlock(&_bm._threads_mutex);
           // @@@ --------> SECTION CRITIQUE <-------- @@@
           UNDER_LOCK( cout << "Father sees his child is STOPPED : " << child_wait_rc << endl );
@@ -630,7 +630,7 @@ namespace Batch {
           // @@@ --------> SECTION CRITIQUE <-------- @@@
           pthread_mutex_lock(&_bm._threads_mutex);
           _bm._threads[id].status       = DONE;
-          _bm._threads[id].param[STATE] = "Done";
+          _bm._threads[id].param[STATE] = Batch::FINISHED;
           pthread_mutex_unlock(&_bm._threads_mutex);
           // @@@ --------> SECTION CRITIQUE <-------- @@@
           UNDER_LOCK( cout << "Father sees his child is DONE : " << child_wait_rc << " (child_rc=" << (WIFEXITED(child_rc) ? WEXITSTATUS(child_rc) : -1) << ")" << endl );
@@ -642,7 +642,7 @@ namespace Batch {
         // @@@ --------> SECTION CRITIQUE <-------- @@@
         pthread_mutex_lock(&_bm._threads_mutex);
         _bm._threads[id].status       = DEAD;
-        _bm._threads[id].param[STATE] = "Dead";
+        _bm._threads[id].param[STATE] = Batch::FAILED;
         pthread_mutex_unlock(&_bm._threads_mutex);
         // @@@ --------> SECTION CRITIQUE <-------- @@@
         UNDER_LOCK( cout << "Father sees his child is DEAD : " << child_wait_rc << " (Reason : " << strerror(errno) << ")" << endl );

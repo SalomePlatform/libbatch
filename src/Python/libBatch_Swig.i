@@ -46,6 +46,9 @@
 /* generate docstrings with types */
 %feature("autodoc", "1");
 
+/* Include std::string conversion */
+%include std_string.i
+
 /* Inclusion des conversions de type */
 %include libBatch_Swig_typemap.i
 
@@ -64,6 +67,10 @@
 %}
 
 /* Les classes exportees en Python */
+%ignore Batch::JobId::operator=;
+%ignore operator<<(std::ostream & os, const Job & job);
+%ignore operator<<(std::ostream & os, const JobInfo & ji);
+
 %include Batch_Defines.hxx
 %include Batch_Job.hxx
 %include Batch_JobId.hxx
@@ -73,6 +80,7 @@
 %include Batch_BatchManagerCatalog.hxx
 %include Batch_FactBatchManager.hxx
 
+%include Batch_Constants.hxx
 
 
 /* Les methodes alterJob (surchargees et mal gerees en Python) sont

@@ -42,23 +42,17 @@ namespace Batch {
   {
   public:
     // Constructeurs et destructeur
-    JobInfo_ePBS() : _running(false) {};
+    JobInfo_ePBS() {};
     JobInfo_ePBS(int id,std::string logFile);
     virtual ~JobInfo_ePBS();
 
     // Constructeur par recopie
     JobInfo_ePBS(const JobInfo_ePBS & jinfo) : JobInfo(jinfo) {};
 
-    // Teste si un job est present en machine
-    virtual bool isRunning() const;
-
     // Methodes pour l'interfacage avec Python (SWIG)
     // TODO : supprimer ces methodes et transferer leur definitions dans SWIG
     std::string  __str__() const; // SWIG : affichage en Python
     std::string  __repr__() const { return __str__(); }; // SWIG : affichage en Python
-
-  protected:
-    bool _running; // etat du job en machine
 
   private:
     // Convertit une date HH:MM:SS en secondes

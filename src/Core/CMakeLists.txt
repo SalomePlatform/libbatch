@@ -28,6 +28,7 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_CharType
                Core/Batch_CommunicationProtocol
                Core/Batch_ConnexionFailureException
+               Core/Batch_Constants
                Core/Batch_Couple
                Core/Batch_CoupleType
                Core/Batch_Date

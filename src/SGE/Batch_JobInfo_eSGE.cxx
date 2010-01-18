@@ -65,15 +65,34 @@ namespace Batch {
     if( sline.length() > 0 ){
       istringstream iss(sline);
       iss >> status >> status >> status >> status >> status;
+
+      if (status == "d") {         // Deletion
+        _param[STATE] = FAILED;
+      } else if (status == "t") {  // Transferring
+        _param[STATE] = IN_PROCESS;
+      } else if (status == "r") {  // Running
+        _param[STATE] = RUNNING;
+        _running = true;
+      } else if (status == "R") {  // Restarted
+        _param[STATE] = RUNNING;
+        _running = true;
+      } else if (status == "s") {  // Suspended
+        _param[STATE] = PAUSED;
+      } else if (status == "S") {  // Suspended
+        _param[STATE] = PAUSED;
+      } else if (status == "T") {  // Threshold
+        _param[STATE] = PAUSED;
+      } else if (status == "qw") { // Queued and waiting
+        _param[STATE] = QUEUED;
+      } else if (status == "h") {  // Hold
+        _param[STATE] = PAUSED;
+      } else {
+        cerr << "Unknown job state code: " << status << endl;
+      }
+    } else {
+      // TODO: Check this. I suppose that unknown jobs are finished ones.
+      _param[STATE] = FINISHED;
     }
-    else
-      status = "e";
-
-    _param[STATE] = status;
-
-    if( status.find("r") != string::npos)
-      _running = true;
-
   }
 
   // Teste si un job est present en machine

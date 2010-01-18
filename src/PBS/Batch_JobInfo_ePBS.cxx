@@ -43,8 +43,6 @@ using namespace std;
 
 namespace Batch {
 
-
-
   // Constructeurs
   JobInfo_ePBS::JobInfo_ePBS(int id, string logFile) : JobInfo()
   {
@@ -57,7 +55,6 @@ namespace Batch {
     char line[128];
     ifstream fp(logFile.c_str(),ios::in);
 
-    string status;
     string sline;
     size_t pos = string::npos;
     while( (pos == string::npos) && fp.getline(line,80,'\n') ){
@@ -66,27 +63,38 @@ namespace Batch {
     };
 
     if(pos!=string::npos){
+      string status;
       istringstream iss(sline);
       iss >> status;
       iss >> status;
       iss >> status;
+
+      if (status == "C") {        // Completed
+        _param[STATE] = FINISHED;
+      } else if (status == "E") { // Exiting
+        _param[STATE] = RUNNING;
+      } else if (status == "H") { // Held
+        _param[STATE] = PAUSED;
+      } else if (status == "Q") { // Queued
+        _param[STATE] = QUEUED;
+      } else if (status == "R") { // Running
+        _param[STATE] = RUNNING;
+      } else if (status == "S") { // Suspend
+        _param[STATE] = PAUSED;
+      } else if (status == "T") { // Transiting
+        _param[STATE] = IN_PROCESS;
+      } else if (status == "W") { // Waiting
+        _param[STATE] = PAUSED;
+      } else {
+        cerr << "Unknown job state code: " << status << endl;
+      }
+    } else {
+      // On some batch managers, the job is deleted as soon as it is finished,
+      // so we have to consider that an unknown job is a finished one, even if
+      // it is not always true.
+      _param[STATE] = FINISHED;
     }
-    else
-      status = "U";
-
-    _param[STATE] = status;
-
-    if( status.find("R") != string::npos)
-      _running = true;
-
   }
-
-  // Teste si un job est present en machine
-  bool JobInfo_ePBS::isRunning() const
-  {
-    return _running;
-  }
-
 
   // Destructeur
   JobInfo_ePBS::~JobInfo_ePBS()
@@ -113,6 +121,5 @@ namespace Batch {
 
     return sst.str();
   }
-
 
 }

@@ -136,7 +136,7 @@ int main(int argc, char** argv)
     JobInfo jinfo = jobid.queryJob();
     string state = jinfo.getParametre()["STATE"].str();
     cout << "State is \"" << state << "\"";
-    while (!timeoutReached && state != "U" && state != "C") {
+    while (!timeoutReached && state != FINISHED && state != FAILED) {
       cout << ", sleeping " << sleeptime << "s..." << endl;
       sleep(sleeptime);
       time += sleeptime;
@@ -152,7 +152,7 @@ int main(int argc, char** argv)
     }
     cout << endl;
 
-    if (state == "U" || state == "C") {
+    if (state == FINISHED || state == FAILED) {
       cout << "Job " << jobid.__repr__() << " is done" << endl;
       bm->importOutputFiles(job, ".");
     } else {

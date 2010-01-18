@@ -210,38 +210,3 @@ typedef int Py_ssize_t;
   $1 = E;
 }
 
-
-
-# // construction d'une string Python a partir d'une string STL
-%typemap(python,out) std::string
-{
-	$result = PyString_FromString($1.c_str());
-}
-
-
-
-# // construction d'une string STL a partir d'une string Python
-#%typemap(in) string & (string S)
-#{
-##  if (!PyString_Check($input)) {
-#    PyErr_SetString(PyExc_ValueError,"Expected a string");
-#    return NULL;
-#  }
-#
-#  S = string(PyString_AsString($input));
-#	$1 = &S; // $1 est une reference donc on lui passe une adresse
-#}
-
-
-
-# // construction d'une string STL a partir d'une string Python
-#%typemap(in) string (string S)
-#{
-##  if (!PyString_Check($input)) {
-#    PyErr_SetString(PyExc_ValueError,"Expected a string");
-#    return NULL;
-#  }
-#
-#  S = string(PyString_AsString($input));
-#	$1 = S;
-#}

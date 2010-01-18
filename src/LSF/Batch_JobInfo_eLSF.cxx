@@ -63,7 +63,27 @@ namespace Batch {
     fp >> username;
     fp >> status;
 
-    _param[STATE] = status;
+    if (status == "PEND") {         // Pending
+      _param[STATE] = QUEUED;
+    } else if (status == "PSUSP") { // Suspended while pending
+      _param[STATE] = PAUSED;
+    } else if (status == "RUN") {   // Running
+      _param[STATE] = RUNNING;
+    } else if (status == "USUSP") { // Suspended while running
+      _param[STATE] = PAUSED;
+    } else if (status == "SSUSP") { // Suspended by LSF
+      _param[STATE] = PAUSED;
+    } else if (status == "DONE") {  // Finished successfully
+      _param[STATE] = FINISHED;
+    } else if (status == "EXIT") {  // Finished in error
+      _param[STATE] = FAILED;
+    } else if (status == "UNKWN") { // Lost contact
+      _param[STATE] = FAILED;
+    } else if (status == "ZOMBI") { // Zombie
+      _param[STATE] = FAILED;
+    } else {
+      cerr << "Unknown job state code: " << status << endl;
+    }
 
     if( status.find("RUN") != string::npos)
       _running = true;

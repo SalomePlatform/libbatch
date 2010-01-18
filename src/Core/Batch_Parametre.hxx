@@ -31,21 +31,18 @@
 #ifndef _PARAMETRE_H_
 #define _PARAMETRE_H_
 
-#include "Batch_Defines.hxx"
-
 #include <map>
 #include <string>
+
+#include "Batch_Defines.hxx"
+#include "Batch_Constants.hxx"
 #include "Batch_InvalidKeyException.hxx"
 #include "Batch_Versatile.hxx"
 
-// Ces macros permettent de simplifier l'ajout de nouvelles
-// clefs dans la map Parametre
-// TODO : remplacer ce mecanisme statique par la lecture
-// TODO : d'une descrption dans un fichier exterieur (genre XML)
-
+// TODO: These declarations are here only to avoid breaking Kernel compilation for now.
+// They must be removed as soon as possible.
 #define def_extern_MapKey(mk) extern BATCH_EXPORT const std::string & mk;
-#define def_static_MapKey(mk) const std::string Batch::Parametre::mk(#mk);	\
-  const std::string & mk = Batch::Parametre::mk;
+#define def_static_MapKey(mk) const std::string & mk = #mk;
 
 namespace Batch {
 
@@ -65,48 +62,6 @@ namespace Batch {
     // Operateur d'affectation
     Parametre & operator =(const Parametre & PM);
 
-    // Declarations statique des clefs de la map
-    // TODO : supprimer les declarations statiques des clefs de la map
-    static const std::string ACCOUNT;
-    static const std::string ARGUMENTS;
-    static const std::string CHECKPOINT;
-    static const std::string CKPTINTERVAL;
-    static const std::string CREATIONTIME;
-    static const std::string EGROUP;
-    static const std::string ELIGIBLETIME;
-    static const std::string ENDTIME;
-    static const std::string EUSER;
-    static const std::string EXECUTABLE;
-    static const std::string EXECUTIONHOST;
-    static const std::string EXITCODE;
-    static const std::string HOLD;
-    static const std::string ID;
-    static const std::string INFILE;
-    static const std::string MAIL;
-    static const std::string MAXCPUTIME;
-    static const std::string MAXDISKSIZE;
-    static const std::string MAXRAMSIZE;
-    static const std::string MAXWALLTIME;
-    static const std::string MODIFICATIONTIME;
-    static const std::string NAME;
-    static const std::string NBPROC;
-    static const std::string OUTFILE;
-    static const std::string PID;
-    static const std::string QUEUE;
-    static const std::string QUEUEDTIME;
-    static const std::string SERVER;
-    static const std::string STARTTIME;
-    static const std::string STATE;
-    static const std::string TEXT;
-    static const std::string TMPDIR;
-    static const std::string USEDCPUTIME;
-    static const std::string USEDDISKSIZE;
-    static const std::string USEDRAMSIZE;
-    static const std::string USEDWALLTIME;
-    static const std::string USER;
-    static const std::string WORKDIR;
-    static const std::string HOMEDIR;
-
   protected:
     std::map< std::string, TypeParam > TypeMap; // map interne servant a controler le type de la valeur associee a chaque clef
 
@@ -116,6 +71,8 @@ namespace Batch {
 
 }
 
+// TODO: These declarations in global namespace are here only to avoid breaking Kernel compilation for now.
+// They must be removed as soon as possible.
 def_extern_MapKey(ACCOUNT)
 def_extern_MapKey(ARGUMENTS)
 def_extern_MapKey(CHECKPOINT)

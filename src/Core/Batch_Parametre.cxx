@@ -34,9 +34,8 @@
 
 using namespace std;
 
-// Definition des membres constants statiques
-// Definition des noms globaux pour les clefs en tant que references
-// TODO : supprimer les declarations statiques des clefs de la map
+// TODO: These definitions in global namespace are here only to avoid breaking Kernel compilation for now.
+// They must be removed as soon as possible.
 def_static_MapKey(ACCOUNT)
 def_static_MapKey(ARGUMENTS)
 def_static_MapKey(CHECKPOINT)

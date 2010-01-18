@@ -67,22 +67,30 @@ namespace Batch {
       if (sourceUser.size() != 0) {
         fullSource += sourceUser + "@";
       }
-      fullSource += sourceHost + ":'";
+      fullSource += sourceHost + ":";
     }
+#ifndef WIN32
+    fullSource += "'";
+#endif
     fullSource += sourcePath;
-    if (sourceHost.size() != 0)
-      fullSource += "'";
+#ifndef WIN32
+    fullSource += "'";
+#endif
 
     string fullDestination;
     if (destinationHost.size() != 0) {
       if (destinationUser.size() != 0) {
         fullDestination += destinationUser + "@";
       }
-      fullDestination += destinationHost + ":'";
+      fullDestination += destinationHost + ":";
     }
+#ifndef WIN32
+    fullDestination += "'";
+#endif
     fullDestination += destinationPath;
-    if (destinationHost.size() != 0)
-      fullDestination += "'";
+#ifndef WIN32
+    fullDestination += "'";
+#endif
 
     // Option -p is used to keep the same permissions for the destination file
     // (particularly useful to keep scripts executable when copying them)

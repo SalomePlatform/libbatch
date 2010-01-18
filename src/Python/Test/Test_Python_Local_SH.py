@@ -71,7 +71,7 @@ def work():
     # Wait for the end of the job
     state = 'Unknown'
     i=0
-    while state != 'Done' and i<config.TEST_LOCAL_SH_TIMEOUT*10:
+    while state != FINISHED and state != FAILED and i<config.TEST_LOCAL_SH_TIMEOUT*10:
         time.sleep(0.1)
         i+=1
         jinfo = jobid.queryJob()
@@ -81,7 +81,7 @@ def work():
             pass
         print "State is", state
 
-    if state != "Done":
+    if state != FINISHED and state != FAILED:
         print "Error: Job not finished after timeout"
         return 1;
 

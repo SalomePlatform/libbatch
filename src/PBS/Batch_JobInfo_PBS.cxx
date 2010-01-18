@@ -78,7 +78,26 @@ namespace Batch {
 	_param[USER] = value;
 
       } else if (name == ATTR_state) {
-	_param[STATE] = value;
+        string status = value;
+        if (status == "C") {        // Completed
+          _param[STATE] = FINISHED;
+        } else if (status == "E") { // Exiting
+          _param[STATE] = RUNNING;
+        } else if (status == "H") { // Held
+          _param[STATE] = PAUSED;
+        } else if (status == "Q") { // Queued
+          _param[STATE] = QUEUED;
+        } else if (status == "R") { // Running
+          _param[STATE] = RUNNING;
+        } else if (status == "S") { // Suspend
+          _param[STATE] = PAUSED;
+        } else if (status == "T") { // Transiting
+          _param[STATE] = IN_PROCESS;
+        } else if (status == "W") { // Waiting
+          _param[STATE] = PAUSED;
+        } else {
+          cerr << "Unknown job state code: " << status << endl;
+        }
 
       } else if (name == ATTR_queue) {
 	_param[QUEUE] = value;

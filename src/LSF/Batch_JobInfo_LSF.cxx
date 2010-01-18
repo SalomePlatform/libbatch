@@ -126,6 +126,7 @@ namespace Batch {
     if (IS_POST_ERR(jobInfo.status))
       status << " Job is post-error;";
 
+    // TODO: Use constants for STATE instead
     _param[STATE] = status.str();
     _running = IS_FINISH(jobInfo.status) ? false : true;
 
