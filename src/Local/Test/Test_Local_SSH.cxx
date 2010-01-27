@@ -71,15 +71,15 @@ int main(int argc, char** argv)
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p["EXECUTABLE"]    = "source copied-test-script.sh";
-    p["NAME"]          = "Test_Local_SSH";
-    p["WORKDIR"]       = workdir;
-    p["INFILE"]        = Couple("seta.sh", "copied-seta.sh");
-    p["INFILE"]       += Couple("setb.sh", "copied-setb.sh");
-    p["INFILE"]       += Couple("test-script.sh", "copied-test-script.sh");
-    p["OUTFILE"]       = Couple("result.txt", "orig-result.txt");
-    p["EXECUTIONHOST"] = exechost;
-    p["USER"]          = user;
+    p[EXECUTABLE]    = "source copied-test-script.sh";
+    p[NAME]          = "Test_Local_SSH";
+    p[WORKDIR]       = workdir;
+    p[INFILE]        = Couple("seta.sh", "copied-seta.sh");
+    p[INFILE]       += Couple("setb.sh", "copied-setb.sh");
+    p[INFILE]       += Couple("test-script.sh", "copied-test-script.sh");
+    p[OUTFILE]       = Couple("result.txt", "orig-result.txt");
+    p[EXECUTIONHOST] = exechost;
+    p[USER]          = user;
     job.setParametre(p);
     // ... and its environment (SSH_AUTH_SOCK env var is important for ssh agent authentication)
     Environnement e;
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
     string state = "Unknown";
     for (int i=0 ; i<timeout*10 && state != FINISHED && state != FAILED ; i++) {
       usleep(100000);
-      Versatile paramState = jobid.queryJob().getParametre()["STATE"];
+      Versatile paramState = jobid.queryJob().getParametre()[STATE];
       state = (paramState.size() > 0) ? paramState.str() : "Unknown";
       cout << "Job state is: " << state << endl;
     }

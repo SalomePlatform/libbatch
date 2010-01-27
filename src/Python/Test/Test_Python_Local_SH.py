@@ -42,13 +42,13 @@ def work():
     job = Job()
     # ... and its parameters ...
     p = {}
-    p['EXECUTABLE'] = './copied-' + config.EXEC_TEST_NAME
-    p["ARGUMENTS"]  = ["copied-seta.sh", "copied-setb.sh", "orig-result.txt"];
-    p['NAME'] = 'Test_Python_Local_SH'
-    p['WORKDIR'] = config.TEST_LOCAL_SH_WORK_DIR
-    p['INFILE'] = [('seta.sh', 'copied-seta.sh'), ('setb.sh', 'copied-setb.sh'),
+    p[EXECUTABLE] = './copied-' + config.EXEC_TEST_NAME
+    p[ARGUMENTS]  = ["copied-seta.sh", "copied-setb.sh", "orig-result.txt"];
+    p[NAME] = 'Test_Python_Local_SH'
+    p[WORKDIR] = config.TEST_LOCAL_SH_WORK_DIR
+    p[INFILE] = [('seta.sh', 'copied-seta.sh'), ('setb.sh', 'copied-setb.sh'),
                    (config.EXEC_TEST_FULL_PATH, 'copied-' + config.EXEC_TEST_NAME)]
-    p['OUTFILE'] = [('result.txt', 'orig-result.txt')]
+    p[OUTFILE] = [('result.txt', 'orig-result.txt')]
     job.setParametre(p)
     # ... and its environment
     e = {}
@@ -76,7 +76,7 @@ def work():
         i+=1
         jinfo = jobid.queryJob()
         try:
-            state = jinfo.getParametre()['STATE']
+            state = jinfo.getParametre()[STATE]
         except KeyError:
             pass
         print "State is", state

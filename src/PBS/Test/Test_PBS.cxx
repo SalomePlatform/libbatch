@@ -81,16 +81,16 @@ int main(int argc, char** argv)
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p["EXECUTABLE"]    = "test-script.sh";
-    p["NAME"]          = "Test_PBS";
-    p["INFILE"]        = Couple(workdir + "/seta.sh", "seta.sh");
-    p["INFILE"]       += Couple(workdir + "/setb.sh", "setb.sh");
-    p["OUTFILE"]       = Couple(workdir + "/result.txt", "result.txt");
-    p["USER"]          = user;
-    p["NBPROC"]        = 1;
-    p["MAXWALLTIME"]   = 1;
-    p["MAXRAMSIZE"]    = 4;
-    p["QUEUE"]         = queue;
+    p[EXECUTABLE]    = "test-script.sh";
+    p[NAME]          = "Test_PBS";
+    p[INFILE]        = Couple(workdir + "/seta.sh", "seta.sh");
+    p[INFILE]       += Couple(workdir + "/setb.sh", "setb.sh");
+    p[OUTFILE]       = Couple(workdir + "/result.txt", "result.txt");
+    p[USER]          = user;
+    p[NBPROC]        = 1;
+    p[MAXWALLTIME]   = 1;
+    p[MAXRAMSIZE]    = 4;
+    p[QUEUE]         = queue;
     job.setParametre(p);
     // ... and its environment
     Environnement e;
@@ -115,9 +115,9 @@ int main(int argc, char** argv)
     bool testTimeout = (timeout > -1);
     bool timeoutReached = (testTimeout && time >= timeout);
     JobInfo jinfo = jobid.queryJob();
-    string state = jinfo.getParametre()["STATE"].str();
+    string state = jinfo.getParametre()[STATE].str();
     cout << "State is \"" << state << "\"";
-    while (!timeoutReached && state != "U" && state != "C") {
+    while (!timeoutReached && state != FINISHED && state != FAILED) {
       cout << ", sleeping " << sleeptime << "s..." << endl;
       sleep(sleeptime);
       time += sleeptime;
@@ -128,12 +128,12 @@ int main(int argc, char** argv)
       if (sleeptime > MAX_SLEEP_TIME)
         sleeptime = MAX_SLEEP_TIME;
       jinfo = jobid.queryJob();
-      state = jinfo.getParametre()["STATE"].str();
+      state = jinfo.getParametre()[STATE].str();
       cout << "State is \"" << state << "\"";
     }
     cout << endl;
 
-    if (state == "U" || state == "C") {
+    if (state == FINISHED || state == FAILED) {
       cout << "Job " << jobid.__repr__() << " is done" << endl;
     } else {
       cerr << "Timeout while executing job" << endl;

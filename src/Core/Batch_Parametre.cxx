@@ -34,48 +34,6 @@
 
 using namespace std;
 
-// TODO: These definitions in global namespace are here only to avoid breaking Kernel compilation for now.
-// They must be removed as soon as possible.
-def_static_MapKey(ACCOUNT)
-def_static_MapKey(ARGUMENTS)
-def_static_MapKey(CHECKPOINT)
-def_static_MapKey(CKPTINTERVAL)
-def_static_MapKey(CREATIONTIME)
-def_static_MapKey(EGROUP)
-def_static_MapKey(ELIGIBLETIME)
-def_static_MapKey(ENDTIME)
-def_static_MapKey(EUSER)
-def_static_MapKey(EXECUTABLE)
-def_static_MapKey(EXECUTIONHOST)
-def_static_MapKey(EXITCODE)
-def_static_MapKey(HOLD)
-def_static_MapKey(ID)
-def_static_MapKey(INFILE)
-def_static_MapKey(MAIL)
-def_static_MapKey(MAXCPUTIME)
-def_static_MapKey(MAXDISKSIZE)
-def_static_MapKey(MAXRAMSIZE)
-def_static_MapKey(MAXWALLTIME)
-def_static_MapKey(MODIFICATIONTIME)
-def_static_MapKey(NAME)
-def_static_MapKey(NBPROC)
-def_static_MapKey(OUTFILE)
-def_static_MapKey(PID)
-def_static_MapKey(QUEUE)
-def_static_MapKey(QUEUEDTIME)
-def_static_MapKey(SERVER)
-def_static_MapKey(STARTTIME)
-def_static_MapKey(STATE)
-def_static_MapKey(TEXT)
-def_static_MapKey(TMPDIR)
-def_static_MapKey(USEDCPUTIME)
-def_static_MapKey(USEDDISKSIZE)
-def_static_MapKey(USEDRAMSIZE)
-def_static_MapKey(USEDWALLTIME)
-def_static_MapKey(USER)
-def_static_MapKey(WORKDIR)
-def_static_MapKey(HOMEDIR)
-
 namespace Batch {
 
   // Constructeur standard

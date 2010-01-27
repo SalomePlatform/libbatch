@@ -36,13 +36,7 @@
 
 #include "Batch_Defines.hxx"
 #include "Batch_Constants.hxx"
-#include "Batch_InvalidKeyException.hxx"
 #include "Batch_Versatile.hxx"
-
-// TODO: These declarations are here only to avoid breaking Kernel compilation for now.
-// They must be removed as soon as possible.
-#define def_extern_MapKey(mk) extern BATCH_EXPORT const std::string & mk;
-#define def_static_MapKey(mk) const std::string & mk = #mk;
 
 namespace Batch {
 
@@ -70,47 +64,5 @@ namespace Batch {
   };
 
 }
-
-// TODO: These declarations in global namespace are here only to avoid breaking Kernel compilation for now.
-// They must be removed as soon as possible.
-def_extern_MapKey(ACCOUNT)
-def_extern_MapKey(ARGUMENTS)
-def_extern_MapKey(CHECKPOINT)
-def_extern_MapKey(CKPTINTERVAL)
-def_extern_MapKey(CREATIONTIME)
-def_extern_MapKey(EGROUP)
-def_extern_MapKey(ELIGIBLETIME)
-def_extern_MapKey(ENDTIME)
-def_extern_MapKey(EUSER)
-def_extern_MapKey(EXECUTABLE)
-def_extern_MapKey(EXECUTIONHOST)
-def_extern_MapKey(EXITCODE)
-def_extern_MapKey(HOLD)
-def_extern_MapKey(ID)
-def_extern_MapKey(INFILE)
-def_extern_MapKey(MAIL)
-def_extern_MapKey(MAXCPUTIME)
-def_extern_MapKey(MAXDISKSIZE)
-def_extern_MapKey(MAXRAMSIZE)
-def_extern_MapKey(MAXWALLTIME)
-def_extern_MapKey(MODIFICATIONTIME)
-def_extern_MapKey(NAME)
-def_extern_MapKey(NBPROC)
-def_extern_MapKey(OUTFILE)
-def_extern_MapKey(PID)
-def_extern_MapKey(QUEUE)
-def_extern_MapKey(QUEUEDTIME)
-def_extern_MapKey(SERVER)
-def_extern_MapKey(STARTTIME)
-def_extern_MapKey(STATE)
-def_extern_MapKey(TEXT)
-def_extern_MapKey(TMPDIR)
-def_extern_MapKey(USEDCPUTIME)
-def_extern_MapKey(USEDDISKSIZE)
-def_extern_MapKey(USEDRAMSIZE)
-def_extern_MapKey(USEDWALLTIME)
-def_extern_MapKey(USER)
-def_extern_MapKey(WORKDIR)
-def_extern_MapKey(HOMEDIR)
 
 #endif
