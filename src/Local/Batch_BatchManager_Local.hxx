@@ -58,9 +58,14 @@ namespace Batch {
 
   class FactBatchManager;
 
+  /*!
+   *  This class defines a local pseudo batch manager that can launch jobs locally or on a remote
+   *  machine with SSH or RSH. This class is NOT thread-safe.
+   */
   class BATCH_EXPORT BatchManager_Local : virtual public BatchManager
   {
   private:
+    typedef int Id;
 #ifdef WIN32
     typedef HANDLE Process;
 #else
@@ -69,13 +74,14 @@ namespace Batch {
     friend class ThreadAdapter;
     class ThreadAdapter{
     public:
-      ThreadAdapter(BatchManager_Local & bm, const Job_Local & job);
+      ThreadAdapter(BatchManager_Local & bm, const Job_Local & job, Id id);
       static void * run(void * arg);
       BatchManager_Local & getBatchManager() const { return _bm; };
 
     protected:
       BatchManager_Local & _bm;
       const Job_Local _job;
+      Id _id;
 
     private:
       void pere(Process child);
@@ -86,8 +92,6 @@ namespace Batch {
 #endif
 
     };
-
-    typedef int Id;
 
     enum Commande {
       NOP = 0,
@@ -157,21 +161,11 @@ namespace Batch {
     std::vector<std::string> exec_command(const Parametre & param) const;
 
   private:
-    struct ThreadIdIdAssociation {
-      pthread_t threadId;
-      Id id;
-    };
-
-    virtual pthread_t submit(const Job_Local & job);
     virtual void cancel(pthread_t thread_id);
     static  void kill_child_on_exit(void * p_pid);
     static  void delete_on_exit(void * arg);
-    Id nextId(); // Retourne un identifiant unique pour un thread (clef de la map)
-    Id getIdByThread_id(pthread_t thread_id);
-    Id registerThread_id(pthread_t thread_id);
-    pthread_mutex_t _thread_id_id_association_mutex;
-    pthread_cond_t  _thread_id_id_association_cond;
-    std::list<struct ThreadIdIdAssociation> _thread_id_id_association;
+    pthread_cond_t _threadLaunchCondition;
+    Id _idCounter;
 
 #ifdef SWIG
   public:
