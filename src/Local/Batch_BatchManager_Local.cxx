@@ -274,6 +274,26 @@ namespace Batch {
       }
     }
 
+    if (param.find(INFILE) != param.end()) {
+      Versatile V = param[INFILE];
+      for(Versatile::const_iterator it=V.begin(); it!=V.end(); it++) {
+        Couple cpl = * static_cast<CoupleType*>(*it);
+        string remote = cpl.getRemote();
+        if (remote == "stdin")
+        exec_sub_cmd << " <stdin";
+      }
+    }
+
+    if (param.find(OUTFILE) != param.end()) {
+      Versatile V = param[OUTFILE];
+      for(Versatile::const_iterator it=V.begin(); it!=V.end(); it++) {
+        Couple cpl = * static_cast<CoupleType*>(*it);
+        string remote = cpl.getRemote();
+        if (remote == "stdout") exec_sub_cmd << " 1>stdout";
+        if (remote == "stderr") exec_sub_cmd << " 2>stderr";
+      }
+    }
+
     string user;
     Parametre::const_iterator it = param.find(USER);
     if (it != param.end()) {
