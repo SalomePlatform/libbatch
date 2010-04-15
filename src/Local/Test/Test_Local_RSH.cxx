@@ -64,7 +64,6 @@ int main(int argc, char** argv)
     const string & exechost = parser.getValue("TEST_LOCAL_RSH_EXECUTION_HOST");
     const string & user = parser.getValue("TEST_LOCAL_RSH_USER");
     int timeout = parser.getValueAsInt("TEST_LOCAL_RSH_TIMEOUT");
-    int finalizationTime = parser.getValueAsInt("TEST_LOCAL_RSH_FINALIZATION_TIME");
 
     // Define the job...
     Job job;
@@ -115,10 +114,6 @@ int main(int argc, char** argv)
     }
 
     cout << "Job " << jobid.__repr__() << " is done" << endl;
-
-    // wait for the copy of output files and the cleanup
-    // (there's no cleaner way to do that yet)
-    sleep(finalizationTime);
 
   } catch (GenericException e) {
     cerr << "Error: " << e << endl;

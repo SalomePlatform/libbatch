@@ -77,6 +77,7 @@ namespace Batch {
       ThreadAdapter(BatchManager_Local & bm, const Job_Local & job, Id id);
       static void * run(void * arg);
       BatchManager_Local & getBatchManager() const { return _bm; };
+      Id getId() const { return _id; };
 
     protected:
       BatchManager_Local & _bm;
@@ -102,20 +103,12 @@ namespace Batch {
       ALTER
     };
 
-    enum Status {
-      UNKNOWN = 0,
-      RUNNING,
-      STOPPED,
-      DONE,
-      DEAD
-    };
-
     struct Child {
       pthread_t thread_id;
       std::queue<Commande, std::deque<Commande> > command_queue;
       pid_t pid;
       int exit_code;
-      Status status;
+      bool hasFailed;
       Parametre param;
       Environnement env;
     };
@@ -164,7 +157,8 @@ namespace Batch {
     virtual void cancel(pthread_t thread_id);
     static  void kill_child_on_exit(void * p_pid);
     static  void delete_on_exit(void * arg);
-    pthread_cond_t _threadLaunchCondition;
+    static void setFailedOnCancel(void * arg);
+    pthread_cond_t _threadSyncCondition;
     Id _idCounter;
 
 #ifdef SWIG

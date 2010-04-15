@@ -87,10 +87,6 @@ def work():
 
     print "Job", jobid, "is done"
 
-    # wait for the copy of output files and the cleanup
-    # (there's no cleaner way to do that yet)
-    time.sleep(config.TEST_LOCAL_SH_FINALIZATION_TIME)
-
     # test the result file
     exp = "c = 12"
     f = open('result.txt')

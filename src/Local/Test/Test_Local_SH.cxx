@@ -63,7 +63,6 @@ int main(int argc, char** argv)
     parser.parseTestConfigFile();
     const string & workdir = parser.getValue("TEST_LOCAL_SH_WORK_DIR");
     int timeout = parser.getValueAsInt("TEST_LOCAL_SH_TIMEOUT");
-    int finalizationTime = parser.getValueAsInt("TEST_LOCAL_SH_FINALIZATION_TIME");
 
     // Define the job...
     Job job;
@@ -115,10 +114,6 @@ int main(int argc, char** argv)
     }
 
     cout << "Job " << jobid.__repr__() << " is done" << endl;
-
-    // wait for the copy of output files and the cleanup
-    // (there's no cleaner way to do that yet)
-    sleep(finalizationTime);
 
   } catch (GenericException e) {
     cerr << "Error: " << e << endl;
