@@ -37,17 +37,8 @@
 
 #include <SimpleParser.hxx>
 
-#ifdef WIN32
-#include <Windows.h>
-#include <direct.h>
-#define sleep(seconds) Sleep((seconds)*1000)
-#define usleep(useconds) Sleep((useconds)/1000)
-#endif
-
 using namespace std;
 using namespace Batch;
-
-const int MAX_SLEEP_TIME = 600;
 
 int main(int argc, char** argv)
 {
@@ -110,28 +101,7 @@ int main(int argc, char** argv)
     cout << jobid.__repr__() << endl;
 
     // Wait for the end of the job
-    int time = 0;
-    int sleeptime = 1;
-    bool testTimeout = (timeout > -1);
-    bool timeoutReached = (testTimeout && time >= timeout);
-    JobInfo jinfo = jobid.queryJob();
-    string state = jinfo.getParametre()[STATE].str();
-    cout << "State is \"" << state << "\"";
-    while (!timeoutReached && state != FINISHED && state != FAILED) {
-      cout << ", sleeping " << sleeptime << "s..." << endl;
-      sleep(sleeptime);
-      time += sleeptime;
-      timeoutReached = (testTimeout && time >= timeout);
-      sleeptime *= 2;
-      if (testTimeout && sleeptime > timeout - time)
-        sleeptime = timeout - time;
-      if (sleeptime > MAX_SLEEP_TIME)
-        sleeptime = MAX_SLEEP_TIME;
-      jinfo = jobid.queryJob();
-      state = jinfo.getParametre()[STATE].str();
-      cout << "State is \"" << state << "\"";
-    }
-    cout << endl;
+    string state = bm->waitForJobEnd(jobid, timeout);
 
     if (state == FINISHED || state == FAILED) {
       cout << "Job " << jobid.__repr__() << " is done" << endl;

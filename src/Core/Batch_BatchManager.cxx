@@ -37,13 +37,17 @@
 # include <netdb.h>
 #endif
 
-//#include "MEDMEM_STRING.hxx"
 #include "Batch_Job.hxx"
 #include "Batch_JobId.hxx"
 #include "Batch_JobInfo.hxx"
 #include "Batch_InvalidArgumentException.hxx"
 #include "Batch_FactBatchManager.hxx"
 #include "Batch_BatchManager.hxx"
+
+#ifdef WIN32
+#define sleep(seconds) Sleep((seconds)*1000)
+#endif
+
 using namespace std;
 
 namespace Batch {
@@ -156,5 +160,45 @@ namespace Batch {
 //   {
 //     return JobInfo();
 //   }
+
+  //! Wait for the end of a job
+  /*!
+   *  This method is a simple way to wait for a job to end. It will query the job state at
+   *  increasing intervals and return when the job is finished (whether successfully or not) or
+   *  when the timeout is reached. This method is not intended to be generic. In many cases you
+   *  will have to write your own loop to wait for the end of a job.
+   *  \param jobid ID of the job to wait for.
+   *  \param timeout Maximum time to wait in seconds. If -1 (default), wait indefinitely.
+   *  \param initSleepTime Initial time in seconds between two queries for the job state (default is 1).
+   *  \param maxSleepTime Maximum time in seconds between two queries for the job state (default is 600).
+   *  \return The job state as returned by the last query.
+   */
+  string BatchManager::waitForJobEnd(const JobId & jobid, long timeout,
+                                     long initSleepTime, long maxSleepTime)
+  {
+    int time = 0;
+    int sleeptime = initSleepTime;
+    bool testTimeout = (timeout > -1);
+    bool timeoutReached = (testTimeout && time >= timeout);
+    JobInfo jinfo = jobid.queryJob();
+    string state = jinfo.getParametre()[STATE].str();
+    cout << "State is \"" << state << "\"";
+    while (!timeoutReached && state != FINISHED && state != FAILED) {
+      cout << ", sleeping " << sleeptime << "s..." << endl;
+      sleep(sleeptime);
+      time += sleeptime;
+      timeoutReached = (testTimeout && time >= timeout);
+      sleeptime *= 2;
+      if (testTimeout && sleeptime > timeout - time)
+        sleeptime = timeout - time;
+      if (sleeptime > maxSleepTime)
+        sleeptime = maxSleepTime;
+      jinfo = jobid.queryJob();
+      state = jinfo.getParametre()[STATE].str();
+      cout << "State is \"" << state << "\"";
+    }
+    cout << endl;
+    return state;
+  }
 
 }

@@ -37,12 +37,6 @@
 
 #include <SimpleParser.hxx>
 
-#ifdef WIN32
-#include <Windows.h>
-#define sleep(seconds) Sleep((seconds)*1000)
-#define usleep(useconds) Sleep((useconds)/1000)
-#endif
-
 using namespace std;
 using namespace Batch;
 
@@ -100,13 +94,7 @@ int main(int argc, char** argv)
     cout << jobid.__repr__() << endl;
 
     // Wait for the end of the job
-    string state = "Unknown";
-    for (int i=0 ; i<timeout*10 && state != FINISHED && state != FAILED ; i++) {
-      usleep(100000);
-      Versatile paramState = jobid.queryJob().getParametre()[STATE];
-      state = (paramState.size() > 0) ? paramState.str() : "Unknown";
-      cout << "Job state is: " << state << endl;
-    }
+    string state = bm->waitForJobEnd(jobid, timeout);
 
     if (state != FINISHED && state != FAILED) {
       cerr << "Error: Job not finished after timeout" << endl;

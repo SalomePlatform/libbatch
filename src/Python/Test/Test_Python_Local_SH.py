@@ -69,17 +69,7 @@ def work():
     jobid.queryJob()
 
     # Wait for the end of the job
-    state = 'Unknown'
-    i=0
-    while state != FINISHED and state != FAILED and i<config.TEST_LOCAL_SH_TIMEOUT*10:
-        time.sleep(0.1)
-        i+=1
-        jinfo = jobid.queryJob()
-        try:
-            state = jinfo.getParametre()[STATE]
-        except KeyError:
-            pass
-        print "State is", state
+    state = bm.waitForJobEnd(jobid, config.TEST_LOCAL_SH_TIMEOUT);
 
     if state != FINISHED and state != FAILED:
         print "Error: Job not finished after timeout"

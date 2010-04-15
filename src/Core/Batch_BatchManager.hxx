@@ -69,6 +69,8 @@ namespace Batch {
     virtual void alterJob(const Batch::JobId & jobid, const Batch::Parametre & param) = 0; // modifie un job en file d'attente
     virtual void alterJob(const Batch::JobId & jobid, const Batch::Environnement & env) = 0; // modifie un job en file d'attente
     virtual Batch::JobInfo queryJob(const Batch::JobId & jobid) = 0; // renvoie l'etat du job
+    virtual std::string waitForJobEnd(const Batch::JobId & jobid, long timeout = -1,
+                                      long initSleepTime = 1, long maxSleepTime = 600);
 
   protected:
     std::string _hostname; // serveur ou tourne le BatchManager
