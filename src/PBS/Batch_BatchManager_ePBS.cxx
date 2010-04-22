@@ -117,14 +117,7 @@ namespace Batch {
     if (sline.size() == 0)
       throw EmulationException("Error in the submission of the job on the remote host");
 
-    size_t pos = sline.find(".");
-    string strjob;
-    if(pos == string::npos)
-      strjob = sline;
-    else
-      strjob = sline.substr(0,pos);
-
-    JobId id(this, strjob);
+    JobId id(this, sline);
     return id;
   }
 
