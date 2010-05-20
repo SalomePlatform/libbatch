@@ -255,7 +255,7 @@ namespace Batch {
     if( edt > 0 )
       tempOutputFile << "#BSUB -W " << getWallTime(edt) << endl ;
     if( mem > 0 )
-      tempOutputFile << "#BSUB -M " << mem*1024 << endl ;
+      tempOutputFile << "#BSUB -M " << mem << endl ;
     tempOutputFile << "#BSUB -n " << nbproc << endl ;
     size_t pos = workDir.find("$HOME");
     string baseDir;
