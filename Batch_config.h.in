@@ -27,7 +27,7 @@
 #cmakedefine MSVC
 #cmakedefine MINGW
 
-/* SH tools (sh, cp, rm) found on the system */
+/* SH tools (sh, cp, rm, mkdir) found on the system */
 #cmakedefine HAS_SH
 
 /* A path to a sh-like command */
@@ -38,6 +38,9 @@
 
 /* A path to a cp-like command */
 #cmakedefine CP_COMMAND "@CP_COMMAND@"
+
+/* A path to a mkdir-like command */
+#cmakedefine MKDIR_COMMAND "@MKDIR_COMMAND@"
 
 /* RSH tools (rsh, rcp) found on the system */
 #cmakedefine HAS_RSH

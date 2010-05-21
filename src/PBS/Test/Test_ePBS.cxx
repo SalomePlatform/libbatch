@@ -99,7 +99,7 @@ int main(int argc, char** argv)
     p[USER]          = user;
     p[NBPROC]        = 1;
     p[MAXWALLTIME]   = 1;
-    p[MAXRAMSIZE]    = 1000;
+    p[MAXRAMSIZE]    = 1;
     p[HOMEDIR]       = homedir;
     p[QUEUE]         = queue;
     job.setParametre(p);
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 
     if (state == FINISHED || state == FAILED) {
       cout << "Job " << jobid.__repr__() << " is done" << endl;
-      bm->importOutputFiles(job, ".");
+      bm->importOutputFiles(job, "resultdir/seconddirname");
     } else {
       cerr << "Timeout while executing job" << endl;
       return 1;
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
   // test the result file
   try {
     SimpleParser resultParser;
-    resultParser.parse("result.txt");
+    resultParser.parse("resultdir/seconddirname/result.txt");
     cout << "Result:" << endl << resultParser;
     const string & envvar = resultParser.getValue("MYENVVAR");
     int result = resultParser.getValueAsInt("c");

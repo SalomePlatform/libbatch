@@ -104,11 +104,26 @@ namespace Batch {
     return string("rm ") + path;
   }
 
+  string CommunicationProtocol::getMakeDirectorySubCommand(const string & path) const
+  {
+    return string("mkdir -p ") + path;
+  }
+
   int CommunicationProtocol::removeFile(const std::string & path,
                                         const std::string & host,
                                         const std::string & user) const
   {
     string command = getExecCommand(getRemoveSubCommand(path), host, user);
+    cout << command.c_str() << endl;
+    int status = system(command.c_str());
+    return status;
+  }
+
+  int CommunicationProtocol::makeDirectory(const std::string & path,
+                                           const std::string & host,
+                                           const std::string & user) const
+  {
+    string command = getExecCommand(getMakeDirectorySubCommand(path), host, user);
     cout << command.c_str() << endl;
     int status = system(command.c_str());
     return status;

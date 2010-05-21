@@ -85,7 +85,17 @@ namespace Batch {
 
   string CommunicationProtocolSH::getRemoveSubCommand(const string & path) const
   {
-    return string(RM_COMMAND) + " " + path;
+    return string(RM_COMMAND) + " " + fixPath(path);
+  }
+
+  string CommunicationProtocolSH::getMakeDirectorySubCommand(const string & path) const
+  {
+    string subCommand = MKDIR_COMMAND;
+#ifndef WIN32
+    subCommand += " -p";
+#endif
+    subCommand += " " + fixPath(path);
+    return subCommand;
   }
 
 }

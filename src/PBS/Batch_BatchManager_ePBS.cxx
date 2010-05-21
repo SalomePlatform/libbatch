@@ -256,7 +256,7 @@ namespace Batch {
     if( edt > 0 )
       tempOutputFile << "#PBS -l walltime=" << edt*60 << endl;
     if( mem > 0 )
-      tempOutputFile << "#PBS -l mem=" << mem << "kb" << endl;
+      tempOutputFile << "#PBS -l mem=" << mem << "MB" << endl;
     tempOutputFile << "#PBS -o " << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "#PBS -e " << workDir << "/logs/error.log."  << rootNameToExecute << endl;
 

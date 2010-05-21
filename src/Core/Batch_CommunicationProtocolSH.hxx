@@ -51,9 +51,11 @@ namespace Batch {
                                                 const std::string & destinationHost,
                                                 const std::string & destinationUser) const;
 
+  protected:
+
     std::string getRemoveSubCommand(const std::string & path) const;
 
-  protected:
+    std::string getMakeDirectorySubCommand(const std::string & path) const;
 
     std::string fixPath(const std::string & path) const;
 

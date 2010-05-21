@@ -64,6 +64,10 @@ namespace Batch {
                            const std::string & host,
                            const std::string & user) const;
 
+    virtual int makeDirectory(const std::string & path,
+                              const std::string & host,
+                              const std::string & user) const;
+
   protected:
 
     virtual std::vector<std::string> getCopyCommandArgs(const std::string & sourcePath,
@@ -74,6 +78,8 @@ namespace Batch {
                                                         const std::string & destinationUser) const=0;
 
     virtual std::string getRemoveSubCommand(const std::string & path) const;
+
+    virtual std::string getMakeDirectorySubCommand(const std::string & path) const;
 
     std::string commandStringFromArgs(const std::vector<std::string> & args) const;
 

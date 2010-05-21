@@ -83,10 +83,7 @@ namespace Batch {
     Versatile::iterator Vit;
     _username = string(params[USER]);
 
-    string subCommand = string("mkdir -p ") + string(params[TMPDIR]) + string("/logs");
-    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
+    status = _protocol.makeDirectory(string(params[TMPDIR]) + "/logs", _hostname, _username);
     if(status) {
       std::ostringstream oss;
       oss << status;
@@ -112,9 +109,9 @@ namespace Batch {
 #ifdef WIN32
       // On Windows, we make the remote file executable afterward because
       // pscp does not preserve access permissions on files
-      subCommand = string("chmod u+x ") + string(params[TMPDIR]) + "/" +
-                   string(params[EXECUTABLE]);
-      command = _protocol.getExecCommand(subCommand, _hostname, _username);
+      string subCommand = string("chmod u+x ") + string(params[TMPDIR]) + "/" +
+                          string(params[EXECUTABLE]);
+      string command = _protocol.getExecCommand(subCommand, _hostname, _username);
       cerr << command.c_str() << endl;
       status = system(command.c_str());
       if(status) {
@@ -152,11 +149,21 @@ namespace Batch {
     Versatile::iterator Vit;
     _username = string(params[USER]);
 
+    // Create local result directory
+    int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
+    if (status) {
+      string mess("Directory creation failed. Status is :");
+      ostringstream status_str;
+      status_str << status;
+      mess += status_str.str();
+      cerr << mess << endl;
+    }
+
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
-      int status = _protocol.copyFile(outputFile.getRemote(), _hostname, _username,
-                                      directory, "", "");
+      status = _protocol.copyFile(outputFile.getRemote(), _hostname, _username,
+                                  directory, "", "");
       if (status) {
         // Try to get what we can (logs files)
         // throw BatchException("Error of connection on remote host");
@@ -169,8 +176,8 @@ namespace Batch {
     }
 
     // Copy logs
-    int status = _protocol.copyFile(string(params[TMPDIR]) + string("/logs"), _hostname, _username,
-				    directory, "", "");
+    status = _protocol.copyFile(string(params[TMPDIR]) + string("/logs"), _hostname, _username,
+                                directory, "", "");
     if (status) {
       std::string mess("Copy logs directory failed ! status is :");
       ostringstream status_str;
