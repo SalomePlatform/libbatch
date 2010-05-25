@@ -774,8 +774,8 @@ namespace Batch {
       if (param.find(MAXRAMSIZE) != param.end()) {
         int maxramsize = param[MAXRAMSIZE];
         struct rlimit limit;
-        limit.rlim_cur = maxramsize * 1024;
-        limit.rlim_max = int(maxramsize * 1.1) * 1024;
+        limit.rlim_cur = maxramsize * 1024 * 1024;
+        limit.rlim_max = int(maxramsize * 1.1) * 1024 * 1024;
         setrlimit(RLIMIT_AS, &limit);
       }
 
