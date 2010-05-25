@@ -142,12 +142,22 @@ namespace Batch {
 
     // @@@ --------> SECTION CRITIQUE <-------- @@@
     pthread_mutex_lock(&_threads_mutex);
-    if (_threads.find(id) != _threads.end())
-      thread_id = _threads[id].thread_id;
+    bool idFound = (_threads.find(id) != _threads.end());
+    if (idFound) {
+      string state = _threads[id].param[STATE];
+      if (state != FINISHED && state != FAILED) {
+        pthread_cancel(_threads[id].thread_id);
+        pthread_cond_wait(&_threadSyncCondition, &_threads_mutex);
+      } else {
+        cout << "Cannot delete job " << jobid.getReference() <<
+                ". Job is already finished." << endl;
+      }
+    }
     pthread_mutex_unlock(&_threads_mutex);
     // @@@ --------> SECTION CRITIQUE <-------- @@@
 
-    cancel(thread_id);
+    if (!idFound)
+      throw RunTimeException(string("Job with id ") + jobid.getReference() + " does not exist");
   }
 
   // Methode pour le controle des jobs : suspend un job en file d'attente
@@ -255,15 +265,6 @@ namespace Batch {
     return running;
   }
 
-  // Methode de destruction d'un job
-  void BatchManager_Local::cancel(pthread_t thread_id)
-  {
-    pthread_mutex_lock(&_threads_mutex);
-    pthread_cancel(thread_id);
-    pthread_cond_wait(&_threadSyncCondition, &_threads_mutex);
-    pthread_mutex_unlock(&_threads_mutex);
-  }
-
 
   vector<string> BatchManager_Local::exec_command(const Parametre & param) const
   {
@@ -347,9 +348,9 @@ namespace Batch {
     // Cette fontion sera automatiquement appelee lorsqu'une demande d'annulation
     // sera prise en compte par pthread_testcancel()
     Process child;
+    pthread_cleanup_push(BatchManager_Local::delete_on_exit, arg);
     pthread_cleanup_push(BatchManager_Local::setFailedOnCancel, arg);
     pthread_cleanup_push(BatchManager_Local::kill_child_on_exit, static_cast<void *> (&child));
-    pthread_cleanup_push(BatchManager_Local::delete_on_exit, arg);
 
 
     // Le code retour cumule (ORed) de tous les appels

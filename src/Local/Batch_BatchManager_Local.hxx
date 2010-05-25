@@ -154,7 +154,6 @@ namespace Batch {
     std::vector<std::string> exec_command(const Parametre & param) const;
 
   private:
-    virtual void cancel(pthread_t thread_id);
     static  void kill_child_on_exit(void * p_pid);
     static  void delete_on_exit(void * arg);
     static void setFailedOnCancel(void * arg);
