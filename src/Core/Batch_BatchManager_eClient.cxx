@@ -292,13 +292,13 @@ namespace Batch {
   const std::string & BatchManager_eClient::getTmpDir()
   {
     if (tmpDirName.empty()) {
-      char * baseDir = getenv("TEMP");
+      const char * baseDir = getenv("TEMP");
       if (baseDir == NULL) baseDir = getenv("TMP");
       if (baseDir == NULL) baseDir = getenv("TEMPDIR");
       if (baseDir == NULL) baseDir = getenv("TMPDIR");
       if (baseDir == NULL) baseDir = "/tmp";
 
-      char * userName = getenv("USER");
+      const char * userName = getenv("USER");
       if (userName == NULL) userName = getenv("USERNAME");
       if (userName == NULL) userName = "unknown";
 
