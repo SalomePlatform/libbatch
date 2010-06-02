@@ -33,6 +33,7 @@ extern "C" {
 #include <pbs_error.h>
 #include <pbs_ifl.h>
 }
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
