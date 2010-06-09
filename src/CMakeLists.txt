@@ -50,6 +50,7 @@ IF (BUILD_LOCAL_SUBMISSION)
     add_subdirectory (Local)
 ENDIF (BUILD_LOCAL_SUBMISSION)
 
+add_subdirectory (CCC)
 add_subdirectory (LSF)
 add_subdirectory (PBS)
 add_subdirectory (SGE)
