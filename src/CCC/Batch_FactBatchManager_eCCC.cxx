@@ -33,6 +33,8 @@
 
 namespace Batch {
 
+  static FactBatchManager_eCCC sFBM_eCCC;
+
   // Constructeur
   FactBatchManager_eCCC::FactBatchManager_eCCC() : FactBatchManager_eClient("eCCC")
   {
