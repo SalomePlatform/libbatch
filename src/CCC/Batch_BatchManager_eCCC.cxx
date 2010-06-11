@@ -255,7 +255,7 @@ namespace Batch {
     if( edt > 0 )
       tempOutputFile << "#MSUB -T " << edt << endl ;
     if( mem > 0 )
-      tempOutputFile << "#MSUB -M " << mem/1024 << endl ;
+      tempOutputFile << "#MSUB -M " << mem << endl ;
     tempOutputFile << "#MSUB -n " << nbproc << endl ;
     size_t pos = workDir.find("$HOME");
     string baseDir;
