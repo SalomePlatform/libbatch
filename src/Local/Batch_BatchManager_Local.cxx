@@ -601,15 +601,15 @@ namespace Batch {
 
       // On regarde si le fils n'a pas depasse son temps (wallclock time)
       time_t child_currenttime = time(NULL);
-      time_t child_elapsedtime = child_currenttime - child_starttime;
+      long child_elapsedtime_minutes = (child_currenttime - child_starttime) / 60L;
       if (param.find(MAXWALLTIME) != param.end()) {
-        int maxwalltime = param[MAXWALLTIME];
+        long maxwalltime = param[MAXWALLTIME];
         // 	  cout << "child_starttime          = " << child_starttime        << endl
         // 	       << "child_currenttime        = " << child_currenttime      << endl
         // 	       << "child_elapsedtime        = " << child_elapsedtime      << endl
         // 	       << "maxwalltime              = " << maxwalltime            << endl
         // 	       << "int(maxwalltime * 1.1)   = " << int(maxwalltime * 1.1) << endl;
-        if (child_elapsedtime > int(maxwalltime * 1.1) ) { // On se donne 10% de marge avant le KILL
+        if (child_elapsedtime_minutes > long((float)maxwalltime * 1.1) ) { // On se donne 10% de marge avant le KILL
           UNDER_LOCK( cout << "Father is sending KILL command to the thread " << _id << endl );
           // On introduit une commande dans la queue du thread
           // @@@ --------> SECTION CRITIQUE <-------- @@@
@@ -620,7 +620,7 @@ namespace Batch {
           // @@@ --------> SECTION CRITIQUE <-------- @@@
 
 
-        } else if (child_elapsedtime > maxwalltime ) {
+        } else if (child_elapsedtime_minutes > maxwalltime ) {
           UNDER_LOCK( cout << "Father is sending TERM command to the thread " << _id << endl );
           // On introduit une commande dans la queue du thread
           // @@@ --------> SECTION CRITIQUE <-------- @@@

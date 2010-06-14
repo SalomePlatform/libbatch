@@ -171,11 +171,10 @@ namespace Batch {
 
       } else if ( (*it).first == MAXWALLTIME ) {
 	char attr_value[32];
-	long secondes = (*it).second;
-	long heures = secondes / 3600L;
-	long minutes = (secondes - 3600L * heures) / 60L;
-	secondes = secondes % 60L;
-	sprintf(attr_value, "%02ld:%02ld:%02ld", heures, minutes, secondes);
+	long minutes = (*it).second;
+	long heures = minutes / 60L;
+	minutes -= 60L * heures;
+	sprintf(attr_value, "%02ld:%02ld:00", heures, minutes);
 
 	setResourceAttributeOP(_p_attr_list, ATTR_l, "walltime", attr_value);
 
