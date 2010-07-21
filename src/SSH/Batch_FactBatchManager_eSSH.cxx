@@ -30,6 +30,9 @@
 #include "Batch_BatchManager_eSSH.hxx"
 #include "Batch_FactBatchManager_eSSH.hxx"
 
+// Automatic register in the catalogue...
+static Batch::FactBatchManager_eSSH sFBM_eSSH;
+
 Batch::FactBatchManager_eSSH::FactBatchManager_eSSH() : FactBatchManager_eClient("eSSH") {}
 
 Batch::FactBatchManager_eSSH::~FactBatchManager_eSSH() {}
