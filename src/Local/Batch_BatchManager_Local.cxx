@@ -246,6 +246,14 @@ namespace Batch {
   }
 
 
+  // Ce manager ne peut pas reprendre un job
+  // On force donc l'état du job à erreur - pour cela on ne donne pas d'Id
+  // au JobId
+  const Batch::JobId
+  BatchManager_Local::addJob(const Batch::Job & job, const std::string reference)
+  {
+    return JobId(this, "undefined");
+  }
 
   // Methode pour le controle des jobs : teste si un job est present en machine
   bool BatchManager_Local::isRunning(const JobId & jobid)

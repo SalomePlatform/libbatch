@@ -62,6 +62,9 @@ namespace Batch {
     // Accesseur pour la reference interne
     virtual std::string getReference() const;
 
+    // Permet de recharger un job depuis un fichier
+    virtual void setReference(const std::string & new_reference);
+
     // Methodes pour le controle du job
     virtual void deleteJob() const; // retire un job du gestionnaire
     virtual void holdJob() const; // suspend un job en file d'attente

@@ -81,7 +81,6 @@ namespace Batch {
     Parametre params = job.getParametre();
     Versatile V = params[INFILE];
     Versatile::iterator Vit;
-    _username = string(params[USER]);
 
     status = _protocol.makeDirectory(string(params[TMPDIR]) + "/logs", _hostname, _username);
     if(status) {

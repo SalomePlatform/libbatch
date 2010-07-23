@@ -136,6 +136,13 @@ namespace Batch {
     return id;
   }
 
+  // Ce manager permet de faire de la reprise
+  const Batch::JobId
+  BatchManager_PBS::addJob(const Batch::Job & job, const std::string reference)
+  {
+    return JobId(this, reference);
+  }
+
   // Methode pour le controle des jobs : retire un job du gestionnaire
   void BatchManager_PBS::deleteJob(const JobId & jobid)
   {

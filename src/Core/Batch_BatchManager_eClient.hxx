@@ -53,6 +53,8 @@ namespace Batch {
     virtual ~BatchManager_eClient();
     void importOutputFiles( const Job & job, const std::string directory ) throw(EmulationException);
 
+    void setUsername(const std::string & username) {_username = username;}
+
   protected:
     const CommunicationProtocol & _protocol; // protocol to access _hostname
     std::string _username; // username to access _hostname

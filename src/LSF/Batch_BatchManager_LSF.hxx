@@ -77,6 +77,7 @@ namespace Batch {
     virtual void setParametre(const JobId & jobid, const Parametre & param) { return alterJob(jobid, param); } // modifie un job en file d'attente
     virtual void setEnvironnement(const JobId & jobid, const Environnement & env) { return alterJob(jobid, env); } // modifie un job en file d'attente
 
+    virtual const Batch::JobId addJob(const Batch::Job & job, const std::string reference); // ajoute un nouveau job sans le soumettre
 
   protected:
     int _connect; // LSF connect id

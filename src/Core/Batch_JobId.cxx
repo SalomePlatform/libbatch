@@ -76,6 +76,12 @@ namespace Batch {
     return _reference;
   }
 
+  // Permet de recharger un job depuis un fichier
+  void JobId::setReference(const std::string & new_reference)
+  {
+    _reference = new_reference;
+  }
+
   // Methode pour le controle du job : retire le job du gestionnaire
   void JobId::deleteJob() const
   {
