@@ -281,6 +281,7 @@ namespace Batch {
     tempOutputFile << "cd " << workDir << endl ;
 
     // generate nodes file
+    tempOutputFile << "NODEFILE=`mktemp nodefile-XXXXXXXXXX` || exit 1" << endl;
     tempOutputFile << "bool=0" << endl;
     tempOutputFile << "for i in $LSB_MCPU_HOSTS; do" << endl;
     tempOutputFile << "  if test $bool = 0; then" << endl;
@@ -288,17 +289,21 @@ namespace Batch {
     tempOutputFile << "    bool=1" << endl;
     tempOutputFile << "  else" << endl;
     tempOutputFile << "    for ((j=0;j<$i;j++)); do" << endl;
-    tempOutputFile << "      echo $n >> nodesFile" << endl;
+    tempOutputFile << "      echo $n >> $NODEFILE" << endl;
     tempOutputFile << "    done" << endl;
     tempOutputFile << "    bool=0" << endl;
     tempOutputFile << "  fi" << endl;
     tempOutputFile << "done" << endl;
 
     // Abstraction of PBS_NODEFILE - TODO
-    tempOutputFile << "export LIBBATCH_NODEFILE=nodesFile" << endl;
+    tempOutputFile << "export LIBBATCH_NODEFILE=$NODEFILE" << endl;
 
     // Launch the executable
     tempOutputFile << "./" + fileNameToExecute << endl;
+
+    // Remove the node file
+    tempOutputFile << "rm $NODEFILE" << endl;
+
     tempOutputFile.flush();
     tempOutputFile.close();
 

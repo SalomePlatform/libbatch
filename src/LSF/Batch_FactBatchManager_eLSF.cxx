@@ -33,6 +33,8 @@
 
 namespace Batch {
 
+  static FactBatchManager_eLSF sFBM_eLSF;
+
   // Constructeur
   FactBatchManager_eLSF::FactBatchManager_eLSF() : FactBatchManager_eClient("eLSF")
   {
