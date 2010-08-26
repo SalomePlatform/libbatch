@@ -210,3 +210,11 @@ typedef int Py_ssize_t;
   $1 = E;
 }
 
+// Dynamic cast to FactBatchManager_eClient if necessary
+%typemap(out) Batch::FactBatchManager *
+{
+  if(dynamic_cast<Batch::FactBatchManager_eClient *>($1))
+    $result=SWIG_NewPointerObj((void*)$1,$descriptor(Batch::FactBatchManager_eClient *),$owner);
+  else
+    $result=SWIG_NewPointerObj((void*)$1,$descriptor(Batch::FactBatchManager *),$owner);
+}

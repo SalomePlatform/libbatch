@@ -32,7 +32,7 @@
 	 ==========
 	 Certaines classes ont des methodes surchargees et SWIG ne gere pas bien
 	 ces surcharges, d'ou un probleme d'utilisation en Python de celles-ci.
-	 En bref, �a ne marche pas et il faudra corriger le probleme...
+	 En bref, ca ne marche pas et il faudra corriger le probleme...
 
 	 TODO : corriger le probleme de surcharge des methodes en Python
 
@@ -61,9 +61,13 @@
 #include "Batch_JobId.hxx"
 #include "Batch_JobInfo.hxx"
 
+#include "Batch_CommunicationProtocol.hxx"
+
 #include "Batch_BatchManager.hxx"
+#include "Batch_BatchManager_eClient.hxx"
 #include "Batch_BatchManagerCatalog.hxx"
 #include "Batch_FactBatchManager.hxx"
+#include "Batch_FactBatchManager_eClient.hxx"
 %}
 
 /* Les classes exportees en Python */
@@ -76,9 +80,13 @@
 %include Batch_JobId.hxx
 %include Batch_JobInfo.hxx
 
+%include Batch_CommunicationProtocol.hxx
+
 %include Batch_BatchManager.hxx
+%include Batch_BatchManager_eClient.hxx
 %include Batch_BatchManagerCatalog.hxx
 %include Batch_FactBatchManager.hxx
+%include Batch_FactBatchManager_eClient.hxx
 
 %include Batch_Constants.hxx
 

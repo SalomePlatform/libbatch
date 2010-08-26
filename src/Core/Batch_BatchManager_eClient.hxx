@@ -51,7 +51,7 @@ namespace Batch {
     BatchManager_eClient(const Batch::FactBatchManager * parent, const char* host="localhost",
                          CommunicationProtocolType protocolType = SSH, const char* mpiImpl="mpich1");
     virtual ~BatchManager_eClient();
-    void importOutputFiles( const Job & job, const std::string directory ) throw(EmulationException);
+    void importOutputFiles( const Job & job, const std::string directory );
 
     void setUsername(const std::string & username) {_username = username;}
 
@@ -62,7 +62,7 @@ namespace Batch {
 
     std::string generateTemporaryFileName(const std::string & prefix);
     std::string createAndOpenTemporaryFile(const std::string & prefix, std::ofstream & outputStream);
-    MpiImpl* FactoryMpiImpl(std::string mpiImpl) throw(EmulationException);
+    MpiImpl* FactoryMpiImpl(std::string mpiImpl);
     void exportInputFiles(const Job & job);
     const std::string & getTmpDir();
 

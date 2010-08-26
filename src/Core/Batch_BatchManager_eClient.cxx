@@ -141,7 +141,7 @@ namespace Batch {
 
   }
 
-  void BatchManager_eClient::importOutputFiles( const Job & job, const string directory ) throw(EmulationException)
+  void BatchManager_eClient::importOutputFiles( const Job & job, const string directory )
   {
     Parametre params = job.getParametre();
     Versatile V = params[OUTFILE];
@@ -187,7 +187,7 @@ namespace Batch {
 
   }
 
-  MpiImpl *BatchManager_eClient::FactoryMpiImpl(string mpiImpl) throw(EmulationException)
+  MpiImpl *BatchManager_eClient::FactoryMpiImpl(string mpiImpl)
   {
     if(mpiImpl == "lam")
       return new MpiImpl_LAM();
