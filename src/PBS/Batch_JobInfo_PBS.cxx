@@ -31,7 +31,8 @@
 
 #include <cstdio>
 #include <sstream>
-//#include "MEDMEM_STRING.hxx"
+#include <string.h>
+#include <stdlib.h>
 #include "Batch_Parametre.hxx"
 #include "Batch_Environnement.hxx"
 #include "Batch_RunTimeException.hxx"
@@ -51,7 +52,6 @@ namespace Batch {
     for(i=0; p_job; p_job = p_job->next) i++;
     if (i == 0) throw RunTimeException("Liste vide (le job est absent de la file)");
     if (i > 1) {
-      //MEDMEM::STRING sst;
       ostringstream sst;
       sst << "JobInfo_PBS::JobInfo_PBS(struct batch_status * list, bool tobedeleted) : la liste contient "
 	  << i << " elements" << " (1 seul requis)" << endl;
@@ -198,7 +198,6 @@ namespace Batch {
   // Methode pour l'interfacage avec Python (SWIG) : affichage en Python
   string JobInfo_PBS::__str__() const
   {
-    //MEDMEM::STRING sst; 
     ostringstream sst;
     sst << "<JobInfo_PBS (" << this << ") :" << endl;
     sst << " ID = " <<_param[ID] << endl;
