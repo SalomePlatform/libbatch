@@ -20,13 +20,9 @@
 #  See http://www.salome-platform.org/ or
 #  email : webmaster.salome@opencascade.com
 
-INSTALL(FILES check_libbatch.m4
-        DESTINATION share/Batch/misc)
-
-GET_TARGET_PROPERTY(LIBBATCH_ABS_PATH Batch LOCATION)
-GET_FILENAME_COMPONENT(LIBBATCH_REAL_NAME ${LIBBATCH_ABS_PATH} NAME)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libBatchConfig.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/libBatchConfig.cmake @ONLY)
-
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libBatchConfig.cmake
-        DESTINATION lib)
+get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(LIBBATCH_ROOT_DIR "${SELF_DIR}/.." ABSOLUTE)
+set(LIBBATCH_INCLUDE_DIRS "${LIBBATCH_ROOT_DIR}/include/Batch")
+set(LIBBATCH_LIBRARIES "${LIBBATCH_ROOT_DIR}/lib/@LIBBATCH_REAL_NAME@")
+set(LIBBATCH_RUNTIME_LIBRARY_DIRS "${LIBBATCH_ROOT_DIR}/lib")
+set(LIBBATCH_PYTHONPATH "${LIBBATCH_ROOT_DIR}/lib/python@PYTHON_VERSION@/site-packages")
