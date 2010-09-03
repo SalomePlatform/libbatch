@@ -75,7 +75,7 @@ namespace Batch {
       _param[STATE] = PAUSED;
     } else if (status == "DONE") {  // Finished successfully
       _param[STATE] = FINISHED;
-    } else if (status == "EXIT") {  // Finished in error
+    } else if (status == "EXIT") {  // Finished successfully
       _param[STATE] = FINISHED;
     } else if (status == "UNKWN") { // Lost contact
       _param[STATE] = FAILED;
