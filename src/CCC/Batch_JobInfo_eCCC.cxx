@@ -76,7 +76,7 @@ namespace Batch {
     } else if (status == "DONE") {  // Finished successfully
       _param[STATE] = FINISHED;
     } else if (status == "EXIT") {  // Finished in error
-      _param[STATE] = FAILED;
+      _param[STATE] = FINISHED;
     } else if (status == "UNKWN") { // Lost contact
       _param[STATE] = FAILED;
     } else if (status == "ZOMBI") { // Zombie
