@@ -49,8 +49,9 @@ using namespace std;
 namespace Batch {
 
   BatchManager_eSSH::BatchManager_eSSH(const FactBatchManager * parent, const char * host,
+                                       const char * username,
                                        CommunicationProtocolType protocolType, const char * mpiImpl)
-    : BatchManager_eClient(parent, host, protocolType, mpiImpl),
+    : BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
       BatchManager_Local(parent, host, protocolType),
       BatchManager(parent, host)
   {

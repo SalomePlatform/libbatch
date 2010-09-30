@@ -49,15 +49,14 @@ namespace Batch {
   public:
     // Constructeur et destructeur
     BatchManager_eClient(const Batch::FactBatchManager * parent, const char* host="localhost",
+                         const char * username="",
                          CommunicationProtocolType protocolType = SSH, const char* mpiImpl="mpich1");
     virtual ~BatchManager_eClient();
     void importOutputFiles( const Job & job, const std::string directory );
 
-    void setUsername(const std::string & username) {_username = username;}
-
   protected:
     const CommunicationProtocol & _protocol; // protocol to access _hostname
-    std::string _username; // username to access _hostname
+    const std::string _username; // username to access _hostname
     MpiImpl *_mpiImpl; // Mpi implementation to launch executable in batch script
 
     std::string generateTemporaryFileName(const std::string & prefix);

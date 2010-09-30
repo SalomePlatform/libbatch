@@ -96,7 +96,6 @@ int main(int argc, char** argv)
     p[INFILE]       += Couple("setb.sh", "tmp/Batch/setb.sh");
     p[OUTFILE]       = Couple("result.txt", "tmp/Batch/result.txt");
     p[TMPDIR]        = "tmp/Batch/";
-    p[USER]          = user;
     p[NBPROC]        = 1;
     p[MAXWALLTIME]   = 1;
     p[MAXRAMSIZE]    = 1;
@@ -114,7 +113,7 @@ int main(int argc, char** argv)
 
     // Create a BatchManager of type ePBS on localhost
     FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("ePBS"));
-    BatchManager_eClient * bm = (*fbm)(host.c_str(), protocol, "lam");
+    BatchManager_eClient * bm = (*fbm)(host.c_str(), user.c_str(), protocol, "lam");
 
     // Submit the job to the BatchManager
     JobId jobid = bm->submitJob(job);

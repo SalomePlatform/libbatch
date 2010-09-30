@@ -57,12 +57,13 @@ namespace Batch {
   }
 
   BatchManager_eClient * FactBatchManager_ePBS::operator() (const char * hostname,
+                                                            const char * username,
                                                             CommunicationProtocolType protocolType,
                                                             const char * mpiImpl,
 							    int nb_proc_per_node) const
   {
     // MESSAGE("Building new BatchManager_PBS on host '" << hostname << "'");
-    return new BatchManager_ePBS(this, hostname, protocolType, mpiImpl, nb_proc_per_node);
+    return new BatchManager_ePBS(this, hostname, username, protocolType, mpiImpl, nb_proc_per_node);
   }
 
 

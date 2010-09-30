@@ -48,6 +48,7 @@ namespace Batch {
 
     virtual BatchManager * operator() (const char * hostname) const; // From FactBacthManager
     virtual BatchManager_eClient * operator() (const char * hostname,
+                                               const char * username,
                                                CommunicationProtocolType protocolType,
                                                const char * mpiImpl,
 					       int nb_proc_per_node = 1) const; // From FactBatchManager_eClient

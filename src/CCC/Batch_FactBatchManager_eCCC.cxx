@@ -55,12 +55,13 @@ namespace Batch {
   }
 
   BatchManager_eClient * FactBatchManager_eCCC::operator() (const char * hostname,
+                                                            const char * username,
                                                             CommunicationProtocolType protocolType,
                                                             const char * mpiImpl,
 							    int nb_proc_per_node) const
   {
     // MESSAGE("Building new BatchManager_CCC on host '" << hostname << "'");
-    return new BatchManager_eCCC(this, hostname, protocolType, mpiImpl);
+    return new BatchManager_eCCC(this, hostname, username, protocolType, mpiImpl);
   }
 
 }

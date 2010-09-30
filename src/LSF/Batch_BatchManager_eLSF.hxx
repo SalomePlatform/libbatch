@@ -45,6 +45,7 @@ namespace Batch {
   public:
     // Constructeur et destructeur
     BatchManager_eLSF(const FactBatchManager * parent, const char * host="localhost",
+                      const char * username="",
                       CommunicationProtocolType protocolType = SSH, const char * mpiImpl="nompi"); // connexion a la machine host
     virtual ~BatchManager_eLSF();
 

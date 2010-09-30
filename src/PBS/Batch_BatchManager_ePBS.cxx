@@ -55,9 +55,10 @@ using namespace std;
 namespace Batch {
 
   BatchManager_ePBS::BatchManager_ePBS(const FactBatchManager * parent, const char * host,
+                                       const char * username,
                                        CommunicationProtocolType protocolType, const char * mpiImpl, 
 				       int nb_proc_per_node)
-    : BatchManager_eClient(parent, host, protocolType, mpiImpl),
+    : BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
     BatchManager(parent, host)
   {
     // Nothing to do

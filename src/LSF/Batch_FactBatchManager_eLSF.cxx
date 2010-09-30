@@ -55,12 +55,13 @@ namespace Batch {
   }
 
   BatchManager_eClient * FactBatchManager_eLSF::operator() (const char * hostname,
+                                                            const char * username,
                                                             CommunicationProtocolType protocolType,
                                                             const char * mpiImpl,
 							    int nb_proc_per_node) const
   {
     // MESSAGE("Building new BatchManager_LSF on host '" << hostname << "'");
-    return new BatchManager_eLSF(this, hostname, protocolType, mpiImpl);
+    return new BatchManager_eLSF(this, hostname, username, protocolType, mpiImpl);
   }
 
 }

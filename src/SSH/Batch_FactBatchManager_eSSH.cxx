@@ -45,6 +45,7 @@ Batch::FactBatchManager_eSSH::operator() (const char * hostname) const
 
 Batch::BatchManager_eClient * 
 Batch::FactBatchManager_eSSH::operator() (const char * hostname,
+                                          const char * username,
 				   CommunicationProtocolType protocolType,
 				   const char * mpiImpl,
 				   int nb_proc_per_node) const
@@ -52,5 +53,5 @@ Batch::FactBatchManager_eSSH::operator() (const char * hostname,
   //protocolType and mpiImpl are ignored.
   std::cerr << "[Batch::FactBatchManager_eSSH] creating new Batch::BatchManager_eSSH with hostname = " << hostname << std::endl;
 
-  return new Batch::BatchManager_eSSH(this, hostname);
+  return new Batch::BatchManager_eSSH(this, hostname, username);
 }

@@ -55,8 +55,9 @@ using namespace std;
 namespace Batch {
 
   BatchManager_eCCC::BatchManager_eCCC(const FactBatchManager * parent, const char * host,
+                                       const char * username,
                                        CommunicationProtocolType protocolType, const char * mpiImpl)
-  : BatchManager_eClient(parent, host, protocolType, mpiImpl),
+  : BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
     BatchManager(parent, host)
   {
     // Nothing to do

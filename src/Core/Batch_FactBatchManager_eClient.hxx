@@ -48,6 +48,7 @@ namespace Batch {
     virtual ~FactBatchManager_eClient();
 
     virtual Batch::BatchManager_eClient * operator() (const char * hostname,
+                                                      const char * username,
                                                       CommunicationProtocolType protocolType,
                                                       const char * mpi,
 						      int nb_proc_per_node = 1) const = 0;

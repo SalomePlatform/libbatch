@@ -61,8 +61,10 @@ using namespace std;
 namespace Batch {
 
   BatchManager_eClient::BatchManager_eClient(const Batch::FactBatchManager * parent, const char* host,
+                                             const char * username,
                                              CommunicationProtocolType protocolType, const char* mpiImpl)
-    : BatchManager(parent, host), _protocol(CommunicationProtocol::getInstance(protocolType)), _username("")
+    : BatchManager(parent, host), _protocol(CommunicationProtocol::getInstance(protocolType)),
+      _username(username)
   {
     // instanciation of mpi implementation needed to launch executable in batch script
     _mpiImpl = FactoryMpiImpl(mpiImpl);
@@ -146,7 +148,6 @@ namespace Batch {
     Parametre params = job.getParametre();
     Versatile V = params[OUTFILE];
     Versatile::iterator Vit;
-    _username = string(params[USER]);
 
     // Create local result directory
     int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
