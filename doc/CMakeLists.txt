@@ -20,12 +20,11 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.texi.in ${CMAKE_CURRENT_BINARY_DIR}/version.texi)
+
 SET (TEXI_FILE ${CMAKE_CURRENT_SOURCE_DIR}/Batch.texi)
 
-ADD_CUSTOM_TARGET(doc ALL
-                  ${MAKEINFO_EXECUTABLE} --html ${TEXI_FILE} -I ${CMAKE_CURRENT_SOURCE_DIR}
-                  DEPENDS ${TEXI_FILE}
-                 )
+ADD_CUSTOM_TARGET(doc ALL ${MAKEINFO_EXECUTABLE} --html ${TEXI_FILE})
 
 FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Batch)
 
