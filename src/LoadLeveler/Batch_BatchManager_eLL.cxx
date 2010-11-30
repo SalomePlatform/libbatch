@@ -144,7 +144,7 @@ namespace Batch {
     ofstream tempOutputFile;
     string tmpFileName = createAndOpenTemporaryFile("LL-script", tempOutputFile);
 
-    tempOutputFile << "# @ executable = " << fileNameToExecute << endl;
+    tempOutputFile << "#!/bin/bash" << endl;
     tempOutputFile << "# @ output = " << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "# @ error = " << workDir << "/logs/error.log." << rootNameToExecute << endl;
     if (queue != "")
@@ -163,6 +163,17 @@ namespace Batch {
 
     tempOutputFile << "# @ job_type = bluegene" << endl;
     tempOutputFile << "# @ queue" << endl;
+
+    // generate nodes file
+    tempOutputFile << "NODEFILE=`mktemp nodefile-XXXXXXXXXX` || exit 1" << endl;
+    tempOutputFile << "for node in $LOADL_PROCESSOR_LIST; do" << endl;
+    tempOutputFile << "  echo $node >> $NODEFILE" << endl;
+    tempOutputFile << "done" << endl;
+    tempOutputFile << "export LIBBATCH_NODEFILE=$NODEFILE" << endl;
+
+    // Launch the executable
+    tempOutputFile << "cd " << workDir << endl;
+    tempOutputFile << "./" + fileNameToExecute << endl;
 
     tempOutputFile.flush();
     tempOutputFile.close();
