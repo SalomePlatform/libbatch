@@ -149,6 +149,18 @@ namespace Batch {
     tempOutputFile << "# @ error = " << workDir << "/logs/error.log." << rootNameToExecute << endl;
     if (queue != "")
       tempOutputFile << "# @ class = " << queue << endl;
+
+    // Define environment for the job
+    Environnement env = job.getEnvironnement();
+    if (!env.empty()) {
+      tempOutputFile << "# @ environment = ";
+      Environnement::const_iterator iter;
+      for (iter = env.begin() ; iter != env.end() ; ++iter) {
+        tempOutputFile << iter->first << "=" << iter->second << "; ";
+      }
+      tempOutputFile << endl;
+    }
+
     tempOutputFile << "# @ job_type = bluegene" << endl;
     tempOutputFile << "# @ queue" << endl;
 
