@@ -125,15 +125,11 @@ namespace Batch {
     if (params.find(WORKDIR) != params.end()) 
       workDir = params[WORKDIR].str();
     else 
-      throw EmulationException("params[WORKDIR] is not defined ! Please defined it, cannot submit this job");
+      throw EmulationException("params[WORKDIR] is not defined. Please define it, cannot submit this job.");
     if (params.find(EXECUTABLE) != params.end()) 
       fileToExecute = params[EXECUTABLE].str();
     else 
-      throw EmulationException("params[EXECUTABLE] is not defined ! Please defined it, cannot submit this job");
-
-    // Optional parameters
-    if (params.find(QUEUE) != params.end()) 
-      queue = params[QUEUE].str();
+      throw EmulationException("params[EXECUTABLE] is not defined. Please define it, cannot submit this job.");
 
     string::size_type p1 = fileToExecute.find_last_of("/");
     string::size_type p2 = fileToExecute.find_last_of(".");
@@ -147,8 +143,12 @@ namespace Batch {
     tempOutputFile << "#!/bin/bash" << endl;
     tempOutputFile << "# @ output = " << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "# @ error = " << workDir << "/logs/error.log." << rootNameToExecute << endl;
-    if (queue != "")
-      tempOutputFile << "# @ class = " << queue << endl;
+
+    // Optional parameters
+    if (params.find(MAXWALLTIME) != params.end())
+      tempOutputFile << "# @ wall_clock_limit = " << params[MAXWALLTIME] << ":00" << endl;
+    if (params.find(QUEUE) != params.end())
+      tempOutputFile << "# @ class = " << params[QUEUE] << endl;
 
     // Define environment for the job
     Environnement env = job.getEnvironnement();
