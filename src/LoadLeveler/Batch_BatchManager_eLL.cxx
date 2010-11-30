@@ -192,7 +192,16 @@ namespace Batch {
 
   void BatchManager_eLL::deleteJob(const JobId & jobid)
   {
-    throw NotYetImplementedException("BatchManager_eLL::deleteJob");
+    // define command to delete job
+    string subCommand = "llcancel " + jobid.getReference();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    cerr << command.c_str() << endl;
+
+    int status = system(command.c_str());
+    if (status)
+      throw EmulationException("Can't delete job " + jobid.getReference());
+
+    cerr << "job " << jobid.getReference() << " killed" << endl;
   }
 
   void BatchManager_eLL::holdJob(const JobId & jobid)
