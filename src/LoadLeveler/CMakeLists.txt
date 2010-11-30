@@ -22,6 +22,7 @@
 
 SET(CLASS_LIST LoadLeveler/Batch_BatchManager_eLL
                LoadLeveler/Batch_FactBatchManager_eLL
+               LoadLeveler/Batch_JobInfo_eLL
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})

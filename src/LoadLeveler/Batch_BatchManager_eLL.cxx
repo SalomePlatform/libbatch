@@ -32,6 +32,7 @@
 #include <Batch_NotYetImplementedException.hxx>
 
 #include "Batch_BatchManager_eLL.hxx"
+#include "Batch_JobInfo_eLL.hxx"
 
 using namespace std;
 
@@ -75,13 +76,13 @@ namespace Batch {
     command += logFile;
     cerr << command.c_str() << endl;
     status = system(command.c_str());
-    if(status)
+    if (status)
     {
       ifstream error_message(logFile.c_str());
       string mess;
       string temp;
-      while(std::getline(error_message, temp))
-          mess += temp;
+      while(getline(error_message, temp))
+        mess += temp;
       error_message.close();
       throw EmulationException("Error of connection on remote host, error was: " + mess);
     }
@@ -89,15 +90,12 @@ namespace Batch {
     // read id of submitted job in log file
     string jobref;
     ifstream idfile(logFile.c_str());
-    unsigned int linebufsize = 1024;
-    char linebuf[linebufsize];
-    idfile.getline(linebuf, linebufsize);
-    while (!idfile.eof() && strncmp(linebuf, "llsubmit:", 9) != 0)
-      idfile.getline(linebuf, linebufsize);
+    string line;
+    while (idfile && line.compare(0, 9, "llsubmit:") != 0)
+      getline(idfile, line);
     idfile.close();
-    if (strncmp(linebuf, "llsubmit:", 9) == 0)
+    if (line.compare(0, 9, "llsubmit:") == 0)
     {
-      string line(linebuf);
       string::size_type p1 = line.find_first_of("\"");
       string::size_type p2 = line.find_last_of("\"");
       if (p1 != p2)
@@ -144,7 +142,7 @@ namespace Batch {
 
     // Create batch submit file
     ofstream tempOutputFile;
-    std::string tmpFileName = createAndOpenTemporaryFile("LL-script", tempOutputFile);
+    string tmpFileName = createAndOpenTemporaryFile("LL-script", tempOutputFile);
 
     tempOutputFile << "# @ executable = " << fileNameToExecute << endl;
     tempOutputFile << "# @ output = " << workDir << "/logs/output.log." << rootNameToExecute << endl;
@@ -157,14 +155,14 @@ namespace Batch {
     tempOutputFile.flush();
     tempOutputFile.close();
 
-    cerr << "Batch script file generated is: " << tmpFileName.c_str() << endl;
+    cerr << "Batch script file generated is: " << tmpFileName << endl;
 
     string remoteFileName = rootNameToExecute + "_LL.cmd";
     int status = _protocol.copyFile(tmpFileName, "", "",
                                     workDir + "/" + remoteFileName,
                                     _hostname, _username);
     if (status)
-      throw EmulationException("Error of connection on remote host, cannot copy batch submission file");
+      throw EmulationException("Cannot copy command file on host " + _hostname);
 
     return remoteFileName;
   }
@@ -201,7 +199,21 @@ namespace Batch {
 
   JobInfo BatchManager_eLL::queryJob(const JobId & jobid)
   {
-    throw NotYetImplementedException("BatchManager_eLL::queryJob");
+    // define name of log file (local)
+    string logFile = generateTemporaryFileName("LL-querylog-" + jobid.getReference());
+
+    // define command to query batch
+    string subCommand = "llq -f %st " + jobid.getReference();
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " > ";
+    command += logFile;
+    cerr << command.c_str() << endl;
+    int status = system(command.c_str());
+    if (status != 0)
+      throw EmulationException("Can't query job " + jobid.getReference());
+
+    JobInfo_eLL jobinfo = JobInfo_eLL(jobid.getReference(), logFile);
+    return jobinfo;
   }
 
   const JobId BatchManager_eLL::addJob(const Job & job, const string reference)
