@@ -147,6 +147,8 @@ namespace Batch {
     // Optional parameters
     if (params.find(MAXWALLTIME) != params.end())
       tempOutputFile << "# @ wall_clock_limit = " << params[MAXWALLTIME] << ":00" << endl;
+    if (params.find(MAXRAMSIZE) != params.end())
+      tempOutputFile << "# @ as_limit = " << params[MAXRAMSIZE] << "mb" << endl;
     if (params.find(QUEUE) != params.end())
       tempOutputFile << "# @ class = " << params[QUEUE] << endl;
 

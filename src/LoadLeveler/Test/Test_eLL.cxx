@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     p[TMPDIR]        = "tmp/Batch/";
     p[NBPROC]        = 1;
     p[MAXWALLTIME]   = 1;
-    p[MAXRAMSIZE]    = 1;
+    p[MAXRAMSIZE]    = 10;
     p[HOMEDIR]       = homedir;
     p[QUEUE]         = queue;
     job.setParametre(p);
