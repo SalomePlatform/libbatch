@@ -43,58 +43,93 @@ ELSE (PYTHON_DEBUG)
 ENDIF (PYTHON_DEBUG)
 
 IF (PYTHON_EXECUTABLE)
-  EXECUTE_PROCESS(
-    COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write(sys.version[:3])"
-    OUTPUT_VARIABLE PYTHON_VERSION
-  )
+    IF (NOT Python_FIND_QUIETLY)
+        MESSAGE(STATUS "Python executable: ${PYTHON_EXECUTABLE}")
+    ENDIF (NOT Python_FIND_QUIETLY)
 
-  SET(PYTHON_ROOT ${PYTHON_EXECUTABLE})
-  GET_FILENAME_COMPONENT(PYTHON_ROOT ${PYTHON_ROOT} PATH)
-  GET_FILENAME_COMPONENT(PYTHON_ROOT ${PYTHON_ROOT} PATH)
+    EXECUTE_PROCESS(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.stdout.write(sys.version[:3])"
+        OUTPUT_VARIABLE PYTHON_VERSION
+    )
 
-  FIND_PATH(PYTHON_INCLUDE_PATH Python.h
-                                PATHS ${PYTHON_ROOT}/include ${PYTHON_ROOT}/include/python${PYTHON_VERSION}
-                                DOC "Python include path")
+    IF (NOT Python_FIND_QUIETLY)
+        MESSAGE(STATUS "Python version: ${PYTHON_VERSION}")
+    ENDIF (NOT Python_FIND_QUIETLY)
 
-  IF(WIN32)
-    STRING(REPLACE "." "" PYTHON_VERSION_WITHOUT_DOT ${PYTHON_VERSION})
-    IF(PYTHON_DEBUG)
-      FIND_LIBRARY(PYTHON_LIBRARIES python${PYTHON_VERSION_WITHOUT_DOT}_d ${PYTHON_ROOT}/libs DOC "Python libraries")
-    ELSE(PYTHON_DEBUG)
-      FIND_LIBRARY(PYTHON_LIBRARIES python${PYTHON_VERSION_WITHOUT_DOT} ${PYTHON_ROOT}/libs DOC "Python libraries")
-    ENDIF(PYTHON_DEBUG)
-  ELSE(WIN32)
-    FIND_LIBRARY(PYTHON_LIBRARIES python${PYTHON_VERSION} ${PYTHON_ROOT}/lib DOC "Python libraries")
-  ENDIF(WIN32)
+    EXECUTE_PROCESS(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import sys; import distutils.sysconfig; sys.stdout.write(distutils.sysconfig.get_python_inc())"
+        OUTPUT_VARIABLE PYTHON_DETECTED_INCLUDE_DIR
+    )
 
-  SET(PYTHON_INCLUDES -I${PYTHON_INCLUDE_PATH})
-  SET(PYTHON_LIBS ${PYTHON_LIBRARIES})
+    SET(PYTHON_HEADER Python.h)
+    FIND_PATH(PYTHON_INCLUDE_DIRS ${PYTHON_HEADER}
+                                  PATHS ${PYTHON_DETECTED_INCLUDE_DIR}
+                                  DOC "Python include directories")
 
-  IF(PYTHON_DEBUG)
-      SET(PYTHON_INCLUDES ${PYTHON_INCLUDES} -DHAVE_DEBUG_PYTHON)
-  ENDIF(PYTHON_DEBUG)
+    IF (NOT Python_FIND_QUIETLY)
+        IF (PYTHON_INCLUDE_DIRS)
+            MESSAGE(STATUS "Python include directories: ${PYTHON_INCLUDE_DIRS}")
+        ELSE (PYTHON_INCLUDE_DIRS)
+            MESSAGE(STATUS "Could not find Python include directories (looked for file ${PYTHON_HEADER} in directory ${PYTHON_DETECTED_INCLUDE_DIR})")
+        ENDIF (PYTHON_INCLUDE_DIRS)        
+    ENDIF (NOT Python_FIND_QUIETLY)
+
+    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/findpythonlib.py
+         "import sys\n"
+         "import os\n"
+         "import distutils.sysconfig\n"
+         "libdir = distutils.sysconfig.get_config_var('LIBDIR')\n"
+         "if libdir is None:\n"
+         "    prefix = distutils.sysconfig.get_config_var('prefix')\n"
+         "    libdir = prefix + ';' + os.path.join(prefix, 'lib') + ';' + os.path.join(prefix, 'libs')\n"
+         "sys.stdout.write(libdir)"
+    )
+    
+    EXECUTE_PROCESS(
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/findpythonlib.py
+        OUTPUT_VARIABLE PYTHON_DETECTED_LIB_DIRS
+    )
+
+    IF(WIN32)
+        STRING(REPLACE "." "" PYTHON_VERSION_WITHOUT_DOT ${PYTHON_VERSION})
+        IF(PYTHON_DEBUG)
+            SET(LIB_NAME python${PYTHON_VERSION_WITHOUT_DOT}_d)
+        ELSE(PYTHON_DEBUG)
+            SET(LIB_NAME python${PYTHON_VERSION_WITHOUT_DOT})
+        ENDIF(PYTHON_DEBUG)
+    ELSE(WIN32)
+        SET(LIB_NAME python${PYTHON_VERSION})
+    ENDIF(WIN32)
+    
+    FIND_LIBRARY(PYTHON_LIBRARIES ${LIB_NAME} ${PYTHON_DETECTED_LIB_DIRS} DOC "Python libraries")
+
+    IF (NOT Python_FIND_QUIETLY)
+        IF (PYTHON_LIBRARIES)
+            MESSAGE(STATUS "Python libraries: ${PYTHON_LIBRARIES}")
+        ELSE (PYTHON_LIBRARIES)
+            MESSAGE(STATUS "Could not find Python libraries (looked for library ${LIB_NAME} in directory ${PYTHON_DETECTED_LIB_DIRS})")
+        ENDIF (PYTHON_LIBRARIES)
+    ENDIF (NOT Python_FIND_QUIETLY)
+
 ENDIF (PYTHON_EXECUTABLE)
 
-IF(PYTHON_EXECUTABLE AND PYTHON_LIBRARIES AND PYTHON_INCLUDE_PATH)
+IF(PYTHON_EXECUTABLE AND PYTHON_LIBRARIES AND PYTHON_INCLUDE_DIRS)
   SET(Python_FOUND True)
-ENDIF(PYTHON_EXECUTABLE AND PYTHON_LIBRARIES AND PYTHON_INCLUDE_PATH)
+ENDIF(PYTHON_EXECUTABLE AND PYTHON_LIBRARIES AND PYTHON_INCLUDE_DIRS)
 
 IF (Python_FOUND)
 
     IF (NOT Python_FIND_QUIETLY)
-        MESSAGE(STATUS "Found Python:")
-        MESSAGE(STATUS "Python executable: ${PYTHON_EXECUTABLE} (version ${PYTHON_VERSION})")
-        MESSAGE(STATUS "Python include directory: ${PYTHON_INCLUDE_PATH}")
-        MESSAGE(STATUS "Python library: ${PYTHON_LIBRARIES}")
+        MESSAGE(STATUS "OK, working Python installation found")
     ENDIF (NOT Python_FIND_QUIETLY)
 
 ELSE (Python_FOUND)
 
     IF (Python_FIND_REQUIRED)
-        MESSAGE(FATAL_ERROR "Python not found")
+        MESSAGE(FATAL_ERROR "No working Python installation found")
     ELSE (Python_FIND_REQUIRED)
         IF (NOT Python_FIND_QUIETLY)
-            MESSAGE(STATUS "Python not found")
+            MESSAGE(STATUS "No working Python installation found")
         ENDIF (NOT Python_FIND_QUIETLY)
     ENDIF (Python_FIND_REQUIRED)
 
