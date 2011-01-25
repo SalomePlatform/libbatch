@@ -188,6 +188,33 @@ namespace Batch {
 
   }
 
+  void BatchManager_eClient::importDumpStateFile( const Job & job, const string directory )
+  {
+    Parametre params = job.getParametre();
+
+    // Create local result directory
+    int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
+    if (status) {
+      string mess("Directory creation failed. Status is :");
+      ostringstream status_str;
+      status_str << status;
+      mess += status_str.str();
+      cerr << mess << endl;
+    }
+
+    status = _protocol.copyFile(string(params[TMPDIR]) + string("/dumpState*.xml"), _hostname, _username,
+                                directory, "", "");
+    if (status) {
+      // Try to get what we can (logs files)
+      // throw BatchException("Error of connection on remote host");
+      std::string mess("Copy command failed ! status is :");
+      ostringstream status_str;
+      status_str << status;
+      mess += status_str.str();
+      cerr << mess << endl;
+    }
+  }
+
   MpiImpl *BatchManager_eClient::FactoryMpiImpl(string mpiImpl)
   {
     if(mpiImpl == "lam")
