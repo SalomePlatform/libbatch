@@ -188,7 +188,7 @@ namespace Batch {
 
   }
 
-  void BatchManager_eClient::importDumpStateFile( const Job & job, const string directory )
+  bool BatchManager_eClient::importDumpStateFile( const Job & job, const string directory )
   {
     Parametre params = job.getParametre();
 
@@ -202,6 +202,7 @@ namespace Batch {
       cerr << mess << endl;
     }
 
+    bool ret = true;
     status = _protocol.copyFile(string(params[TMPDIR]) + string("/dumpState*.xml"), _hostname, _username,
                                 directory, "", "");
     if (status) {
@@ -212,7 +213,9 @@ namespace Batch {
       status_str << status;
       mess += status_str.str();
       cerr << mess << endl;
+      ret = false;
     }
+    return ret;
   }
 
   MpiImpl *BatchManager_eClient::FactoryMpiImpl(string mpiImpl)
