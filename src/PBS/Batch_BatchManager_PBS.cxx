@@ -157,7 +157,7 @@ namespace Batch {
   void BatchManager_PBS::holdJob(const JobId & jobid)
   {
     char * ref = const_cast< char * >(jobid.getReference().c_str());
-    int rc = pbs_holdjob(_connect, ref, USER_HOLD, 0);
+    int rc = pbs_holdjob(_connect, ref, const_cast< char * >(USER_HOLD), 0);
     if (rc) { // si erreur
       throw APIInternalFailureException(getErrorMessage("holdjob").c_str());
     }
@@ -167,7 +167,7 @@ namespace Batch {
   void BatchManager_PBS::releaseJob(const JobId & jobid)
   {
     char * ref = const_cast< char * >(jobid.getReference().c_str());
-    int rc = pbs_rlsjob(_connect, ref, USER_HOLD, 0);
+    int rc = pbs_rlsjob(_connect, ref, const_cast< char * >(USER_HOLD), 0);
     if (rc) { // si erreur
       throw APIInternalFailureException(getErrorMessage("rlsjob").c_str());
     }

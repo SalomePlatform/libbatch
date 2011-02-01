@@ -57,9 +57,9 @@ namespace Batch {
   BatchManager_ePBS::BatchManager_ePBS(const FactBatchManager * parent, const char * host,
                                        const char * username,
                                        CommunicationProtocolType protocolType, const char * mpiImpl, 
-				       int nb_proc_per_node)
-    : BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
-    BatchManager(parent, host)
+                                       int nb_proc_per_node)
+    : BatchManager(parent, host),
+      BatchManager_eClient(parent, host, username, protocolType, mpiImpl)
   {
     // Nothing to do
     _nb_proc_per_node = nb_proc_per_node;

@@ -57,8 +57,9 @@ namespace Batch {
   BatchManager_eLSF::BatchManager_eLSF(const FactBatchManager * parent, const char * host,
                                        const char * username,
                                        CommunicationProtocolType protocolType, const char * mpiImpl)
-  : BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
-    BatchManager(parent, host)
+  : BatchManager(parent, host),
+    BatchManager_eClient(parent, host, username, protocolType, mpiImpl)
+
   {
     // Nothing to do
   }

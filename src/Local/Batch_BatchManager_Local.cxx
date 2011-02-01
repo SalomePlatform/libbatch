@@ -137,9 +137,6 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> id;
 
-    // On retrouve le thread_id du thread
-    pthread_t thread_id;
-
     // @@@ --------> SECTION CRITIQUE <-------- @@@
     pthread_mutex_lock(&_threads_mutex);
     bool idFound = (_threads.find(id) != _threads.end());
@@ -807,7 +804,7 @@ namespace Batch {
 
 
       // On execute la commande du fils
-      int result = execve(argv[0], argv, envp);
+      execve(argv[0], argv, envp);
       UNDER_LOCK( cout << "*** debug_command = " << strerror(errno) << endl );
       // No need to deallocate since nothing happens after a successful exec
 
