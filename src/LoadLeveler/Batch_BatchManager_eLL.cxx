@@ -144,8 +144,25 @@ namespace Batch {
     tempOutputFile << "#!/bin/bash" << endl;
     tempOutputFile << "# @ output = " << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "# @ error = " << workDir << "/logs/error.log." << rootNameToExecute << endl;
+    tempOutputFile << "# @ node_usage = not_shared" << endl;
+
+    if (params.find(NAME) != params.end())
+      tempOutputFile << "# @ job_name = " << params[NAME] << endl;
 
     // Optional parameters
+    int nbproc = 1;
+    if (params.find(NBPROC) != params.end())
+      nbproc = params[NBPROC];
+    //if (nbproc == 1)
+    //  tempOutputFile << "# @ job_type = serial" << endl;
+    //else {
+      //  tempOutputFile << "# @ job_type = parallel" << endl;
+      tempOutputFile << "# @ job_type = mpich" << endl;
+      tempOutputFile << "# @ node = " << nbproc << endl;
+      tempOutputFile << "# @ tasks_per_node = 1" << endl;
+    //}
+    //tempOutputFile << "# @ job_type = bluegene" << endl;
+
     if (params.find(MAXWALLTIME) != params.end())
       tempOutputFile << "# @ wall_clock_limit = " << params[MAXWALLTIME] << ":00" << endl;
     if (params.find(MAXRAMSIZE) != params.end())
@@ -164,7 +181,6 @@ namespace Batch {
       tempOutputFile << endl;
     }
 
-    tempOutputFile << "# @ job_type = bluegene" << endl;
     tempOutputFile << "# @ queue" << endl;
 
     // generate nodes file
