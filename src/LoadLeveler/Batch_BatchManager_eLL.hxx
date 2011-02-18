@@ -62,6 +62,8 @@ namespace Batch {
   protected:
     std::string buildCommandFile(const Job & job);
 
+    int _nb_proc_per_node;
+
   };
 
 }

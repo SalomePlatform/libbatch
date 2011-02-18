@@ -44,7 +44,8 @@ namespace Batch {
                                      CommunicationProtocolType protocolType, const char * mpiImpl,
                                      int nb_proc_per_node)
     : BatchManager(parent, host),
-      BatchManager_eClient(parent, host, username, protocolType, mpiImpl)
+      BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
+      _nb_proc_per_node(nb_proc_per_node)
   {
     // Nothing to do
   }
@@ -157,9 +158,10 @@ namespace Batch {
     //  tempOutputFile << "# @ job_type = serial" << endl;
     //else {
       //  tempOutputFile << "# @ job_type = parallel" << endl;
+      int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
       tempOutputFile << "# @ job_type = mpich" << endl;
-      tempOutputFile << "# @ node = " << nbproc << endl;
-      tempOutputFile << "# @ tasks_per_node = 1" << endl;
+      tempOutputFile << "# @ node = " << nodes_requested << endl;
+      tempOutputFile << "# @ tasks_per_node = " << _nb_proc_per_node << endl;
     //}
     //tempOutputFile << "# @ job_type = bluegene" << endl;
 
