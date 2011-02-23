@@ -186,11 +186,7 @@ namespace Batch {
     tempOutputFile << "# @ queue" << endl;
 
     // generate nodes file
-    tempOutputFile << "NODEFILE=`mktemp nodefile-XXXXXXXXXX` || exit 1" << endl;
-    tempOutputFile << "for node in $LOADL_PROCESSOR_LIST; do" << endl;
-    tempOutputFile << "  echo $node >> $NODEFILE" << endl;
-    tempOutputFile << "done" << endl;
-    tempOutputFile << "export LIBBATCH_NODEFILE=$NODEFILE" << endl;
+    tempOutputFile << "export LIBBATCH_NODEFILE=$LOADL_HOSTFILE" << endl;
 
     // Launch the executable
     tempOutputFile << "cd " << workDir << endl;
