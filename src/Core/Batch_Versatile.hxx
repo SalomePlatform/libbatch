@@ -52,11 +52,6 @@ namespace Batch {
   // enum DiscriminatorType { UNDEFINED, BOOL, CHAR, INT, LONG, STRING};
   enum DiscriminatorType { UNDEFINED, LONG, STRING, COUPLE };
 
-  typedef struct {
-    DiscriminatorType type; // le type de l'element interne
-    int maxelem; // le nombre d'elements autorises
-  } TypeParam;
-
   class BATCH_EXPORT Versatile : public std::list< GenericType * >
   {
   public:

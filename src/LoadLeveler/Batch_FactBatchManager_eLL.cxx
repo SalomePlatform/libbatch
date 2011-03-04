@@ -26,16 +26,20 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
+#include "Batch_ParameterTypeMap.hxx"
 #include "Batch_BatchManager_eLL.hxx"
 #include "Batch_FactBatchManager_eLL.hxx"
 
 namespace Batch {
 
+  def_Constant(LL_JOBTYPE);
+
   static FactBatchManager_eLL sFBM_eLL;
 
   FactBatchManager_eLL::FactBatchManager_eLL() : FactBatchManager_eClient("eLL")
   {
-    // Nothing to do
+    // Add specific parameters
+    ParameterTypeMap::getInstance().addParameter(LL_JOBTYPE, STRING, 1);
   }
 
   FactBatchManager_eLL::~FactBatchManager_eLL()

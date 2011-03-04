@@ -46,6 +46,7 @@
 #include <libgen.h>
 #endif
 
+#include "Batch_Constants.hxx"
 #include "Batch_BatchManager_eSGE.hxx"
 #include "Batch_JobInfo_eSGE.hxx"
 

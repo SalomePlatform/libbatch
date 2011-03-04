@@ -32,6 +32,8 @@
 #include <cstdio>
 #include <sstream>
 #include <string>
+
+#include "Batch_Constants.hxx"
 #include "Batch_Parametre.hxx"
 #include "Batch_Environnement.hxx"
 #include "Batch_RunTimeException.hxx"

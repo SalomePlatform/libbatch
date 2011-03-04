@@ -31,10 +31,12 @@
 #include <fstream>
 #include <cstring>
 
+#include <Batch_Constants.hxx>
 #include <Batch_Job.hxx>
 #include <Batch_BatchManagerCatalog.hxx>
 #include <Batch_FactBatchManager.hxx>
 #include <Batch_FactBatchManager_eClient.hxx>
+#include <Batch_FactBatchManager_eLL.hxx>
 #include <Batch_BatchManager.hxx>
 #include <Batch_BatchManager_eClient.hxx>
 
@@ -83,6 +85,7 @@ int main(int argc, char** argv)
     const string & host = parser.getValue("TEST_ELL_HOST");
     const string & user = parser.getValue("TEST_ELL_USER");
     const string & queue = parser.getValue("TEST_ELL_QUEUE");
+    const string & jobType = parser.getValue("TEST_ELL_JOBTYPE");
     int timeout = parser.getValueAsInt("TEST_ELL_TIMEOUT");
 
     // Define the job...
@@ -98,9 +101,10 @@ int main(int argc, char** argv)
     p[TMPDIR]        = "tmp/Batch/";
     p[NBPROC]        = 1;
     p[MAXWALLTIME]   = 1;
-    p[MAXRAMSIZE]    = 10;
+    p[MAXRAMSIZE]    = 50;
     p[HOMEDIR]       = homedir;
     p[QUEUE]         = queue;
+    p[LL_JOBTYPE]       = jobType;
     job.setParametre(p);
     // ... and its environment
     Environnement e;

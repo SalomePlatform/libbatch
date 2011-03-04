@@ -46,6 +46,7 @@
 
 #include <Batch_config.h>
 
+#include "Batch_Constants.hxx"
 #include "Batch_BatchManager_eClient.hxx"
 #include "Batch_RunTimeException.hxx"
 

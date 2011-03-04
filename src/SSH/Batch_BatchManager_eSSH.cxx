@@ -41,6 +41,7 @@
 #include <libgen.h>
 #endif
 
+#include "Batch_Constants.hxx"
 #include "Batch_BatchManager_eSSH.hxx"
 #include "Batch_JobInfo_eSSH.hxx"
 

@@ -31,7 +31,9 @@
 #include <fstream>
 
 #include <Batch_NotYetImplementedException.hxx>
+#include <Batch_Constants.hxx>
 
+#include "Batch_FactBatchManager_eLL.hxx"
 #include "Batch_BatchManager_eLL.hxx"
 #include "Batch_JobInfo_eLL.hxx"
 
@@ -154,16 +156,23 @@ namespace Batch {
     int nbproc = 1;
     if (params.find(NBPROC) != params.end())
       nbproc = params[NBPROC];
-    //if (nbproc == 1)
-    //  tempOutputFile << "# @ job_type = serial" << endl;
-    //else {
-      //  tempOutputFile << "# @ job_type = parallel" << endl;
+
+    // If job type is not specified, try to guess it from number of procs
+    string job_type;
+    if (params.find(LL_JOBTYPE) != params.end())
+      job_type = params[LL_JOBTYPE].str();
+    else if (nbproc == 1)
+      job_type = "serial";
+    else
+      job_type = "mpich";
+
+    tempOutputFile << "# @ job_type = " << job_type << endl;
+
+    if (job_type != "serial") {
       int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
-      tempOutputFile << "# @ job_type = mpich" << endl;
       tempOutputFile << "# @ node = " << nodes_requested << endl;
       tempOutputFile << "# @ tasks_per_node = " << _nb_proc_per_node << endl;
-    //}
-    //tempOutputFile << "# @ job_type = bluegene" << endl;
+    }
 
     if (params.find(MAXWALLTIME) != params.end())
       tempOutputFile << "# @ wall_clock_limit = " << params[MAXWALLTIME] << ":00" << endl;

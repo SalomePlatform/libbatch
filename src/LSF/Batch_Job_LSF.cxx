@@ -34,6 +34,8 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+
+#include "Batch_Constants.hxx"
 #include "Batch_Job_LSF.hxx"
 
 using namespace std;

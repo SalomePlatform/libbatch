@@ -57,6 +57,7 @@
 
 %{
 #include "Batch_Defines.hxx"
+#include "Batch_Constants.hxx"
 #include "Batch_Job.hxx"
 #include "Batch_JobId.hxx"
 #include "Batch_JobInfo.hxx"

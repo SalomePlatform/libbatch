@@ -30,6 +30,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+#include "Batch_Constants.hxx"
 #include "Batch_Parametre.hxx"
 #include "Batch_Environnement.hxx"
 #include "Batch_RunTimeException.hxx"

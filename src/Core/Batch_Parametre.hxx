@@ -35,7 +35,6 @@
 #include <string>
 
 #include "Batch_Defines.hxx"
-#include "Batch_Constants.hxx"
 #include "Batch_Versatile.hxx"
 
 namespace Batch {
@@ -55,11 +54,6 @@ namespace Batch {
 
     // Operateur d'affectation
     Parametre & operator =(const Parametre & PM);
-
-  protected:
-    std::map< std::string, TypeParam > TypeMap; // map interne servant a controler le type de la valeur associee a chaque clef
-
-  private:
 
   };
 

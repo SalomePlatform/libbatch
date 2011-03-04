@@ -30,6 +30,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <Batch_Constants.hxx>
 #include <Batch_Job.hxx>
 #include <Batch_BatchManagerCatalog.hxx>
 #include <Batch_FactBatchManager.hxx>

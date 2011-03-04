@@ -47,9 +47,9 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_JobInfo
                Core/Batch_ListIsFullException
                Core/Batch_LongType
-               Core/Batch_MapKey
                Core/Batch_MpiImpl
                Core/Batch_NotYetImplementedException
+               Core/Batch_ParameterTypeMap
                Core/Batch_Parametre
                Core/Batch_RunTimeException
                Core/Batch_StringType

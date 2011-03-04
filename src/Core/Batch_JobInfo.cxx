@@ -32,7 +32,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-//#include "MEDMEM_STRING.hxx"
+
+#include "Batch_Constants.hxx"
 #include "Batch_JobInfo.hxx"
 
 using namespace std;

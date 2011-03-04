@@ -34,6 +34,8 @@
 #ifndef WIN32
 #include <unistd.h>
 #endif
+
+#include "Batch_Constants.hxx"
 #include "Batch_Job_Local.hxx"
 
 using namespace std;

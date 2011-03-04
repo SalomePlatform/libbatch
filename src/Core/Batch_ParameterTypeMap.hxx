@@ -20,50 +20,59 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * MapKey.hxx : 
+ * Batch_ParameterTypeMap.hxx :
  *
- * Auteur : Ivan DUTKA-MALEN - EDF R&D
- * Mail   : mailto:ivan.dutka-malen@der.edf.fr
- * Date   : Tue Oct 14 14:00:29 2003
- * Projet : Salome 2
+ * Auteur : Renaud Barate - EDF R&D
+ * Date   : Mars 2011
  *
  */
 
-#ifndef _MAPKEY_H_
-#define _MAPKEY_H_
+#ifndef _PARAMETERTYPEMAP_H_
+#define _PARAMETERTYPEMAP_H_
 
 #include "Batch_Defines.hxx"
-
+#include "Batch_Versatile.hxx"
 
 #include <string>
+#include <map>
 
 namespace Batch {
 
-  // une classe privee pour les differents types
-  // ces types ne peuvent pas etre redefinis
-  class BATCH_EXPORT MapKey : public std::string
-  {
-  private:
-    friend class Parametre; // seule la classe Parametre peut creer des MapKey
-    MapKey() : std::string() {}
-    MapKey(const MapKey & mk, size_type pos, size_type npos) : std::string(mk, pos, npos) {}
-    MapKey(const char * s, size_type n) : std::string(s, n) {}
-    MapKey(const char * s) : std::string(s) {}
-    MapKey(size_type n, char c) : std::string(n, c) {}
-#ifdef __STL_MEMBER_TEMPLATES
-    template<class InputIterator>
-    MapKey(InputIterator __begin, InputIterator __end) : std::string(__begin, __end) {}
-#else
-    MapKey(const_iterator __begin, const_iterator __end) : std::string(__begin, __end) {}
-#endif
+  typedef struct {
+    DiscriminatorType type;
+    int maxelem;
+  } ParameterType;
 
+
+  /*!
+   * This class is used to control the type of the values associated with a parameter.
+   * It's a singleton that can be get only through the static method getInstance().
+   */
+  class BATCH_EXPORT ParameterTypeMap
+  {
   public:
-    MapKey(const MapKey & mk) : std::string(mk) {}
+    static ParameterTypeMap& getInstance();
+
+    bool hasKey(const std::string & key) const;
+    const ParameterType & operator[](const std::string & key) const;
+
+    void addParameter(const std::string & key, DiscriminatorType type, int maxelem);
+
+  protected:
+
+    ParameterTypeMap();
+    virtual ~ParameterTypeMap();
+
+    std::map<std::string, ParameterType> _map;
+
+  private:
+
+    // Forbid the use of copy constructor and assignment operator
+    ParameterTypeMap(const ParameterTypeMap & orig) {}
+    void operator=(const ParameterTypeMap & orig) {}
 
   };
 
 }
 
 #endif
-
-// COMMENTS

@@ -50,6 +50,8 @@
 #include <signal.h>
 #include <errno.h>
 #include <string.h>
+
+#include "Batch_Constants.hxx"
 #include "Batch_IOMutex.hxx"
 #include "Batch_BatchManager_Local.hxx"
 #include "Batch_RunTimeException.hxx"

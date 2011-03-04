@@ -47,6 +47,7 @@
 #include <libgen.h>
 #endif
 
+#include "Batch_Constants.hxx"
 #include "Batch_BatchManager_eCCC.hxx"
 #include "Batch_JobInfo_eCCC.hxx"
 

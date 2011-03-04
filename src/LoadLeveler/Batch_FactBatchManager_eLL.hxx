@@ -29,13 +29,16 @@
 #ifndef _FACTBATCHMANAGER_ELL_H_
 #define _FACTBATCHMANAGER_ELL_H_
 
-#include "Batch_Defines.hxx"
+#include <Batch_Defines.hxx>
+#include <Batch_Constants.hxx>
 
 #include "Batch_BatchManager_eClient.hxx"
 #include "Batch_FactBatchManager_eClient.hxx"
 
 namespace Batch {
-  
+
+  decl_extern_Constant(LL_JOBTYPE);
+
   class BatchManager_eLL;
 
   class BATCH_EXPORT FactBatchManager_eLL : public FactBatchManager_eClient
