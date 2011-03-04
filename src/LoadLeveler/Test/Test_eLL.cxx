@@ -126,9 +126,13 @@ int main(int argc, char** argv)
     // Wait for the end of the job
     string state = bm->waitForJobEnd(jobid, timeout);
 
-    if (state == FINISHED || state == FAILED) {
+    if (state == FINISHED) {
       cout << "Job " << jobid.__repr__() << " is done" << endl;
       bm->importOutputFiles(job, "resultdir/seconddirname");
+    } else if (state == FAILED) {
+      cerr << "Job " << jobid.__repr__() << " finished in error" << endl;
+      bm->importOutputFiles(job, "resultdir/seconddirname");
+      return 1;
     } else {
       cerr << "Timeout while executing job" << endl;
       return 1;

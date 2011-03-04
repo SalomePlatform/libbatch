@@ -281,7 +281,8 @@ namespace Batch {
 #ifdef WIN32
 
     string fileName = generateTemporaryFileName(prefix);
-    outputStream.open(fileName.c_str());
+    // Open the file as binary to avoid problems with Windows newlines
+    outputStream.open(fileName.c_str(), ios_base::binary | ios_base::out);
 
 #else
 
