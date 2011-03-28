@@ -276,7 +276,7 @@ namespace Batch {
 
   const JobId BatchManager_eLL::addJob(const Job & job, const string reference)
   {
-    throw NotYetImplementedException("BatchManager_eLL::addJob");
+    return JobId(this, reference);
   }
 
 }
