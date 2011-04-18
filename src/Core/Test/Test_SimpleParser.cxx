@@ -29,7 +29,7 @@
 #include <cassert>
 #include <iostream>
 
-#include <Test_config.h>
+#include "Test_config.h"
 
 #include "SimpleParser.hxx"
 

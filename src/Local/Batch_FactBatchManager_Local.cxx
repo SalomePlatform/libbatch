@@ -32,7 +32,7 @@
  *
  */
 
-#include <Batch_config.h>
+#include "Batch_config.h"
 
 #include "Batch_BatchManager_Local.hxx"
 #include "Batch_FactBatchManager_Local.hxx"

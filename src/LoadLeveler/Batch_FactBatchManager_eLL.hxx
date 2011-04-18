@@ -29,8 +29,8 @@
 #ifndef _FACTBATCHMANAGER_ELL_H_
 #define _FACTBATCHMANAGER_ELL_H_
 
-#include <Batch_Defines.hxx>
-#include <Batch_Constants.hxx>
+#include "Batch_Defines.hxx"
+#include "Batch_Constants.hxx"
 
 #include "Batch_BatchManager_eClient.hxx"
 #include "Batch_FactBatchManager_eClient.hxx"

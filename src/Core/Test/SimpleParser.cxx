@@ -31,7 +31,7 @@
 #include <sstream>
 #include <cstdlib>
 
-#include <Test_config.h>
+#include "Test_config.h"
 
 #include "SimpleParser.hxx"
 

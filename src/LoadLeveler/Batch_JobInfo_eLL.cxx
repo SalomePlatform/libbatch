@@ -30,8 +30,8 @@
 #include <fstream>
 #include <sstream>
 
-#include <Batch_RunTimeException.hxx>
-#include <Batch_Constants.hxx>
+#include "Batch_RunTimeException.hxx"
+#include "Batch_Constants.hxx"
 
 #include "Batch_JobInfo_eLL.hxx"
 

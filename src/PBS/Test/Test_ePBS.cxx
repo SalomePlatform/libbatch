@@ -31,15 +31,15 @@
 #include <fstream>
 #include <cstring>
 
-#include <Batch_Constants.hxx>
-#include <Batch_Job.hxx>
-#include <Batch_BatchManagerCatalog.hxx>
-#include <Batch_FactBatchManager.hxx>
-#include <Batch_FactBatchManager_eClient.hxx>
-#include <Batch_BatchManager.hxx>
-#include <Batch_BatchManager_eClient.hxx>
+#include "Batch_Constants.hxx"
+#include "Batch_Job.hxx"
+#include "Batch_BatchManagerCatalog.hxx"
+#include "Batch_FactBatchManager.hxx"
+#include "Batch_FactBatchManager_eClient.hxx"
+#include "Batch_BatchManager.hxx"
+#include "Batch_BatchManager_eClient.hxx"
 
-#include <SimpleParser.hxx>
+#include "SimpleParser.hxx"
 
 using namespace std;
 using namespace Batch;
