@@ -26,7 +26,6 @@ SET(CLASS_LIST SSH/Batch_FactBatchManager_eSSH
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
-APPEND_CLASSES_TO_HDR_FILES(${CLASS_LIST})
 
 #IF (TEST_ENABLED)
 #    add_subdirectory(Test)

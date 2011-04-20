@@ -57,27 +57,22 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_Versatile
    )
 
-IF (HAS_SH)
-    SET(CLASS_LIST ${CLASS_LIST}
-                   Core/Batch_CommunicationProtocolSH
-       )
-ENDIF (HAS_SH)
-
-IF (HAS_RSH)
-    SET(CLASS_LIST ${CLASS_LIST}
-                   Core/Batch_CommunicationProtocolRSH
-       )
-ENDIF (HAS_RSH)
-
-IF (HAS_SSH)
-    SET(CLASS_LIST ${CLASS_LIST}
-                   Core/Batch_CommunicationProtocolSSH
-       )
-ENDIF (HAS_SSH)
-
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 APPEND_CLASSES_TO_HDR_FILES(${CLASS_LIST})
 APPEND_CLASSES_TO_HDR_FILES(Core/Batch_Defines)
+
+IF (HAS_SH)
+    APPEND_CLASSES_TO_SRC_FILES(Core/Batch_CommunicationProtocolSH)
+ENDIF (HAS_SH)
+
+IF (HAS_RSH)
+    APPEND_CLASSES_TO_SRC_FILES(Core/Batch_CommunicationProtocolRSH)
+ENDIF (HAS_RSH)
+
+IF (HAS_SSH)
+    APPEND_CLASSES_TO_SRC_FILES(Core/Batch_CommunicationProtocolSSH)
+ENDIF (HAS_SSH)
+
 
 IF (TEST_ENABLED)
     add_subdirectory(Test)
