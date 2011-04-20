@@ -30,7 +30,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#include "Batch_config.h"
+#include <Batch_config.h>
 
 #include "Batch_CommunicationProtocol.hxx"
 #include "Batch_CommunicationProtocolRSH.hxx"

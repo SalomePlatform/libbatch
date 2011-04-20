@@ -30,14 +30,14 @@
 #include <iostream>
 #include <fstream>
 
-#include "Batch_Constants.hxx"
-#include "Batch_Job.hxx"
-#include "Batch_BatchManagerCatalog.hxx"
-#include "Batch_FactBatchManager.hxx"
-#include "Batch_BatchManager.hxx"
+#include <Batch_Constants.hxx>
+#include <Batch_Job.hxx>
+#include <Batch_BatchManagerCatalog.hxx>
+#include <Batch_FactBatchManager.hxx>
+#include <Batch_BatchManager.hxx>
 
-#include "Test_Local_config.h"
-#include "SimpleParser.hxx"
+#include <Test_Local_config.h>
+#include <SimpleParser.hxx>
 
 using namespace std;
 using namespace Batch;

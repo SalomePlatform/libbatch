@@ -30,10 +30,10 @@
 #include <direct.h>
 #include <iostream>
 
-#include "Batch_RunTimeException.hxx"
+#include <Batch_RunTimeException.hxx>
 #endif
 
-#include "Batch_config.h"
+#include <Batch_config.h>
 
 #include "Batch_CommunicationProtocolRSH.hxx"
 

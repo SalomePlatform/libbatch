@@ -39,7 +39,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "Batch_config.h"
+#include <Batch_config.h>
 
 #ifdef MSVC
 #include <io.h>

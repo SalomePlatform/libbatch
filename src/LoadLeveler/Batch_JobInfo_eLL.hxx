@@ -31,7 +31,7 @@
 
 #include <string>
 
-#include "Batch_JobInfo.hxx"
+#include <Batch_JobInfo.hxx>
 
 namespace Batch {
 

@@ -26,7 +26,7 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#include "Batch_config.h"
+#include <Batch_config.h>
 
 #include "Batch_CommunicationProtocolSH.hxx"
 
