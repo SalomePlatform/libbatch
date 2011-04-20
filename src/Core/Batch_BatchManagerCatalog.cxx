@@ -70,11 +70,20 @@ namespace Batch {
     }
   }
 
+  bool BatchManagerCatalog::hasFactBatchManager(const char * type)
+  {
+    pthread_mutex_lock(&_mutex);
+    bool result = (_catalog.find(type) != _catalog.end());
+    pthread_mutex_unlock(&_mutex);
+    return result;
+  }
+
   // Functor
   FactBatchManager * BatchManagerCatalog::operator() (const char * type)
   {
+    FactBatchManager * result = NULL;
     pthread_mutex_lock(&_mutex);
-    FactBatchManager * result = _catalog[type];
+    if (_catalog.find(type) != _catalog.end()) result = _catalog[type];
     pthread_mutex_unlock(&_mutex);
     return result;
   }

@@ -48,6 +48,7 @@ namespace Batch {
     static BatchManagerCatalog& getInstance();
 
     void addFactBatchManager(const char * type, Batch::FactBatchManager * pFBM);
+    bool hasFactBatchManager(const char * type);
     Batch::FactBatchManager * operator() (const char * type);
 
     virtual std::map<std::string, FactBatchManager *> * dict();
