@@ -56,6 +56,7 @@ add_subdirectory (PBS)
 add_subdirectory (SGE)
 add_subdirectory (SSH)
 add_subdirectory (LoadLeveler)
+add_subdirectory (Slurm)
 
 # Make a copy of the built value and clear the built value for the next run of cmake
 SET(SRC_FILES ${SRC_FILES_BUILD} CACHE INTERNAL "")
