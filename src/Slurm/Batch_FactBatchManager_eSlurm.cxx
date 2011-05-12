@@ -35,7 +35,7 @@ namespace Batch {
 
   static FactBatchManager_eSlurm sFBM_eSlurm;
 
-  FactBatchManager_eSlurm::FactBatchManager_eSlurm() : FactBatchManager_eClient("eSlurm")
+  FactBatchManager_eSlurm::FactBatchManager_eSlurm() : FactBatchManager_eClient("eSLURM")
   {
   }
 
