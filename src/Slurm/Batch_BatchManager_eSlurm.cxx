@@ -144,7 +144,7 @@ namespace Batch {
     tempOutputFile << "#SBATCH --error=" << workDir << "/logs/error.log." << rootNameToExecute << endl;
 
     if (params.find(NAME) != params.end())
-      tempOutputFile << "#SBATCH --job-name=" << params[NAME] << endl;
+      tempOutputFile << "#SBATCH --job-name=\"" << params[NAME] << "\"" << endl;
 
     // Optional parameters
     int nbproc = 1;

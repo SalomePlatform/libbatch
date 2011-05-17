@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     // ... and its parameters ...
     Parametre p;
     p[EXECUTABLE]    = "./test-script.sh";
-    p[NAME]          = string("Test_eSlurm_") + argv[1];
+    p[NAME]          = string("Test eSLURM ") + argv[1];
     p[WORKDIR]       = homedir + "/tmp/Batch";
     p[INFILE]        = Couple("seta.sh", "tmp/Batch/seta.sh");
     p[INFILE]       += Couple("setb.sh", "tmp/Batch/setb.sh");
