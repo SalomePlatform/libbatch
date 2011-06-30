@@ -299,6 +299,9 @@ namespace Batch {
     // Abstraction of PBS_NODEFILE - TODO
     tempOutputFile << "export LIBBATCH_NODEFILE=nodesFile" << endl;
 
+    // Allow resource sharing in CCRT nodes
+    tempOutputFile << "export OMPI_MCA_orte_process_binding=none" << endl;
+
     // Launch the executable
     tempOutputFile << "./" + fileNameToExecute << endl;
     tempOutputFile.flush();
