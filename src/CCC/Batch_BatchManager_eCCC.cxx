@@ -290,14 +290,14 @@ namespace Batch {
     tempOutputFile << "    bool=1" << endl;
     tempOutputFile << "  else" << endl;
     tempOutputFile << "    for ((j=0;j<$i;j++)); do" << endl;
-    tempOutputFile << "      echo $n >> nodesFile" << endl;
+    tempOutputFile << "      echo $n >> nodesFile." << rootNameToExecute << endl;
     tempOutputFile << "    done" << endl;
     tempOutputFile << "    bool=0" << endl;
     tempOutputFile << "  fi" << endl;
     tempOutputFile << "done" << endl;
 
     // Abstraction of PBS_NODEFILE - TODO
-    tempOutputFile << "export LIBBATCH_NODEFILE=nodesFile" << endl;
+    tempOutputFile << "export LIBBATCH_NODEFILE=nodesFile." << rootNameToExecute << endl;
 
     // Allow resource sharing in CCRT nodes
     tempOutputFile << "export OMPI_MCA_orte_process_binding=none" << endl;
