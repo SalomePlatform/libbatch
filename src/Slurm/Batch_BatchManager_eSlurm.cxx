@@ -242,9 +242,10 @@ namespace Batch {
     command += " > ";
     command += logFile;
     cerr << command.c_str() << endl;
-    int status = system(command.c_str());
-    if (status != 0)
-      throw EmulationException("Can't query job " + jobid.getReference());
+    system(command.c_str());
+    // We don't test the return code here because with jobs finished since a long time Slurm
+    // returns an error and a message like "slurm_load_jobs error: Invalid job id specified".
+    // So we consider that the job is finished when we get an error.
 
     JobInfo_eSlurm jobinfo = JobInfo_eSlurm(jobid.getReference(), logFile);
     return jobinfo;

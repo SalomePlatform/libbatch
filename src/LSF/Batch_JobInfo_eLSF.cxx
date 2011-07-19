@@ -56,40 +56,46 @@ namespace Batch {
     _param[ID] = oss.str();
 
     // read status of job in log file
-    char line[128];
-    ifstream fp(logFile.c_str(),ios::in);
-    fp.getline(line,80,'\n');
-    
-    string sjobid, username, status;
-    fp >> sjobid;
-    fp >> username;
-    fp >> status;
+    string line;
+    ifstream fp(logFile.c_str());
+    getline(fp, line);
 
-    if (status == "PEND") {         // Pending
-      _param[STATE] = QUEUED;
-    } else if (status == "PSUSP") { // Suspended while pending
-      _param[STATE] = PAUSED;
-    } else if (status == "RUN") {   // Running
-      _param[STATE] = RUNNING;
-    } else if (status == "USUSP") { // Suspended while running
-      _param[STATE] = PAUSED;
-    } else if (status == "SSUSP") { // Suspended by LSF
-      _param[STATE] = PAUSED;
-    } else if (status == "DONE") {  // Finished successfully
+    // On some batch managers, the job is deleted soon after it is finished,
+    // so we have to consider that an unknown job (empty file) is a finished
+    // one, even if it is not always true.
+    if (fp.eof()) {
       _param[STATE] = FINISHED;
-    } else if (status == "EXIT") {  // Finished in error
-      _param[STATE] = FAILED;
-    } else if (status == "UNKWN") { // Lost contact
-      _param[STATE] = FAILED;
-    } else if (status == "ZOMBI") { // Zombie
-      _param[STATE] = FAILED;
     } else {
-      cerr << "Unknown job state code: " << status << endl;
+      string sjobid, username, status;
+      fp >> sjobid;
+      fp >> username;
+      fp >> status;
+
+      if (status == "PEND") {         // Pending
+        _param[STATE] = QUEUED;
+      } else if (status == "PSUSP") { // Suspended while pending
+        _param[STATE] = PAUSED;
+      } else if (status == "RUN") {   // Running
+        _param[STATE] = RUNNING;
+      } else if (status == "USUSP") { // Suspended while running
+        _param[STATE] = PAUSED;
+      } else if (status == "SSUSP") { // Suspended by LSF
+        _param[STATE] = PAUSED;
+      } else if (status == "DONE") {  // Finished successfully
+        _param[STATE] = FINISHED;
+      } else if (status == "EXIT") {  // Finished in error
+        _param[STATE] = FAILED;
+      } else if (status == "UNKWN") { // Lost contact
+        _param[STATE] = FAILED;
+      } else if (status == "ZOMBI") { // Zombie
+        _param[STATE] = FAILED;
+      } else {
+        cerr << "Unknown job state code: " << status << endl;
+      }
+
+      if( status.find("RUN") != string::npos)
+        _running = true;
     }
-
-    if( status.find("RUN") != string::npos)
-      _running = true;
-
   }
 
   // Teste si un job est present en machine
