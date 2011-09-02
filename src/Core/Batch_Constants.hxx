@@ -82,6 +82,7 @@ namespace Batch {
   decl_extern_Constant(USER);
   decl_extern_Constant(WORKDIR);
   decl_extern_Constant(HOMEDIR);
+  decl_extern_Constant(EXCLUSIVE);
 
   // These constants define the status of a job (parameter STATE)
   decl_extern_Constant(CREATED);

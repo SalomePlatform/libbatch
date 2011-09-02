@@ -150,10 +150,14 @@ namespace Batch {
     int nbproc = 1;
     if (params.find(NBPROC) != params.end())
       nbproc = params[NBPROC];
+    tempOutputFile << "#SBATCH --ntasks=" << nbproc << endl;
 
-    int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
-    tempOutputFile << "#SBATCH --nodes=" << nodes_requested << endl;
-    tempOutputFile << "#SBATCH --ntasks-per-node=" << _nb_proc_per_node << endl;
+    if (params.find(EXCLUSIVE) != params.end()) {
+      if (params[EXCLUSIVE])
+        tempOutputFile << "#SBATCH --exclusive" << endl;
+      else
+        tempOutputFile << "#SBATCH --share" << endl;
+    }
 
     if (params.find(MAXWALLTIME) != params.end())
       tempOutputFile << "#SBATCH --time=" << params[MAXWALLTIME] << endl;
@@ -176,6 +180,9 @@ namespace Batch {
     // Launch the executable
     tempOutputFile << "cd " << workDir << endl;
     tempOutputFile << "./" + fileNameToExecute << endl;
+
+    // Remove the node file
+    tempOutputFile << "rm $LIBBATCH_NODEFILE" << endl;
 
     tempOutputFile.flush();
     tempOutputFile.close();

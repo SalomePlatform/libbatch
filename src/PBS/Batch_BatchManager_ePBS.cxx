@@ -256,9 +256,31 @@ namespace Batch {
     tempOutputFile << "#! /bin/sh -f" << endl;
     if (nbproc > 0)
     {
-      // Division - arrondi supérieur
-      int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
-      tempOutputFile << "#PBS -l nodes=" << nodes_requested << ":ppn=" << _nb_proc_per_node << endl;
+      int nb_full_nodes = nbproc / _nb_proc_per_node;
+      int nb_proc_on_last_node = nbproc % _nb_proc_per_node;
+
+      // In exclusive mode, we reserve all procs on the nodes
+      if (params.find(EXCLUSIVE) != params.end() && params[EXCLUSIVE] && nb_proc_on_last_node > 0) {
+        nb_full_nodes += 1;
+        nb_proc_on_last_node = 0;
+      }
+
+      tempOutputFile << "#PBS -l nodes=";
+
+      // Full nodes
+      if (nb_full_nodes > 0) {
+        tempOutputFile << nb_full_nodes << ":ppn=" << _nb_proc_per_node;
+        if (nb_proc_on_last_node > 0) {
+          tempOutputFile << "+";
+        }
+      }
+
+      // Partly reserved node
+      if (nb_proc_on_last_node > 0) {
+        tempOutputFile << "1:ppn=" << nb_proc_on_last_node;
+      }
+
+      tempOutputFile << endl;
     }
     if (queue != "")
       tempOutputFile << "#PBS -q " << queue << endl;

@@ -267,6 +267,11 @@ namespace Batch {
     if( mem > 0 )
       tempOutputFile << "#BSUB -M " << mem*1024 << endl ;
     tempOutputFile << "#BSUB -n " << nbproc << endl ;
+
+    if (params.find(EXCLUSIVE) != params.end() && params[EXCLUSIVE]) {
+      tempOutputFile << "#BSUB -x" << endl ;
+    }
+
     size_t pos = workDir.find("$HOME");
     string baseDir;
     if( pos != string::npos )
@@ -281,10 +286,16 @@ namespace Batch {
     tempOutputFile << "#BSUB -o " << baseDir << "/logs/output.log." << rootNameToExecute << endl ;
     tempOutputFile << "#BSUB -e " << baseDir << "/logs/error.log." << rootNameToExecute << endl ;
 
+    // Define environment for the job
+    Environnement env = job.getEnvironnement();
+    for (Environnement::const_iterator iter = env.begin() ; iter != env.end() ; ++iter) {
+      tempOutputFile << "export " << iter->first << "=" << iter->second << endl;
+    }
+
     tempOutputFile << "cd " << workDir << endl ;
 
     // generate nodes file
-    tempOutputFile << "NODEFILE=`mktemp nodefile-XXXXXXXXXX` || exit 1" << endl;
+    tempOutputFile << "LIBBATCH_NODEFILE=`mktemp nodefile-XXXXXXXXXX` || exit 1" << endl;
     tempOutputFile << "bool=0" << endl;
     tempOutputFile << "for i in $LSB_MCPU_HOSTS; do" << endl;
     tempOutputFile << "  if test $bool = 0; then" << endl;
@@ -292,20 +303,18 @@ namespace Batch {
     tempOutputFile << "    bool=1" << endl;
     tempOutputFile << "  else" << endl;
     tempOutputFile << "    for ((j=0;j<$i;j++)); do" << endl;
-    tempOutputFile << "      echo $n >> $NODEFILE" << endl;
+    tempOutputFile << "      echo $n >> $LIBBATCH_NODEFILE" << endl;
     tempOutputFile << "    done" << endl;
     tempOutputFile << "    bool=0" << endl;
     tempOutputFile << "  fi" << endl;
     tempOutputFile << "done" << endl;
-
-    // Abstraction of PBS_NODEFILE - TODO
-    tempOutputFile << "export LIBBATCH_NODEFILE=$NODEFILE" << endl;
+    tempOutputFile << "export LIBBATCH_NODEFILE" << endl;
 
     // Launch the executable
     tempOutputFile << "./" + fileNameToExecute << endl;
 
     // Remove the node file
-    tempOutputFile << "rm $NODEFILE" << endl;
+    tempOutputFile << "rm $LIBBATCH_NODEFILE" << endl;
 
     tempOutputFile.flush();
     tempOutputFile.close();

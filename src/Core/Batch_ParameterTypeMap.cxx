@@ -84,6 +84,7 @@ namespace Batch {
     addParameter("USER", STRING, 1);
     addParameter("WORKDIR", STRING, 1);
     addParameter("HOMEDIR", STRING, 1);
+    addParameter("EXCLUSIVE", BOOL, 1);
   }
 
   ParameterTypeMap::~ParameterTypeMap()
@@ -106,18 +107,18 @@ namespace Batch {
     return (_map.find(key) != _map.end());
   }
 
-  const ParameterType & ParameterTypeMap::operator[](const string & key) const
-  {
-    map<string, ParameterType>::const_iterator it = _map.find(key);
-    if (it == _map.end()) throw InvalidKeyException(key);
-    return it->second;
-  }
-
   void ParameterTypeMap::addParameter(const std::string & key, DiscriminatorType type, int maxelem)
   {
     if (hasKey(key)) throw InvalidKeyException(key + " is already present in type map");
     _map[key].type = type;
     _map[key].maxelem = maxelem;
+  }
+
+  Versatile ParameterTypeMap::createVersatile(const std::string & parameterName)
+  {
+    map<string, ParameterType>::const_iterator it = _map.find(parameterName);
+    if (it == _map.end()) throw InvalidKeyException(parameterName);
+    return Versatile(it->second.type, it->second.maxelem, parameterName);
   }
 
 }

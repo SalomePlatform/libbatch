@@ -104,7 +104,8 @@ int main(int argc, char** argv)
     p[MAXRAMSIZE]    = 50;
     p[HOMEDIR]       = homedir;
     p[QUEUE]         = queue;
-    p[LL_JOBTYPE]       = jobType;
+    p[LL_JOBTYPE]    = jobType;
+    p[EXCLUSIVE]     = false;
     job.setParametre(p);
     // ... and its environment
     Environnement e;

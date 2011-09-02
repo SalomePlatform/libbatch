@@ -71,6 +71,7 @@ namespace Batch {
   def_Constant(USER);
   def_Constant(WORKDIR);
   def_Constant(HOMEDIR);
+  def_Constant(EXCLUSIVE);
 
   // These constants define the status of a job (parameter STATE);
   def_Constant(CREATED);

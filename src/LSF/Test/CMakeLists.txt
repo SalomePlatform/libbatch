@@ -20,23 +20,25 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseSWIG)
+# Just copy the test scripts to the binary dir
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/seta.sh ${CMAKE_CURRENT_BINARY_DIR}/seta.sh COPYONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setb.sh ${CMAKE_CURRENT_BINARY_DIR}/setb.sh COPYONLY)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test-script.sh ${CMAKE_CURRENT_BINARY_DIR}/test-script.sh COPYONLY)
 
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+# set the include directories
+include_directories(${CMAKE_SOURCE_DIR}/src/Core)
+include_directories(${CMAKE_SOURCE_DIR}/src/Core/Test)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-SET(SWIG_SRC_FILE libBatch_Swig.i)
-SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES CPLUSPLUS ON
-                                                        SWIG_FLAGS "-shadow")
-SWIG_ADD_MODULE(libBatch_Swig python ${SWIG_SRC_FILE})
-SWIG_LINK_LIBRARIES(libBatch_Swig Batch ${PYTHON_LIBRARIES})
+# Build the test programs and add the tests
+add_executable(Test_eLSF Test_eLSF.cxx)
+target_link_libraries(Test_eLSF Batch SimpleParser)
 
-INSTALL(TARGETS ${SWIG_MODULE_libBatch_Swig_REAL_NAME} DESTINATION lib/python${PYTHON_VERSION}/site-packages)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libBatch_Swig.py
-        DESTINATION lib/python${PYTHON_VERSION}/site-packages)
+IF (HAS_SSH)
+    ADD_TEST(eLSF_SSH Test_eLSF SSH)
+ENDIF (HAS_SSH)
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES libBatch_Swig.py)
-
-IF (TEST_ENABLED)
-    add_subdirectory(Test)
-ENDIF (TEST_ENABLED)
+#IF (HAS_RSH)
+#    ADD_TEST(eLSF_RSH Test_eLSF RSH)
+#ENDIF (HAS_RSH)

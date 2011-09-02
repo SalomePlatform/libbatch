@@ -54,9 +54,8 @@ namespace Batch {
     static ParameterTypeMap& getInstance();
 
     bool hasKey(const std::string & key) const;
-    const ParameterType & operator[](const std::string & key) const;
-
     void addParameter(const std::string & key, DiscriminatorType type, int maxelem);
+    Versatile createVersatile(const std::string & parameterName);
 
   protected:
 

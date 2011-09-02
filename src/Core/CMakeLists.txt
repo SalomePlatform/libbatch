@@ -39,7 +39,6 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_FactBatchManager
                Core/Batch_GenericException
                Core/Batch_GenericType
-               Core/Batch_IntType
                Core/Batch_InvalidArgumentException
                Core/Batch_InvalidKeyException
                Core/Batch_Job

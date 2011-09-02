@@ -22,9 +22,8 @@
 /*
  * Versatile.hxx :
  *
- * Auteur : Ivan DUTKA-MALEN - EDF R&D
- * Date   : Septembre 2003
- * Projet : SALOME 2
+ * Author : Ivan DUTKA-MALEN - EDF R&D
+ * Date   : September 2003
  *
  */
 
@@ -37,7 +36,6 @@
 #include <list>
 #include <string>
 #include "Batch_GenericType.hxx"
-#include "Batch_IntType.hxx"
 #include "Batch_BoolType.hxx"
 #include "Batch_CharType.hxx"
 #include "Batch_LongType.hxx"
@@ -48,67 +46,67 @@
 
 namespace Batch {
 
-	// Les types autorises
-  // enum DiscriminatorType { UNDEFINED, BOOL, CHAR, INT, LONG, STRING};
-  enum DiscriminatorType { UNDEFINED, LONG, STRING, COUPLE };
+  // Authorized types
+  enum DiscriminatorType { BOOL, LONG, STRING, COUPLE };
 
   class BATCH_EXPORT Versatile : public std::list< GenericType * >
   {
   public:
-		// Constructeur standard et destructeur
-    Versatile() : _discriminator(UNDEFINED), _maxsize(1), _name("undefined") {}
-    virtual ~Versatile();
 
-		// Constructeur par recopie
+    // Constructors
+    Versatile(DiscriminatorType discriminator, size_type maxsize, std::string name);
     Versatile(const Versatile & V);
 
-		// Constructeur depuis le type de "base"
-    Versatile(long   l) : _discriminator(LONG), _maxsize(1), _name("long")   { push_back(new LongType(l)); }
-    Versatile(const std::string & s) : _discriminator(STRING), _maxsize(1), _name("string") { push_back(new StringType(s)); }
-    Versatile(const Couple & c) : _discriminator(COUPLE), _maxsize(1), _name("couple") { push_back(new CoupleType(c)); }
+    // Destructor
+    virtual ~Versatile();
 
-		// Operateur d'affectation et de concatenation a partir d'un type de "base"
+    // Affectation and concatenation operators from base types
     Versatile & operator = (const long     l)    throw(TypeMismatchException);
     Versatile & operator = (const std::string & ch)   throw(TypeMismatchException);
     Versatile & operator +=(const std::string & ch)   throw(TypeMismatchException,ListIsFullException);
     Versatile & operator , (const std::string & ch)   throw(TypeMismatchException,ListIsFullException);
+    Versatile & operator = (const char * ch)   throw(TypeMismatchException);
+    Versatile & operator +=(const char * ch)   throw(TypeMismatchException,ListIsFullException);
+    Versatile & operator , (const char * ch)   throw(TypeMismatchException,ListIsFullException);
     Versatile & operator = (const Couple & cp)   throw(TypeMismatchException);
     Versatile & operator +=(const Couple & cp)   throw(TypeMismatchException,ListIsFullException);
     Versatile & operator , (const Couple & cp)   throw(TypeMismatchException,ListIsFullException);
+    Versatile & operator = (const int i) throw(TypeMismatchException);
+    Versatile & operator = (const bool b) throw(TypeMismatchException);
 
-		// Operateur d'affectation entre objets
-    Versatile & operator = (const Versatile & V) throw(TypeMismatchException);
-
-		// Conversion de type vers un type de "base"
+    // Type conversion to base types
     operator long() const throw(TypeMismatchException);
     operator std::string() const throw(TypeMismatchException);
     operator Couple() const throw(TypeMismatchException);
     std::string str() const throw(TypeMismatchException);
+    operator bool() const throw(TypeMismatchException);
+    operator int() const throw(TypeMismatchException);
 
-		// Operateur pour l'affichage sur un stream
+    // Display on a stream
     BATCH_EXPORT friend std::ostream & operator << (std::ostream & os, const Versatile & );
 
-		// Positionnement et recuperation du type de l'element interne
-    void setType(DiscriminatorType) throw(TypeMismatchException);
+    // Check the type
+    void checkType(DiscriminatorType t) const throw (TypeMismatchException);
+
+    // Getter methods
     DiscriminatorType getType() const;
+    size_type getMaxSize() const;
+    const std::string & getName() const;
 
-		// Positionnement et recuperation du nombre d'elements internes
-    void setMaxSize(int i);
-		int getMaxSize() const { return _maxsize; }
+    // Erase all internal elements
+    void eraseAll();
 
-		// Positionnement et recuperation du nom de l'objet
-    std::string getName() const;
-    void setName(const std::string & name);
-
-		// Efface tous les elements internes de l'objet
-    virtual void eraseAll();
   protected:
 
-    DiscriminatorType _discriminator; // type de l'element interne
-    size_type _maxsize; // nombre max d'elements internes
-    std::string _name; // nom de l'objet (sert pour les exceptions)
+    DiscriminatorType _discriminator; // Internal element type
+    size_type _maxsize; // Maximum number of internal elements
+    std::string _name; // Object name (used for exceptions)
 
   private:
+
+    // Forbid the use of default constructor and affectation operator
+    Versatile() {}
+    void operator= (const Versatile & V) {}
 
   };
 

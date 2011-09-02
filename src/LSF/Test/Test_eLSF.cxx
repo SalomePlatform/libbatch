@@ -20,10 +20,10 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * Test_eSlurm.cxx :
+ * Test_eLSF.cxx :
  *
  * Author : Renaud BARATE - EDF R&D
- * Date   : May 2011
+ * Date   : September 2011
  *
  */
 
@@ -46,7 +46,7 @@ using namespace Batch;
 
 void print_usage()
 {
-  cout << "usage: Test_eSlurm PROTOCOL" << endl;
+  cout << "usage: Test_eLSF PROTOCOL" << endl;
   cout << "    PROTOCOL      \"SSH\" or \"RSH\"" << endl;
 }
 
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   }
 
   cout << "*******************************************************************************************" << endl;
-  cout << "This program tests the batch submission based on Slurm emulation. Passwordless" << endl;
+  cout << "This program tests the batch submission based on LSF emulation. Passwordless" << endl;
   cout << "authentication must be used for this test to pass. For SSH, this can be configured with" << endl;
   cout << "ssh-agent for instance. For RSH, this can be configured with the .rhosts file." << endl;
   cout << "*******************************************************************************************" << endl;
@@ -80,17 +80,17 @@ int main(int argc, char** argv)
     // Parse the test configuration file
     SimpleParser parser;
     parser.parseTestConfigFile();
-    const string & homedir = parser.getValue("TEST_ESLURM_HOMEDIR");
-    const string & host = parser.getValue("TEST_ESLURM_HOST");
-    const string & user = parser.getValue("TEST_ESLURM_USER");
-    int timeout = parser.getValueAsInt("TEST_ESLURM_TIMEOUT");
+    const string & homedir = parser.getValue("TEST_ELSF_HOMEDIR");
+    const string & host = parser.getValue("TEST_ELSF_HOST");
+    const string & user = parser.getValue("TEST_ELSF_USER");
+    int timeout = parser.getValueAsInt("TEST_ELSF_TIMEOUT");
 
     // Define the job...
     Job job;
     // ... and its parameters ...
     Parametre p;
     p[EXECUTABLE]    = "./test-script.sh";
-    p[NAME]          = string("Test eSLURM ") + argv[1];
+    p[NAME]          = string("Test eLSF ") + argv[1];
     p[WORKDIR]       = homedir + "/tmp/Batch";
     p[INFILE]        = Couple("seta.sh", "tmp/Batch/seta.sh");
     p[INFILE]       += Couple("setb.sh", "tmp/Batch/setb.sh");
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     BatchManagerCatalog& c = BatchManagerCatalog::getInstance();
 
     // Create a BatchManager of type ePBS on localhost
-    FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("eSLURM"));
+    FactBatchManager_eClient * fbm = (FactBatchManager_eClient *)(c("eLSF"));
     BatchManager_eClient * bm = (*fbm)(host.c_str(), user.c_str(), protocol);
 
     // Submit the job to the BatchManager

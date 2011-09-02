@@ -147,7 +147,6 @@ namespace Batch {
     tempOutputFile << "#!/bin/bash" << endl;
     tempOutputFile << "# @ output = " << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "# @ error = " << workDir << "/logs/error.log." << rootNameToExecute << endl;
-    tempOutputFile << "# @ node_usage = not_shared" << endl;
 
     if (params.find(NAME) != params.end())
       tempOutputFile << "# @ job_name = " << params[NAME] << endl;
@@ -156,6 +155,13 @@ namespace Batch {
     int nbproc = 1;
     if (params.find(NBPROC) != params.end())
       nbproc = params[NBPROC];
+
+    if (params.find(EXCLUSIVE) != params.end()) {
+      if (params[EXCLUSIVE])
+        tempOutputFile << "# @ node_usage = not_shared" << endl;
+      else
+        tempOutputFile << "# @ node_usage = shared" << endl;
+    }
 
     // If job type is not specified, try to guess it from number of procs
     string job_type;
@@ -168,10 +174,10 @@ namespace Batch {
 
     tempOutputFile << "# @ job_type = " << job_type << endl;
 
-    if (job_type != "serial") {
+    if (job_type == "mpich") {
       int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
       tempOutputFile << "# @ node = " << nodes_requested << endl;
-      tempOutputFile << "# @ tasks_per_node = " << _nb_proc_per_node << endl;
+      tempOutputFile << "# @ total_tasks = " << nbproc << endl;
     }
 
     if (params.find(MAXWALLTIME) != params.end())

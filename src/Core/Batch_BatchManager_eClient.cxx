@@ -82,8 +82,8 @@ namespace Batch {
   {
     int status;
     Parametre params = job.getParametre();
-    Versatile V = params[INFILE];
-    Versatile::iterator Vit;
+    const Versatile & V = params[INFILE];
+    Versatile::const_iterator Vit;
 
     status = _protocol.makeDirectory(string(params[TMPDIR]) + "/logs", _hostname, _username);
     if(status) {
@@ -147,8 +147,8 @@ namespace Batch {
   void BatchManager_eClient::importOutputFiles( const Job & job, const string directory )
   {
     Parametre params = job.getParametre();
-    Versatile V = params[OUTFILE];
-    Versatile::iterator Vit;
+    const Versatile & V = params[OUTFILE];
+    Versatile::const_iterator Vit;
 
     // Create local result directory
     int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");

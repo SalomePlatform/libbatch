@@ -44,24 +44,20 @@ namespace Batch {
 
   // Operateur de recherche dans la map
   // Cet operateur agit sur les objets NON CONSTANTS, il autorise la modification de
-  // la valeur associ�e � la clef car il retourne une reference non constante
+  // la valeur associée à la clef car il retourne une reference non constante
   Versatile & Parametre::operator [] (const string & mk)
   {
     // On controle que la clef est valide
     if (!ParameterTypeMap::getInstance().hasKey(mk)) throw InvalidKeyException(mk);
 
-    // On recherche la valeur associee...
-    Versatile & V = map< string, Versatile >::operator [] (mk);
-
-    // ... et on l'initialise systematiquement
-    // ATTENTION : si un probleme de type survient (ie, on stocke une valeur d'un type
-    // different de celui inscrit dans TypeMap) une exception TypeMismatchException est
-    // levee
-    V.setName(mk);
-    V.setType(ParameterTypeMap::getInstance()[mk].type);
-    V.setMaxSize(ParameterTypeMap::getInstance()[mk].maxelem);
-
-    return V;
+    Parametre::iterator it = find(mk);
+    if (it != end()) {
+      return it->second;
+    } else {
+      Versatile V = ParameterTypeMap::getInstance().createVersatile(mk);
+      pair<iterator, bool> result = insert(make_pair(mk, V));
+      return result.first->second;
+    }
   }
 
   // Operateur de recherche dans la map

@@ -32,20 +32,167 @@
 #include <string>
 #include <list>
 #include <map>
+#include "Batch_ParameterTypeMap.hxx"
 #include "Batch_Parametre.hxx"
-#include "Batch_PyVersatile.hxx"
 #include "Batch_JobId.hxx"
 #include "Batch_FactBatchManager.hxx"
-#if PY_VERSION_HEX < 0x02050000 && !defined(PY_SSIZE_T_MIN)
-typedef int Py_ssize_t;
-#define PY_SSIZE_T_MAX INT_MAX
-#define PY_SSIZE_T_MIN INT_MIN
-#endif
+#include "Batch_RunTimeException.hxx"
 %}
 
 # // supprime toutes les definitions par defaut => sert au debug
 # %typemap(in) SWIGTYPE ;
 
+%{
+// Helper function to initialize a Batch::Versatile from a PyObj
+static bool initVersatile(Batch::Versatile & newVersatile, PyObject * input)
+{
+  if (PyList_Check(input)) { // c'est une liste
+    for (Py_ssize_t i=0; i<PyList_Size(input); i++) {
+      PyObject * val = PyList_GetItem(input, i);
+      if (PyString_Check(val)) {
+        newVersatile += PyString_AsString(val);
+
+      } else if (PyTuple_Check(val) &&
+          (PyTuple_Size(val) == 2) &&
+          PyString_Check( PyTuple_GetItem(val,0) ) &&
+          PyString_Check( PyTuple_GetItem(val,1) )   ) {
+        newVersatile += Batch::Couple( PyString_AsString( PyTuple_GetItem(val,0) ),
+                                       PyString_AsString( PyTuple_GetItem(val,1) )
+                                     );
+
+      } else {
+        PyErr_SetString(PyExc_RuntimeWarning, "initVersatile : invalid PyObject");
+        return false;
+      }
+    }
+
+  } else if (PyString_Check(input)) { // c'est une string
+    newVersatile = PyString_AsString(input);
+  } else if (PyInt_Check(input)) { // c'est un int
+    newVersatile = PyInt_AsLong(input);
+  } else if (PyBool_Check(input)) { // c'est un bool
+    newVersatile = (input == Py_True);
+  } else { // erreur
+    PyErr_SetString(PyExc_RuntimeWarning, "initVersatile : invalid PyObject");
+    return false;
+  }
+  return true;
+}
+
+// Helper function to create a PyObj from a Batch::Versatile
+static PyObject * versatileToPyObj(const Batch::Versatile & vers)
+{
+  PyObject * obj;
+
+  if (vers.getMaxSize() != 1) { // une liste
+    obj = PyList_New(0);
+    for(Batch::Versatile::const_iterator it=vers.begin(); it!=vers.end(); it++) {
+      std::string st;
+      Batch::Couple cp;
+      switch (vers.getType()) {
+      case Batch::LONG:
+        PyList_Append(obj, PyInt_FromLong(* static_cast<Batch::LongType *>(*it)));
+        break;
+
+      case Batch::STRING:
+        st = * static_cast<Batch::StringType *>(*it);
+        PyList_Append(obj, PyString_FromString(st.c_str()));
+        break;
+
+      case Batch::COUPLE:
+        cp = * static_cast<Batch::CoupleType *>(*it);
+        PyList_Append(obj, Py_BuildValue("(ss)", cp.getLocal().c_str(), cp.getRemote().c_str() ));
+        break;
+
+      default:
+        throw Batch::RunTimeException("Versatile object cannot be converted to Python object");
+      }
+
+    }
+
+  } else {
+    bool b;
+    std::string st;
+    Batch::Couple cp;
+    switch (vers.getType()) {
+    case Batch::BOOL:
+      b = (* static_cast<Batch::BoolType *>(vers.front()));
+      obj = PyBool_FromLong(b);
+      break;
+
+    case Batch::LONG:
+      obj = PyInt_FromLong(* static_cast<Batch::LongType *>(vers.front()));
+      break;
+
+    case Batch::STRING:
+      st = * static_cast<Batch::StringType *>(vers.front());
+      obj = PyString_FromString(st.c_str());
+      break;
+
+    case Batch::COUPLE:
+      cp = * static_cast<Batch::CoupleType *>(vers.front());
+      obj = Py_BuildValue("[(ss)]", cp.getLocal().c_str(), cp.getRemote().c_str() );
+      break;
+
+    default:
+      throw Batch::RunTimeException("Versatile object cannot be converted to Python object");
+    }
+  }
+
+  return obj;
+}
+
+// Helper function to initialize a Batch::Parametre from a PyObj
+static bool initParameter(Batch::Parametre & newParam, PyObject * input)
+{
+  if (!PyDict_Check(input)) {
+    PyErr_SetString(PyExc_ValueError, "Expected a dictionnary");
+    return false;
+  }
+
+  try {
+    // on itere sur toutes les clefs du dictionnaire, et on passe par la classe PyVersatile
+    // qui convertit un Versatile en PyObject et vice versa
+    PyObject *key, *value;
+    Py_ssize_t pos = 0;
+    while (PyDict_Next(input, &pos, &key, &value)) {
+      std::string mk = PyString_AsString(key);
+      bool res = initVersatile(newParam[mk], value);
+      if (!res)
+        return false;
+    }
+  }
+  catch (Batch::GenericException & ex) {
+      std::string msg = ex.type + " : " + ex.message;
+      PyErr_SetString(PyExc_RuntimeWarning, msg.c_str());
+      return false;
+  }
+  catch (...) {
+      PyErr_SetString(PyExc_RuntimeWarning, "unknown exception");
+      return false;
+  }
+  return true;
+}
+
+// Helper function to initialize a Batch::Environnement from a PyObj
+static bool initEnvironment(Batch::Environnement & newEnv, PyObject * input)
+{
+  if (!PyDict_Check(input)) {
+    PyErr_SetString(PyExc_ValueError, "Expected a dictionnary");
+    return false;
+  }
+
+  // on itere sur toutes les clefs du dictionnaire
+  PyObject *key, *value;
+  Py_ssize_t pos = 0;
+  while (PyDict_Next(input, &pos, &key, &value)) {
+    std::string mk  = PyString_AsString(key);
+    std::string val = PyString_AsString(value);
+    newEnv[mk] = val;
+  }
+  return true;
+}
+%}
 
 # // construction d'un dictionnaire Python a partir d'un objet BatchManagerCatalog C++
 %typemap(out) std::map<std::string, Batch::FactBatchManager *> *
@@ -73,78 +220,26 @@ typedef int Py_ssize_t;
   // on itere sur toutes les clefs de la map, et on passe par la classe PyVersatile
 	// qui convertit un Versatile en PyObject et vice versa
   for(Batch::Parametre::const_iterator it=$1.begin(); it!=$1.end(); it++) {
-    std::string key = (*it).first;
-    Batch::PyVersatile PyV = (*it).second;
-    PyDict_SetItem($result, PyString_FromString(key.c_str()), PyV);
+    const std::string & key = (*it).first;
+    const Batch::Versatile & vers = (*it).second;
+    PyDict_SetItem($result, PyString_FromString(key.c_str()), versatileToPyObj(vers));
   }
 }
 
-
-# // construction d'un objet Parametre C++ a partir d'un dictionnaire Python
-%typemap(in) Batch::Parametre & (Batch::Parametre PM)
+// Build a C++ object Batch::Parametre from a Python dictionary
+%typemap(in) const Batch::Parametre & (Batch::Parametre PM)
 {
-  if (!PyDict_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a dictionnary");
+  bool res = initParameter(PM, $input);
+  if (res)
+    $1 = &PM;
+  else
     return NULL;
-  }
-
-  try {	
-  // on itere sur toutes les clefs du dictionnaire, et on passe par la classe PyVersatile
-	// qui convertit un Versatile en PyObject et vice versa
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	while (PyDict_Next($input, &pos, &key, &value)) {
-		std::string mk = PyString_AsString(key);
-		Batch::PyVersatile PyV = value;
-		PyV.setName(mk);
-		PM[mk] = PyV;
-	}
-
-  $1 = &PM; // $1 est une reference donc on lui passe une adresse
-  }
-  catch (Batch::GenericException & ex) {
-      std::string msg = ex.type + " : " + ex.message;
-      PyErr_SetString(PyExc_RuntimeWarning, msg.c_str());
-      return NULL;
-  }
-  catch (...) {
-      PyErr_SetString(PyExc_RuntimeWarning, "unknown exception");
-      return NULL;
-  }
 }
 
-
-# // construction d'un objet Parametre C++ a partir d'un dictionnaire Python
-%typemap(in) Batch::Parametre (Batch::Parametre PM)
+%typemap(in) Batch::Parametre
 {
-  if (!PyDict_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a dictionnary");
-    return NULL;
-  }
-
-  try {
-  // on itere sur toutes les clefs du dictionnaire, et on passe par la classe PyVersatile
-	// qui convertit un Versatile en PyObject et vice versa
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	while (PyDict_Next($input, &pos, &key, &value)) {
-		std::string mk = PyString_AsString(key);
-		Batch::PyVersatile PyV = value;
-		PyV.setName(mk);
-		PM[mk] = PyV;
-	}
-
-  $1 = PM;
-  }
-  catch (Batch::GenericException & ex) {
-      std::string msg = ex.type + " : " + ex.message;
-      PyErr_SetString(PyExc_RuntimeWarning, msg.c_str());
-      return NULL;
-  }
-  catch (...) {
-      PyErr_SetString(PyExc_RuntimeWarning, "unknown exception");
-      return NULL;
-  }
+  bool res = initParameter($1, $input);
+  if (!res) return NULL;
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_POINTER) Batch::Environnement
@@ -167,47 +262,20 @@ typedef int Py_ssize_t;
   }
 }
 
-
-# // construction d'un objet Environnement C++ a partir d'un dictionnaire Python
-%typemap(in) Batch::Environnement & (Batch::Environnement E)
+// Build a C++ object Batch::Environnement from a Python dictionary
+%typemap(in) const Batch::Environnement & (Batch::Environnement E)
 {
-  if (!PyDict_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a dictionnary");
+  bool res = initEnvironment(E, $input);
+  if (res)
+    $1 = &E;
+  else
     return NULL;
-  }
-
-	// on itere sur toutes les clefs du dictionnaire
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	while (PyDict_Next($input, &pos, &key, &value)) {
-		std::string mk  = PyString_AsString(key);
-		std::string val = PyString_AsString(value);
-		E[mk] = val;
-	}
-  
-  $1 = &E; // $1 est une reference donc on lui passe une adresse
 }
 
-
-
-# // construction d'un objet Environnement C++ a partir d'un dictionnaire Python
-%typemap(in) Batch::Environnement (Batch::Environnement E)
+%typemap(in) Batch::Environnement
 {
-  if (!PyDict_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a dictionnary");
-    return NULL;
-  }
-
-	// on itere sur toutes les clefs du dictionnaire
-	PyObject *key, *value;
-	Py_ssize_t pos = 0;
-	while (PyDict_Next($input, &pos, &key, &value)) {
-		std::string mk  = PyString_AsString(key);
-		std::string val = PyString_AsString(value);
-		E[mk] = val;
-	}
-  
-  $1 = E;
+  bool res = initEnvironment($1, $input);
+  if (!res) return NULL;
 }
 
 // Dynamic cast to FactBatchManager_eClient if necessary

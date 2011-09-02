@@ -243,7 +243,7 @@ namespace Batch {
     if (params.find(NBPROC) != params.end()) 
       nbproc = params[NBPROC];
     if (params.find(MAXWALLTIME) != params.end()) 
-      edt = params[MAXWALLTIME] * 60;
+      edt = (long)params[MAXWALLTIME] * 60;
     if (params.find(MAXRAMSIZE) != params.end()) 
       mem = params[MAXRAMSIZE];
     if (params.find(QUEUE) != params.end()) 
