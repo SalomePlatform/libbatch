@@ -43,6 +43,7 @@
 #include "Batch_CoupleType.hxx"
 #include "Batch_TypeMismatchException.hxx"
 #include "Batch_ListIsFullException.hxx"
+#include "Batch_RunTimeException.hxx"
 
 namespace Batch {
 
@@ -56,6 +57,10 @@ namespace Batch {
     // Constructors
     Versatile(DiscriminatorType discriminator, size_type maxsize, std::string name);
     Versatile(const Versatile & V);
+
+    // Use of default constructor is forbidden but we cannot declare it private because
+    // compilation fails with VC8 on Windows
+    Versatile() { throw RunTimeException("Forbidden constructor"); }
 
     // Destructor
     virtual ~Versatile();
@@ -104,8 +109,7 @@ namespace Batch {
 
   private:
 
-    // Forbid the use of default constructor and affectation operator
-    Versatile() {}
+    // Forbid the use of affectation operator
     void operator= (const Versatile & V) {}
 
   };

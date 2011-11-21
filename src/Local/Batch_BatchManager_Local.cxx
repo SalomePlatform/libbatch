@@ -549,7 +549,7 @@ namespace Batch {
     while (1) {
 #ifdef WIN32
       DWORD exitCode;
-      BOOL res = GetExitCodeProcess(child, &exitCode);
+      GetExitCodeProcess(child, &exitCode);
       if (exitCode != STILL_ACTIVE) {
         UNDER_LOCK( cout << "Father sees his child is DONE: exit code = " << exitCode << endl );
         break;
@@ -881,7 +881,7 @@ namespace Batch {
       char * buffer = strdup(comstr.c_str());
 
       // launch the new process
-      BOOL res = CreateProcess(NULL, buffer, NULL, NULL, FALSE,
+      bool res = CreateProcess(NULL, buffer, NULL, NULL, FALSE,
                                CREATE_NO_WINDOW, chNewEnv, NULL, &si, &pi);
 
       if (buffer) free(buffer);
