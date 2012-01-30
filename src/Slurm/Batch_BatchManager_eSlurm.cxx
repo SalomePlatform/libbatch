@@ -27,13 +27,12 @@
  */
 
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
 
 #include <Batch_NotYetImplementedException.hxx>
 #include <Batch_Constants.hxx>
+#include <Batch_Utils.hxx>
 
-#include "Batch_FactBatchManager_eSlurm.hxx"
 #include "Batch_BatchManager_eSlurm.hxx"
 #include "Batch_JobInfo_eSlurm.hxx"
 
@@ -60,7 +59,6 @@ namespace Batch {
   // Method to submit a job to the batch manager
   const JobId BatchManager_eSlurm::submitJob(const Job & job)
   {
-    int status;
     Parametre params = job.getParametre();
     const string workDir = params[WORKDIR];
 
@@ -70,38 +68,27 @@ namespace Batch {
     // build command file to submit the job and copy it on the server
     string cmdFile = buildCommandFile(job);
 
-    // define name of log file (local)
-    string logFile = generateTemporaryFileName("slurm-submitlog");
-
     // define command to submit batch
     string subCommand = string("cd ") + workDir + "; sbatch " + cmdFile;
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
-    command += " > ";
-    command += logFile;
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if (status)
-    {
-      ifstream error_message(logFile.c_str());
-      string mess;
-      string temp;
-      while(getline(error_message, temp))
-        mess += temp;
-      error_message.close();
-      throw EmulationException("Error of connection on remote host, error was: " + mess);
-    }
+    command += " 2>&1";
+    cout << command.c_str() << endl;
 
-    // read id of submitted job in log file
-    string jobref;
-    ifstream idfile(logFile.c_str());
-    string line;
-    while (idfile && line.compare(0, 20, "Submitted batch job ") != 0)
-      getline(idfile, line);
-    idfile.close();
-    if (line.compare(0, 20, "Submitted batch job ") == 0)
-      jobref = line.substr(20);
-    if (jobref.size() == 0)
+    // submit job
+    string output;
+    int status = Utils::getCommandOutput(command, output);
+    cout << output;
+    if (status != 0) throw EmulationException("Can't submit job, error was: " + output);
+
+    // find id of submitted job in output
+    string search = "Submitted batch job ";
+    string::size_type pos = output.find(search);
+    if (pos == string::npos)
       throw EmulationException("Error in the submission of the job on the remote host");
+    pos += search.size();
+    string::size_type endl_pos = output.find('\n', pos);
+    string::size_type count = (endl_pos == string::npos)? string::npos : endl_pos - pos;
+    string jobref = output.substr(pos, count);
 
     JobId id(this, jobref);
     return id;
@@ -240,21 +227,17 @@ namespace Batch {
 
   JobInfo BatchManager_eSlurm::queryJob(const JobId & jobid)
   {
-    // define name of log file (local)
-    string logFile = generateTemporaryFileName("slurm-querylog-" + jobid.getReference());
-
     // define command to query batch
     string subCommand = "squeue -o %t -j " + jobid.getReference();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
-    command += " > ";
-    command += logFile;
     cerr << command.c_str() << endl;
-    system(command.c_str());
+    string output;
+    Utils::getCommandOutput(command, output);
     // We don't test the return code here because with jobs finished since a long time Slurm
     // returns an error and a message like "slurm_load_jobs error: Invalid job id specified".
     // So we consider that the job is finished when we get an error.
 
-    JobInfo_eSlurm jobinfo = JobInfo_eSlurm(jobid.getReference(), logFile);
+    JobInfo_eSlurm jobinfo = JobInfo_eSlurm(jobid.getReference(), output);
     return jobinfo;
   }
 

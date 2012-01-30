@@ -54,6 +54,7 @@ SET(CLASS_LIST Core/Batch_APIInternalFailureException
                Core/Batch_StringType
                Core/Batch_TypeMismatchException
                Core/Batch_Versatile
+               Core/Batch_Utils
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})

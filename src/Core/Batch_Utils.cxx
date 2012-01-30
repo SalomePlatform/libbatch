@@ -20,30 +20,45 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- *  Batch_JobInfo_eSlurm.hxx :
+ * Batch_Utils.cxx
  *
- *  Created on: 12 may 2011
+ *  Created on: 30 jan. 2012
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#ifndef _JOBINFO_ESLURM_H_
-#define _JOBINFO_ESLURM_H_
+#include <cstdio>
 
-#include <string>
+#include <Batch_config.h>
+#include "Batch_Utils.hxx"
 
-#include <Batch_JobInfo.hxx>
+#ifdef MSVC
+#define popen _popen
+#define pclose _pclose
+#endif
 
+using namespace std;
 namespace Batch {
 
-  class JobInfo_eSlurm : public JobInfo
-  {
-  public:
+int Utils::getCommandOutput(const string & command, string & output)
+{
+  // Reinitialize output
+  output = "";
 
-    JobInfo_eSlurm(const std::string & id, const std::string & queryOutput);
-    virtual ~JobInfo_eSlurm();
+  // Call command
+  FILE * fp = popen(command.c_str(), "r");
+  if (fp == NULL) {
+    return -1;
+  }
 
-  };
+  // Read the output and store it
+  char buf[1024];
+  while (fgets(buf, sizeof(buf), fp) != NULL) {
+    output += buf;
+  }
 
+  // close and get status
+  int status = pclose(fp);
+  return status;
 }
 
-#endif
+}

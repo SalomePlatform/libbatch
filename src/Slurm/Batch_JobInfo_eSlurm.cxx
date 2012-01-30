@@ -26,8 +26,6 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#include <iostream>
-#include <fstream>
 #include <sstream>
 
 #include <Batch_RunTimeException.hxx>
@@ -39,22 +37,16 @@ using namespace std;
 
 namespace Batch {
 
-  JobInfo_eSlurm::JobInfo_eSlurm(const std::string & id, const std::string & logFile)
+  JobInfo_eSlurm::JobInfo_eSlurm(const std::string & id, const std::string & queryOutput)
     : JobInfo()
   {
     _param[ID] = id;
 
-    // read log file
-    ifstream log(logFile.c_str());
-    string line;
-
-    // status should be on the second line
-    for (int i=0 ; i<2 ; i++)
-      getline(log, line);
-    log.close();
+    // read query output, status should be on the second line
+    istringstream iss(queryOutput);
     string status;
-    istringstream iss(line);
-    iss >> status;
+    for (int i=0 ; i<2 ; i++)
+      getline(iss, status);
 
     if (status.size() == 0) {
       // On some batch managers, the job is deleted as soon as it is finished,

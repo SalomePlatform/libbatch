@@ -20,30 +20,35 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- *  Batch_JobInfo_eSlurm.hxx :
+ * Batch_Utils.hxx
  *
- *  Created on: 12 may 2011
+ *  Created on: 30 jan. 2012
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#ifndef _JOBINFO_ESLURM_H_
-#define _JOBINFO_ESLURM_H_
+#ifndef BATCH_UTILS_HXX_
+#define BATCH_UTILS_HXX_
 
 #include <string>
 
-#include <Batch_JobInfo.hxx>
-
 namespace Batch {
 
-  class JobInfo_eSlurm : public JobInfo
-  {
-  public:
+class Utils {
+public:
 
-    JobInfo_eSlurm(const std::string & id, const std::string & queryOutput);
-    virtual ~JobInfo_eSlurm();
+  /**
+   * Call a command with the system shell and stores its output in parameter "output".
+   * Returns the return code of the command.
+   */
+  static int getCommandOutput(const std::string & command, std::string & output);
 
-  };
+private:
+
+  // No instanciation possible as this class provides only static methods
+  Utils() { }
+
+};
 
 }
 
-#endif
+#endif /* BATCH_UTILS_HXX_ */
