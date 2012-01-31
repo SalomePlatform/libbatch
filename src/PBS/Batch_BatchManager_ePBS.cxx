@@ -29,25 +29,13 @@
  *
  */
 
-#include <stdlib.h>
-#include <string.h>
-
-#include <iostream>
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
-#include <sys/stat.h>
 
-#include <stdlib.h>
-#include <string.h>
-#include <Batch_config.h>
+#include <Batch_Constants.hxx>
+#include <Batch_Utils.hxx>
 
-#ifdef MSVC
-#include <io.h>
-#else
-#include <libgen.h>
-#endif
-
-#include "Batch_Constants.hxx"
 #include "Batch_BatchManager_ePBS.hxx"
 #include "Batch_JobInfo_ePBS.hxx"
 
@@ -60,10 +48,10 @@ namespace Batch {
                                        CommunicationProtocolType protocolType, const char * mpiImpl, 
                                        int nb_proc_per_node)
     : BatchManager(parent, host),
-      BatchManager_eClient(parent, host, username, protocolType, mpiImpl)
+      BatchManager_eClient(parent, host, username, protocolType, mpiImpl),
+      _nb_proc_per_node(nb_proc_per_node)
   {
     // Nothing to do
-    _nb_proc_per_node = nb_proc_per_node;
   }
 
   // Destructeur
@@ -75,51 +63,31 @@ namespace Batch {
   // Methode pour le controle des jobs : soumet un job au gestionnaire
   const JobId BatchManager_ePBS::submitJob(const Job & job)
   {
-    int status;
     Parametre params = job.getParametre();
     const std::string workDir = params[WORKDIR];
-    const string fileToExecute = params[EXECUTABLE];
-    string::size_type p1 = fileToExecute.find_last_of("/");
-    string::size_type p2 = fileToExecute.find_last_of(".");
-    std::string fileNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
 
     // export input files on cluster
     exportInputFiles(job);
 
     // build batch script for job
-    buildBatchScript(job);
-
-    // define name of log file (local)
-    string logFile = generateTemporaryFileName("PBS-submitlog");
+    string scriptFile = buildSubmissionScript(job);
 
     // define command to submit batch
-    string subCommand = string("cd ") + workDir + "; qsub " + fileNameToExecute + "_Batch.sh";
+    string subCommand = string("cd ") + workDir + "; qsub " + scriptFile;
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
-    command += " > ";
-    command += logFile;
     command += " 2>&1";
     cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if(status)
-    {
-      ifstream error_message(logFile.c_str());
-      std::string mess;
-      std::string temp;
-      while(std::getline(error_message, temp))
-	mess += temp;
-      error_message.close();
-      throw EmulationException("Error of connection on remote host, error was: " + mess);
-    }
 
-    // read id of submitted job in log file
-    ifstream idfile(logFile.c_str());
-    string sline;
-    idfile >> sline;
-    idfile.close();
-    if (sline.size() == 0)
-      throw EmulationException("Error in the submission of the job on the remote host");
+    // submit job
+    string output;
+    int status = Utils::getCommandOutput(command, output);
+    cout << output;
+    if (status != 0) throw EmulationException("Can't submit job, error was: " + output);
 
-    JobId id(this, sline);
+    // normally output contains only id of submitted job, we just need to remove the final \n
+    string jobref = output.substr(0, output.size() - 1);
+    JobId id(this, jobref);
+
     return id;
   }
 
@@ -187,20 +155,17 @@ namespace Batch {
     istringstream iss(jobid.getReference());
     iss >> id;
 
-    // define name of log file (local)
-    string logFile = generateTemporaryFileName(string("PBS-querylog-id") + jobid.getReference());
-
     // define command to query batch
     string subCommand = string("qstat -f ") + iss.str();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
-    command += " > ";
-    command += logFile;
     cerr << command.c_str() << endl;
-    int status = system(command.c_str());
+
+    string output;
+    int status = Utils::getCommandOutput(command, output);
     if(status && status != 153 && status != 256*153)
       throw EmulationException("Error of connection on remote host");
 
-    JobInfo_ePBS ji = JobInfo_ePBS(id,logFile);
+    JobInfo_ePBS ji = JobInfo_ePBS(id, output);
     return ji;
   }
 
@@ -210,9 +175,8 @@ namespace Batch {
     throw EmulationException("Not yet implemented");
   }
 
-  void BatchManager_ePBS::buildBatchScript(const Job & job)
+  std::string BatchManager_ePBS::buildSubmissionScript(const Job & job)
   {
-    std::cerr << "BuildBatchScript" << std::endl;
     Parametre params = job.getParametre();
     Environnement env = job.getEnvironnement();
 
@@ -254,6 +218,10 @@ namespace Batch {
     std::string TmpFileName = createAndOpenTemporaryFile("PBS-script", tempOutputFile);
 
     tempOutputFile << "#! /bin/sh -f" << endl;
+    if (params.find(NAME) != params.end()) {
+      tempOutputFile << "#PBS -N " << params[NAME] << endl;
+    }
+
     if (nbproc > 0)
     {
       int nb_full_nodes = nbproc / _nb_proc_per_node;
@@ -310,13 +278,14 @@ namespace Batch {
     tempOutputFile.flush();
     tempOutputFile.close();
 
-    BATCH_CHMOD(TmpFileName.c_str(), 0x1ED);
     cerr << "Batch script file generated is: " << TmpFileName.c_str() << endl;
 
+    string remoteFileName = rootNameToExecute + "_Batch.sh";
     int status = _protocol.copyFile(TmpFileName, "", "",
-                                    workDir + "/" + rootNameToExecute + "_Batch.sh",
+                                    workDir + "/" + remoteFileName,
                                     _hostname, _username);
     if (status)
       throw EmulationException("Error of connection on remote host, cannot copy batch submission file");
+    return remoteFileName;
   }
 }

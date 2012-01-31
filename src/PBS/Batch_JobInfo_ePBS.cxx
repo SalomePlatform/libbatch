@@ -31,14 +31,9 @@
 
 #include <cstdio>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
-#include "Batch_Constants.hxx"
-#include "Batch_Parametre.hxx"
-#include "Batch_Environnement.hxx"
-#include "Batch_RunTimeException.hxx"
-#include "Batch_APIInternalFailureException.hxx"
+#include <Batch_Constants.hxx>
 #include "Batch_JobInfo_ePBS.hxx"
 
 using namespace std;
@@ -46,27 +41,24 @@ using namespace std;
 namespace Batch {
 
   // Constructeurs
-  JobInfo_ePBS::JobInfo_ePBS(int id, string logFile) : JobInfo()
+  JobInfo_ePBS::JobInfo_ePBS(int id, string queryOutput) : JobInfo()
   {
-    // On remplit les membres _param et _env
+    // Fill ID parameter
     ostringstream oss;
     oss << id;
     _param[ID] = oss.str();
 
-    // read of log file
-    char line[128];
-    ifstream fp(logFile.c_str(),ios::in);
-
-    string sline;
+    // read query output
+    istringstream queryIss(queryOutput);
+    string line;
     size_t pos = string::npos;
-    while( (pos == string::npos) && fp.getline(line,80,'\n') ){
-      sline = string(line);
-      pos = sline.find("job_state");
-    };
+    while( (pos == string::npos) && getline(queryIss, line) ) {
+      pos = line.find("job_state");
+    }
 
     if(pos!=string::npos){
       string status;
-      istringstream iss(sline);
+      istringstream iss(line);
       iss >> status;
       iss >> status;
       iss >> status;
