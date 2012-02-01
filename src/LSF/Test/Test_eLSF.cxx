@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     // ... and its parameters ...
     Parametre p;
     p[EXECUTABLE]    = "./test-script.sh";
-    p[NAME]          = string("Test eLSF ") + argv[1];
+    p[NAME]          = string("Test_eLSF_") + argv[1];
     p[WORKDIR]       = homedir + "/tmp/Batch";
     p[INFILE]        = Couple("seta.sh", "tmp/Batch/seta.sh");
     p[INFILE]       += Couple("setb.sh", "tmp/Batch/setb.sh");
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     p[TMPDIR]        = "tmp/Batch/";
     p[NBPROC]        = 1;
     p[MAXWALLTIME]   = 1;
-    p[MAXRAMSIZE]    = 50;
+    p[MAXRAMSIZE]    = 128;
     p[HOMEDIR]       = homedir;
     p[EXCLUSIVE]     = true;
     job.setParametre(p);

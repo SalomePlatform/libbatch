@@ -30,34 +30,26 @@
  */
 
 #include <cstdio>
-#include <iostream>
-#include <fstream>
 #include <sstream>
 
-#include "Batch_Constants.hxx"
-#include "Batch_Parametre.hxx"
-#include "Batch_Environnement.hxx"
-#include "Batch_RunTimeException.hxx"
-#include "Batch_APIInternalFailureException.hxx"
+#include <Batch_Constants.hxx>
 #include "Batch_JobInfo_eLSF.hxx"
 
 using namespace std;
 
 namespace Batch {
 
-
-
   // Constructeurs
-  JobInfo_eLSF::JobInfo_eLSF(int id, string logFile) : JobInfo()
+  JobInfo_eLSF::JobInfo_eLSF(int id, const std::string & queryOutput) : JobInfo()
   {
-    // On remplit les membres _param et _env
+    // Fill ID parameter
     ostringstream oss;
     oss << id;
     _param[ID] = oss.str();
 
-    // read status of job in log file
+    // read query output
     string line;
-    ifstream fp(logFile.c_str());
+    istringstream fp(queryOutput);
     getline(fp, line);
 
     // On some batch managers, the job is deleted soon after it is finished,

@@ -69,7 +69,7 @@ namespace Batch {
     virtual const Batch::JobId addJob(const Batch::Job & job, const std::string reference); // ajoute un nouveau job sans le soumettre
 
   protected:
-    void buildBatchScript(const Job & job);
+    std::string buildSubmissionScript(const Job & job);
     std::string getWallTime(const long edt);
 
   private:

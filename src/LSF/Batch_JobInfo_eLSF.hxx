@@ -32,7 +32,6 @@
 #ifndef _JOBINFO_LSF_H_
 #define _JOBINFO_LSF_H_
 
-#include "Batch_RunTimeException.hxx"
 #include "Batch_JobInfo.hxx"
 
 #include <string>
@@ -44,7 +43,7 @@ namespace Batch {
   public:
     // Constructeurs et destructeur
     JobInfo_eLSF() : _running(false) {};
-    JobInfo_eLSF(int id,std::string logFile);
+    JobInfo_eLSF(int id, const std::string & queryOutput);
     virtual ~JobInfo_eLSF();
 
     // Constructeur par recopie
