@@ -94,7 +94,7 @@ namespace Batch {
     string logFile = generateTemporaryFileName("CCC-submitlog");
 
     // define command to submit batch
-    string subCommand = string('bash -l -c "cd ') + workDir + '; ccc_msub ' + fileNameToExecute + '_Batch.sh"';
+    string subCommand = string("bash -l -c \"cd ") + workDir + "; ccc_msub " + fileNameToExecute + "_Batch.sh\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
@@ -143,7 +143,7 @@ namespace Batch {
     iss >> ref;
 
     // define command to delete batch
-    string subCommand = string('bash -l -c "ccc_mdel ') + iss.str() + string('"');
+    string subCommand = string("bash -l -c \"ccc_mdel ") + iss.str() + string("\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
