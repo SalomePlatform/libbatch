@@ -195,7 +195,7 @@ namespace Batch {
     string logFile = generateTemporaryFileName(string("CCC-querylog-id") + jobid.getReference());
 
     // define command to query batch
-    string subCommand = string("bjobs ") + iss.str();
+    string subCommand = string("bash -l -c \"bjobs ") + iss.str() + string("\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
