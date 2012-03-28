@@ -52,7 +52,7 @@ namespace Batch {
                          const char * username="",
                          CommunicationProtocolType protocolType = SSH, const char* mpiImpl="mpich1");
     virtual ~BatchManager_eClient();
-    void importOutputFiles( const Job & job, const std::string directory );
+    virtual void importOutputFiles( const Job & job, const std::string directory );
     bool importDumpStateFile( const Job & job, const std::string directory );
 
   protected:

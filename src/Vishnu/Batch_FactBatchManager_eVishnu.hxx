@@ -20,52 +20,38 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * Batch_Utils.cxx
+ *  Batch_FactBatchManager_eVishnu.hxx :
  *
- *  Created on: 30 jan. 2012
+ *  Created on: 24 june 2011
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#include <cstdio>
+#ifndef _FACTBATCHMANAGER_EVISHNU_H_
+#define _FACTBATCHMANAGER_EVISHNU_H_
 
-#include <Batch_config.h>
-#include "Batch_Utils.hxx"
+#include <Batch_Defines.hxx>
+#include <Batch_Constants.hxx>
+#include <Batch_BatchManager_eClient.hxx>
+#include <Batch_FactBatchManager_eClient.hxx>
 
-#ifdef MSVC
-#define popen _popen
-#define pclose _pclose
-#endif
-
-using namespace std;
 namespace Batch {
 
-int Utils::getCommandOutput(const string & command, string & output)
-{
-  // Reinitialize output
-  output = "";
+  class BATCH_EXPORT FactBatchManager_eVishnu : public FactBatchManager_eClient
+  {
+  public:
 
-  // Call command
-  FILE * fp = popen(command.c_str(), "r");
-  if (fp == NULL) {
-    return -1;
-  }
+    FactBatchManager_eVishnu();
+    virtual ~FactBatchManager_eVishnu();
 
-  // Read the output and store it
-  char buf[1024];
-  while (fgets(buf, sizeof(buf), fp) != NULL) {
-    output += buf;
-  }
+    virtual BatchManager * operator() (const char * hostname) const;
+    virtual BatchManager_eClient * operator() (const char * hostname,
+                                               const char * username,
+                                               CommunicationProtocolType protocolType,
+                                               const char * mpiImpl,
+                                               int nb_proc_per_node = 1) const;
 
-  // close and get status
-  int status = pclose(fp);
-  return status;
-}
-
-bool Utils::isAbsolutePath(const string & path)
-{
-  if (path.size() == 0)
-    return false;
-  return path[0] == '/';
-}
+  };
 
 }
+
+#endif

@@ -20,52 +20,30 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /*
- * Batch_Utils.cxx
+ *  Batch_JobInfo_eVishnu.hxx :
  *
- *  Created on: 30 jan. 2012
+ *  Created on: 24 june 2011
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#include <cstdio>
+#ifndef _JOBINFO_EVISHNU_H_
+#define _JOBINFO_EVISHNU_H_
 
-#include <Batch_config.h>
-#include "Batch_Utils.hxx"
+#include <string>
 
-#ifdef MSVC
-#define popen _popen
-#define pclose _pclose
-#endif
+#include <Batch_JobInfo.hxx>
 
-using namespace std;
 namespace Batch {
 
-int Utils::getCommandOutput(const string & command, string & output)
-{
-  // Reinitialize output
-  output = "";
+  class JobInfo_eVishnu : public JobInfo
+  {
+  public:
 
-  // Call command
-  FILE * fp = popen(command.c_str(), "r");
-  if (fp == NULL) {
-    return -1;
-  }
+    JobInfo_eVishnu(const std::string & id, const std::string & logFile);
+    virtual ~JobInfo_eVishnu();
 
-  // Read the output and store it
-  char buf[1024];
-  while (fgets(buf, sizeof(buf), fp) != NULL) {
-    output += buf;
-  }
-
-  // close and get status
-  int status = pclose(fp);
-  return status;
-}
-
-bool Utils::isAbsolutePath(const string & path)
-{
-  if (path.size() == 0)
-    return false;
-  return path[0] == '/';
-}
+  };
 
 }
+
+#endif

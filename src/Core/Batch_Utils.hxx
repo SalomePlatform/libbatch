@@ -42,6 +42,12 @@ public:
    */
   static int getCommandOutput(const std::string & command, std::string & output);
 
+  /**
+   * Test if the path in parameter is an absolute path (does not test the existence of
+   * a file or directory at this path).
+   */
+  static bool isAbsolutePath(const std::string & path);
+
 private:
 
   // No instanciation possible as this class provides only static methods

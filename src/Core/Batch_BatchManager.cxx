@@ -66,6 +66,7 @@ namespace Batch {
 //   }
   BatchManager::BatchManager(const FactBatchManager * parent, const char * host) throw(InvalidArgumentException) : _hostname(host), jobid_map(), _parent(parent)
   {
+    /*
 #ifdef WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);  // Initialize Winsock
@@ -84,6 +85,7 @@ namespace Batch {
       msg += "\" unknown from the network";
       throw InvalidArgumentException(msg.c_str());
     }
+    */
   }
 
   // Destructeur
