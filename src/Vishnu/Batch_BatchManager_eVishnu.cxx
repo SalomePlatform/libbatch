@@ -73,13 +73,20 @@ namespace Batch {
     // build command file to submit the job
     string cmdFile = buildCommandFile(job);
 
+    // define extra parameters (that can not be defined in the command file)
+    ostringstream extraParams;
+    if (params.find(NBPROC) != params.end())
+      extraParams << "-P " << params[NBPROC] << " ";
+    if (params.find(MAXRAMSIZE) != params.end())
+      extraParams << "-m " << params[MAXRAMSIZE] << " ";
+
     // define name of log file (local)
     string logFile = generateTemporaryFileName("vishnu-submitlog");
 
     // define command to submit batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
     subCommand += "vishnu_connect -p 2; ";
-    subCommand += "vishnu_submit_job " + _hostname + " " + cmdFile;
+    subCommand += "vishnu_submit_job " + extraParams.str() + _hostname + " " + cmdFile;
     string command = _protocol.getExecCommand(subCommand,
                                               _hostname,
                                               _username);
@@ -220,14 +227,6 @@ namespace Batch {
       tempOutputFile << "#% vishnu_job_name=\"" << params[NAME] << "\"" << endl;
 
     // Optional parameters
-    int nbproc = 1;
-    if (params.find(NBPROC) != params.end())
-      nbproc = params[NBPROC];
-
-    //int nodes_requested = (nbproc + _nb_proc_per_node -1) / _nb_proc_per_node;
-    //tempOutputFile << "#SBATCH --nodes=" << nodes_requested << endl;
-    //tempOutputFile << "#SBATCH --ntasks-per-node=" << _nb_proc_per_node << endl;
-
     if (params.find(MAXWALLTIME) != params.end()) {
       long totalMinutes = params[MAXWALLTIME];
       long h = totalMinutes / 60;
@@ -237,8 +236,6 @@ namespace Batch {
         tempOutputFile << "0";
       tempOutputFile << m << ":00" << endl;
     }
-    //if (params.find(MAXRAMSIZE) != params.end())
-    //  tempOutputFile << "#SBATCH --mem=" << params[MAXRAMSIZE] << endl;
     if (params.find(QUEUE) != params.end())
       tempOutputFile << "#% vishnu_queue=" << params[QUEUE] << endl;
 
@@ -248,10 +245,8 @@ namespace Batch {
       tempOutputFile << "export " << iter->first << "=" << iter->second << endl;
     }
 
-    // generate nodes file
-    //tempOutputFile << "LIBBATCH_NODEFILE=`mktemp nodefile-XXXXXXXXXX`" << endl;
-    //tempOutputFile << "srun hostname > $LIBBATCH_NODEFILE" << endl;
-    //tempOutputFile << "export LIBBATCH_NODEFILE" << endl;
+    // Node file
+    tempOutputFile << "export LIBBATCH_NODEFILE=$VISHNU_BATCHJOB_NODEFILE" << endl;
 
     // Launch the executable
     tempOutputFile << "cd " << workDir << endl;
