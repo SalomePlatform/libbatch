@@ -33,9 +33,15 @@
 #include <Batch_config.h>
 
 #include "Batch_CommunicationProtocol.hxx"
-#include "Batch_CommunicationProtocolRSH.hxx"
-#include "Batch_CommunicationProtocolSH.hxx"
-#include "Batch_CommunicationProtocolSSH.hxx"
+#ifdef HAS_RSH
+ #include "Batch_CommunicationProtocolRSH.hxx"
+#endif
+#ifdef HAS_SH
+ #include "Batch_CommunicationProtocolSH.hxx"
+#endif
+#ifdef HAS_SSH
+ #include "Batch_CommunicationProtocolSSH.hxx"
+#endif
 #include "Batch_APIInternalFailureException.hxx"
 #include "Batch_RunTimeException.hxx"
 
