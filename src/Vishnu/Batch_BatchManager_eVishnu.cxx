@@ -31,10 +31,6 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef WIN32
-#include <direct.h>
-#endif
-
 #include <Batch_NotYetImplementedException.hxx>
 #include <Batch_Constants.hxx>
 #include <Batch_Utils.hxx>
@@ -167,12 +163,7 @@ namespace Batch {
       Couple inputFile = cpt;
 
       // Get absolute paths
-      char * buf = 
-#ifdef WIN32
-      _getcwd(NULL, 0);
-#else
-       getcwd(NULL, 0);
-#endif
+      char * buf = getcwd(NULL, 0);
       string cwd = buf;
       free(buf);
 
@@ -350,12 +341,7 @@ namespace Batch {
     Versatile::const_iterator Vit;
 
     // Create local result directory
-    char * buf = 
-#ifdef WIN32
-     _getcwd(NULL, 0);
-#else
-     getcwd(NULL, 0);
-#endif
+    char * buf = getcwd(NULL, 0);
     string cwd = buf;
     free(buf);
     string absdir = (Utils::isAbsolutePath(directory))? directory : cwd + "/" + directory;

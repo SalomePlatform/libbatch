@@ -57,7 +57,11 @@ add_subdirectory (SGE)
 add_subdirectory (SSH)
 add_subdirectory (LoadLeveler)
 add_subdirectory (Slurm)
-add_subdirectory (Vishnu)
+
+# Vishnu is not available for Windows
+IF (NOT WIN32)
+    add_subdirectory (Vishnu)
+ENDIF (NOT WIN32)
 
 # Make a copy of the built value and clear the built value for the next run of cmake
 SET(SRC_FILES ${SRC_FILES_BUILD} CACHE INTERNAL "")
