@@ -39,7 +39,7 @@ namespace Batch {
   {
   public:
 
-    JobInfo_eVishnu(const std::string & id, const std::string & logFile);
+    JobInfo_eVishnu(const std::string & id, const std::string & queryOutput);
     virtual ~JobInfo_eVishnu();
 
   };

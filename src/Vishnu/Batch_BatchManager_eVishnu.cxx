@@ -35,7 +35,6 @@
 #include <Batch_Constants.hxx>
 #include <Batch_Utils.hxx>
 
-#include "Batch_FactBatchManager_eVishnu.hxx"
 #include "Batch_BatchManager_eVishnu.hxx"
 #include "Batch_JobInfo_eVishnu.hxx"
 
@@ -63,10 +62,6 @@ namespace Batch {
   // Method to submit a job to the batch manager
   const JobId BatchManager_eVishnu::submitJob(const Job & job)
   {
-    int status;
-    Parametre params = job.getParametre();
-    const string workDir = params[WORKDIR];
-
     // export input files on cluster
     exportInputFiles(job);
 
@@ -74,46 +69,35 @@ namespace Batch {
     string cmdFile = buildCommandFile(job);
 
     // define extra parameters (that can not be defined in the command file)
+    Parametre params = job.getParametre();
     ostringstream extraParams;
     if (params.find(NBPROC) != params.end())
       extraParams << "-P " << params[NBPROC] << " ";
     if (params.find(MAXRAMSIZE) != params.end())
       extraParams << "-m " << params[MAXRAMSIZE] << " ";
 
-    // define name of log file (local)
-    string logFile = generateTemporaryFileName("vishnu-submitlog");
-
     // define command to submit batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
     subCommand += "vishnu_connect -p 2; ";
     subCommand += "vishnu_submit_job " + extraParams.str() + _hostname + " " + cmdFile;
-    string command = _protocol.getExecCommand(subCommand,
-                                              _hostname,
-                                              _username);
-    command += " > ";
-    command += logFile;
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if (status)
-    {
-      ifstream error_message(logFile.c_str());
-      string mess;
-      string temp;
-      while(getline(error_message, temp))
-        mess += temp;
-      error_message.close();
-      throw EmulationException("Error of connection on remote host, error was: " + mess);
-    }
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " 2>&1";
 
-    // read id of submitted job in log file
-    string jobref;
-    ifstream idfile(logFile.c_str());
-    string line;
-    while (idfile && line.compare(0, 13, "Job Id     : ") != 0)
-      getline(idfile, line);
-    idfile.close();
-    if (line.compare(0, 13, "Job Id     : ") == 0)
-      jobref = line.substr(13);
+    // submit job
+    string output;
+    int status = Utils::getCommandOutput(command, output);
+    cout << output;
+    if (status != 0) throw EmulationException("Can't submit job, error was: " + output);
+
+    // find id of submitted job in output
+    string search = "Job Id     : ";
+    string::size_type pos = output.find(search);
+    if (pos == string::npos)
+      throw EmulationException("Error in the submission of the job on the remote host");
+    pos += search.size();
+    string::size_type endl_pos = output.find('\n', pos);
+    string::size_type count = (endl_pos == string::npos)? string::npos : endl_pos - pos;
+    string jobref = output.substr(pos, count);
     if (jobref.size() == 0)
       throw EmulationException("Error in the submission of the job on the remote host");
 
@@ -261,14 +245,10 @@ namespace Batch {
 
   void BatchManager_eVishnu::deleteJob(const JobId & jobid)
   {
-    string vishnuJobId;
-    istringstream iss(jobid.getReference());
-    getline(iss, vishnuJobId, ':');
-
     // define command to delete job
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
     subCommand += "vishnu_connect -p 2; ";
-    subCommand += "vishnu_cancel_job " + _hostname + " " + vishnuJobId;
+    subCommand += "vishnu_cancel_job " + _hostname + " " + jobid.getReference();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
 
@@ -306,26 +286,18 @@ namespace Batch {
 
   JobInfo BatchManager_eVishnu::queryJob(const JobId & jobid)
   {
-    // define name of log file (local)
-    string logFile = generateTemporaryFileName("vishnu-querylog-" + jobid.getReference());
-
-    string vishnuJobId;
-    istringstream iss(jobid.getReference());
-    getline(iss, vishnuJobId, ':');
-
     // define command to query batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
     subCommand += "vishnu_connect -p 2; ";
-    subCommand += "vishnu_get_job_info " + _hostname + " " + vishnuJobId;
+    subCommand += "vishnu_get_job_info " + _hostname + " " + jobid.getReference();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
-    command += " > ";
-    command += logFile;
     cerr << command.c_str() << endl;
-    int status = system(command.c_str());
+
+    string output;
+    int status = Utils::getCommandOutput(command, output);
     if (status != 0)
       throw EmulationException("Can't query job " + jobid.getReference());
-
-    JobInfo_eVishnu jobinfo = JobInfo_eVishnu(jobid.getReference(), logFile);
+    JobInfo_eVishnu jobinfo = JobInfo_eVishnu(jobid.getReference(), output);
     return jobinfo;
   }
 

@@ -27,7 +27,6 @@
  */
 
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
 #include <Batch_RunTimeException.hxx>
@@ -39,18 +38,18 @@ using namespace std;
 
 namespace Batch {
 
-  JobInfo_eVishnu::JobInfo_eVishnu(const std::string & id, const std::string & logFile)
+  JobInfo_eVishnu::JobInfo_eVishnu(const string & id, const string & queryOutput)
     : JobInfo()
   {
     _param[ID] = id;
 
-    // find the status in the log file
-    ifstream log(logFile.c_str());
+    // find the status in the query output
+    istringstream iss(queryOutput);
     string status;
     bool statusFound = false;
-    while (!statusFound && !log.eof()) {
+    while (!statusFound && !iss.eof()) {
       string line;
-      getline(log, line);
+      getline(iss, line);
       size_t pos = line.find(':');
       if (pos != string::npos) {
         string begline = line.substr(0, pos);
@@ -71,7 +70,6 @@ namespace Batch {
         }
       }
     }
-    log.close();
 
     if (status.size() == 0) {
       // On some batch managers, the job is deleted as soon as it is finished,
