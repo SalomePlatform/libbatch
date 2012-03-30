@@ -78,10 +78,11 @@ namespace Batch {
 
     // define command to submit batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2; ";
+    subCommand += "vishnu_connect -p 2 && ";
     subCommand += "vishnu_submit_job " + extraParams.str() + _hostname + " " + cmdFile;
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " 2>&1";
+    cerr << command.c_str() << endl;
 
     // submit job
     string output;
@@ -108,40 +109,23 @@ namespace Batch {
 
   void BatchManager_eVishnu::exportInputFiles(const Job& job)
   {
-    int status;
     Parametre params = job.getParametre();
-    const Versatile & V = params[INFILE];
-    Versatile::const_iterator Vit;
+    string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
+    subCommand += "vishnu_connect -p 2 && ";
 
     // create remote directories
-    string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2; ";
-    subCommand += "vishnu_create_dir -p " + _hostname + ":" + params[WORKDIR].str() + "/logs";
-    string command = _protocol.getExecCommand(subCommand,
-                                              _hostname,
-                                              _username);
-    cerr << command.c_str() << endl;
-    status = system(command.c_str());
-    if (status != 0)
-      throw EmulationException("Can't create remote directories");
+    subCommand += "vishnu_create_dir -p " + _hostname + ":" + params[WORKDIR].str() + "/logs && ";
 
     // copy executable
     string executeFile = params[EXECUTABLE];
     if (executeFile.size() != 0) {
-
-      string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-      subCommand += "vishnu_connect -p 2; ";
-      subCommand += "vishnu_copy_file " + executeFile + " " + _hostname + ":" + params[WORKDIR].str() + "/";
-      string command = _protocol.getExecCommand(subCommand,
-                                                _hostname,
-                                                _username);
-      cerr << command.c_str() << endl;
-      status = system(command.c_str());
-      if (status != 0)
-        throw EmulationException("Can't copy executable");
+      subCommand += "vishnu_copy_file " + executeFile + " " +
+                    _hostname + ":" + params[WORKDIR].str() + "/ && ";
     }
 
     // copy filesToExportList
+    const Versatile & V = params[INFILE];
+    Versatile::const_iterator Vit;
     for (Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple inputFile = cpt;
@@ -158,17 +142,20 @@ namespace Batch {
                         inputFile.getLocal() :
                         cwd + "/" + inputFile.getLocal();
 
-      string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-      subCommand += "vishnu_connect -p 2; ";
+      if (Vit != V.begin())
+        subCommand += " && ";
       subCommand += "vishnu_copy_file " + abslocal + " " + _hostname + ":" + absremote;
-      string command = _protocol.getExecCommand(subCommand,
-                                                _hostname,
-                                                _username);
-      cerr << command.c_str() << endl;
-      status = system(command.c_str());
-      if (status != 0)
-        throw EmulationException("Can't copy file");
     }
+
+    // Execute command
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " 2>&1";
+    cerr << command.c_str() << endl;
+    string output;
+    int status = Utils::getCommandOutput(command, output);
+    cout << output;
+    if (status != 0)
+      throw EmulationException("Can't copy input files, error was: " + output);
   }
 
   /**
@@ -247,7 +234,7 @@ namespace Batch {
   {
     // define command to delete job
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2; ";
+    subCommand += "vishnu_connect -p 2 && ";
     subCommand += "vishnu_cancel_job " + _hostname + " " + jobid.getReference();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
@@ -288,7 +275,7 @@ namespace Batch {
   {
     // define command to query batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2; ";
+    subCommand += "vishnu_connect -p 2 && ";
     subCommand += "vishnu_get_job_info " + _hostname + " " + jobid.getReference();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
@@ -308,24 +295,23 @@ namespace Batch {
 
   void BatchManager_eVishnu::importOutputFiles(const Job & job, const std::string directory)
   {
-    Parametre params = job.getParametre();
-    const Versatile & V = params[OUTFILE];
-    Versatile::const_iterator Vit;
-
     // Create local result directory
     char * buf = getcwd(NULL, 0);
     string cwd = buf;
     free(buf);
     string absdir = (Utils::isAbsolutePath(directory))? directory : cwd + "/" + directory;
     int status = CommunicationProtocol::getInstance(SH).makeDirectory(absdir, "", "");
-    if (status) {
-      string mess("Directory creation failed. Status is :");
-      ostringstream status_str;
-      status_str << status;
-      mess += status_str.str();
-      cerr << mess << endl;
+    if (status != 0) {
+      throw EmulationException("Can't create result directory");
     }
 
+    string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
+    subCommand += "vishnu_connect -p 2 && ";
+
+    // Copy output files
+    Parametre params = job.getParametre();
+    const Versatile & V = params[OUTFILE];
+    Versatile::const_iterator Vit;
     for (Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
@@ -338,29 +324,21 @@ namespace Batch {
                         outputFile.getLocal() :
                         absdir + "/" + outputFile.getLocal();
 
-      string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-      subCommand += "vishnu_connect -p 2; ";
-      subCommand += "vishnu_copy_file " + _hostname + ":" + absremote + " " + abslocal;
-      string command = _protocol.getExecCommand(subCommand,
-                                                _hostname,
-                                                _username);
-      cerr << command.c_str() << endl;
-      status = system(command.c_str());
-      if (status != 0)
-        throw EmulationException("Can't copy file");
+      subCommand += "vishnu_copy_file " + _hostname + ":" + absremote + " " + abslocal + " && ";
     }
 
     // Copy logs
-    string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2; ";
     subCommand += "vishnu_copy_file -r " +_hostname + ":" + params[WORKDIR].str() + "/logs" + " " + absdir;
-    string command = _protocol.getExecCommand(subCommand,
-                                              _hostname,
-                                              _username);
+
+    // Execute command
+    string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+    command += " 2>&1";
     cerr << command.c_str() << endl;
-    status = system(command.c_str());
+    string output;
+    status = Utils::getCommandOutput(command, output);
+    cout << output;
     if (status != 0)
-      throw EmulationException("Can't copy logs");
+      throw EmulationException("Can't import output files, error was: " + output);
   }
 
 }
