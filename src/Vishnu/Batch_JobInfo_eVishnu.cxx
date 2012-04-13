@@ -78,6 +78,8 @@ namespace Batch {
       _param[STATE] = FINISHED;
     } else if (status == "QUEUED") {
       _param[STATE] = QUEUED;
+    } else if (status == "WAITING") {
+      _param[STATE] = QUEUED;
     } else if (status == "RUNNING") {
       _param[STATE] = RUNNING;
     } else if (status == "TERMINATED") {
