@@ -111,11 +111,10 @@ namespace Batch {
   {
     Parametre params = job.getParametre();
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2 || exit; ";
+    subCommand += "vishnu_connect -p 2 && ";
 
     // create remote directories
-    // error in this command is not fatal because it fails if the directory already exists
-    subCommand += "vishnu_create_dir -p " + _hostname + ":" + params[WORKDIR].str() + "/logs; ";
+    subCommand += "vishnu_create_dir -p " + _hostname + ":" + params[WORKDIR].str() + "/logs && ";
 
     // copy executable
     string executeFile = params[EXECUTABLE];
