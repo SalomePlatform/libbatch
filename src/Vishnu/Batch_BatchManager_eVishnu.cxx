@@ -26,6 +26,7 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
+#include <unistd.h>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
