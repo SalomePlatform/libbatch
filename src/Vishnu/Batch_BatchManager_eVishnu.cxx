@@ -26,7 +26,10 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
+#ifndef WIN32
 #include <unistd.h>
+#endif
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>

@@ -29,7 +29,6 @@
 *
 */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -38,11 +37,11 @@
 #include <fstream>
 #include <sstream>
 
-#include <stdlib.h>
-
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 #include <Batch_config.h>
