@@ -111,8 +111,11 @@ namespace Batch {
 #ifdef WIN32
       // On Windows, we make the remote file executable afterward because
       // pscp does not preserve access permissions on files
-      string subCommand = string("chmod u+x ") + string(params[TMPDIR]) + "/" +
-                          string(params[EXECUTABLE]);
+
+	  string executable = string(params[EXECUTABLE]);
+	  executable = executable.substr(executable.rfind("/") + 1,executable.length());
+
+      string subCommand = string("chmod u+x ") + string(params[TMPDIR]) + "/" + executable;
       string command = _protocol.getExecCommand(subCommand, _hostname, _username);
       cerr << command.c_str() << endl;
       status = system(command.c_str());
