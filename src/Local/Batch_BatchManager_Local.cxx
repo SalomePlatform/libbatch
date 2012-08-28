@@ -763,6 +763,9 @@ namespace Batch {
 
 
       // On positionne les limites systeme imposees au fils
+      // This part is deactivated because those limits should be set on the job process, not on
+      // the ssh process. If it is done properly one day, beware of the types used (int is not enough)
+      /*
       if (param.find(MAXCPUTIME) != param.end()) {
         int maxcputime = param[MAXCPUTIME];
         struct rlimit limit;
@@ -786,6 +789,7 @@ namespace Batch {
         limit.rlim_max = int(maxramsize * 1.1) * 1024 * 1024;
         setrlimit(RLIMIT_AS, &limit);
       }
+      */
 
 
       //char *const parmList[] = {"/usr/bin/ssh", "localhost", "-l", "aribes", "sleep 1 && echo end", NULL};
