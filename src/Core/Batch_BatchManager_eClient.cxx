@@ -167,7 +167,7 @@ namespace Batch {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
       status = _protocol.copyFile(outputFile.getRemote(), _hostname, _username,
-                                  directory, "", "");
+                                  outputFile.getLocal(), "", "");
       if (status) {
         // Try to get what we can (logs files)
         // throw BatchException("Error of connection on remote host");
