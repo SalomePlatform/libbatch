@@ -113,7 +113,7 @@ namespace Batch {
       // pscp does not preserve access permissions on files
 
 	  string executable = string(params[EXECUTABLE]);
-	  executable = executable.substr(executable.rfind("/") + 1,executable.length());
+	  executable = executable.substr(executable.rfind("\\") + 1,executable.length());
 
       string subCommand = string("chmod u+x ") + string(params[TMPDIR]) + "/" + executable;
       string command = _protocol.getExecCommand(subCommand, _hostname, _username);
