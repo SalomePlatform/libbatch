@@ -295,6 +295,8 @@ namespace Batch {
       oss << h << ":" << m;
     else
       oss << h << ":0" << m;
+    oss << ":00"; // the seconds
+
     return oss.str();
   }
 
