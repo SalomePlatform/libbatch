@@ -323,11 +323,10 @@ namespace Batch {
   std::string BatchManager_eCCC::getHomeDir(std::string tmpdir)
   {
     std::string home;
-    int idx = tmpdir.find("Batch/");
-    std::string filelogtemp = tmpdir.substr(idx+6, tmpdir.length());
-    filelogtemp = "/tmp/logs" + filelogtemp + "_home";
+    std::string filelogtemp = generateTemporaryFileName("gethomedir");
 
-    string subCommand = string("echo $HOME");
+    string subCommand = string("echo ");
+    subCommand += tmpdir;
     string command = _protocol.getExecCommand(subCommand, _hostname, _username) + " > " + filelogtemp;
     cerr << command.c_str() << endl;
     int status = system(command.c_str());
