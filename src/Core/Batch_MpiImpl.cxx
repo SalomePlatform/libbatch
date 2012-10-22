@@ -79,6 +79,11 @@ string MpiImpl_LAM::halt()
   return oss.str();
 }
 
+string MpiImpl_LAM::name()
+{
+  return "lam";
+}
+
 // mpich1 implementation
 // Constructor
 MpiImpl_MPICH1::MpiImpl_MPICH1() : MpiImpl()
@@ -115,6 +120,11 @@ string MpiImpl_MPICH1::run(const string machinefile, const unsigned int nbproc, 
 string MpiImpl_MPICH1::halt()
 {
   return "";
+}
+
+string MpiImpl_MPICH1::name()
+{
+  return "mpich";
 }
 
 // mpich2 implementation
@@ -162,6 +172,11 @@ string MpiImpl_MPICH2::halt()
   return oss.str();
 }
 
+string MpiImpl_MPICH2::name()
+{
+  return "mpich";
+}
+
 // openmpi implementation
 // Constructor
 MpiImpl_OPENMPI::MpiImpl_OPENMPI() : MpiImpl()
@@ -198,6 +213,11 @@ string MpiImpl_OPENMPI::run(const string machinefile, const unsigned int nbproc,
 string MpiImpl_OPENMPI::halt()
 {
   return "";
+}
+
+string MpiImpl_OPENMPI::name()
+{
+  return "openmpi";
 }
 
 // slurm implementation
@@ -238,6 +258,11 @@ string MpiImpl_SLURM::halt()
   return "";
 }
 
+string MpiImpl_SLURM::name()
+{
+  return "slurm";
+}
+
 // prun implementation
 // Constructor
 MpiImpl_PRUN::MpiImpl_PRUN() : MpiImpl()
@@ -274,4 +299,9 @@ string MpiImpl_PRUN::run(const string machinefile, const unsigned int nbproc, co
 string MpiImpl_PRUN::halt()
 {
   return "";
+}
+
+string MpiImpl_PRUN::name()
+{
+  return "prun";
 }

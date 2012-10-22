@@ -90,7 +90,7 @@ namespace Batch {
     string logFile = generateTemporaryFileName("SGE-submitlog");
 
     // define command to submit batch
-    string subCommand = string("cd ") + workDir + "; qsub " + fileNameToExecute + "_Batch.sh";
+    string subCommand = string("bash -l -c \"cd ") + workDir + "; qsub " + fileNameToExecute + "_Batch.sh\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
@@ -138,7 +138,7 @@ namespace Batch {
     iss >> ref;
 
     // define command to delete batch
-    string subCommand = string("qdel ") + iss.str();
+    string subCommand = string("bash -l -c \"qdel ") + iss.str() + string("\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
     status = system(command.c_str());
@@ -190,7 +190,7 @@ namespace Batch {
     string logFile = generateTemporaryFileName(string("SGE-querylog-id") + jobid.getReference());
 
     // define command to query batch
-    string subCommand = string("qstat | grep ") + iss.str();
+    string subCommand = string("bash -l -c \"qstat | grep ") + iss.str() + string("\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " > ";
     command += logFile;
@@ -256,7 +256,7 @@ namespace Batch {
     tempOutputFile << "#! /bin/sh -f" << endl;
     if (queue != "")
       tempOutputFile << "#$ -q " << queue << endl;
-    tempOutputFile << "#$ -pe mpich " << nbproc << endl;
+    tempOutputFile << "#$ -pe " << _mpiImpl->name() << " " << nbproc << endl;
     if( edt > 0 )
       tempOutputFile << "#$ -l h_rt=" << getWallTime(edt) << endl ;
     if( mem > 0 )

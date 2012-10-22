@@ -46,6 +46,7 @@ public:
   virtual std::string boot(const std::string machinefile, const unsigned int nbnodes) = 0; // get boot command
   virtual std::string run(const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute) = 0; // get run command
   virtual std::string halt() = 0; // get stop command
+  virtual std::string name() = 0; // name of mpi implementation
 
 protected:
 
@@ -65,6 +66,7 @@ public:
   std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
   std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
   std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
 
 protected:
   
@@ -84,6 +86,7 @@ public:
   std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
   std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
   std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
 
 protected:
   
@@ -103,6 +106,7 @@ public:
   std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
   std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
   std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
 
 protected:
 
@@ -122,6 +126,7 @@ public:
   std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
   std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
   std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
 
 protected:
 
@@ -141,6 +146,7 @@ public:
   std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
   std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
   std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
 
 protected:
 
@@ -160,6 +166,7 @@ public:
   std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
   std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
   std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
 
 protected:
 
