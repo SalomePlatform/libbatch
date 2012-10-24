@@ -134,6 +134,26 @@ private:
 
 };
 
+class BATCH_EXPORT MpiImpl_OMPI : public MpiImpl
+{
+public:
+  // Constructeur et destructeur
+  MpiImpl_OMPI(); // constructor
+  virtual ~MpiImpl_OMPI(); //Destructor
+
+  std::string size(); // get number of process of current job
+  std::string rank(); // get process number of current job
+  std::string boot( const std::string machinefile, const unsigned int nbnodes); // get boot command
+  std::string run( const std::string machinefile, const unsigned int nbproc, const std::string fileNameToExecute); // get run command
+  std::string halt(); // get stop command
+  std::string name(); // name of mpi implementation
+
+protected:
+
+private:
+
+};
+
 class BATCH_EXPORT MpiImpl_SLURM : public MpiImpl
 {
 public:

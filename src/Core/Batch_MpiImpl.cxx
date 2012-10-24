@@ -220,6 +220,49 @@ string MpiImpl_OPENMPI::name()
   return "openmpi";
 }
 
+// ompi implementation
+// Constructor
+MpiImpl_OMPI::MpiImpl_OMPI() : MpiImpl()
+{
+}
+
+// Destructor
+MpiImpl_OMPI::~MpiImpl_OMPI()
+{
+}
+
+string MpiImpl_OMPI::size()
+{
+  return "${OMPI_MCA_ns_nds_num_procs}";
+}
+
+string MpiImpl_OMPI::rank()
+{
+  return "${OMPI_MCA_ns_nds_vpid}";
+}
+
+string MpiImpl_OMPI::boot(const string machinefile, const unsigned int nbnodes)
+{
+  return "";
+}
+
+string MpiImpl_OMPI::run(const string machinefile, const unsigned int nbproc, const string fileNameToExecute)
+{
+  ostringstream oss;
+  oss << "mpirun -hostfile " << machinefile << " -np " << nbproc << " " << fileNameToExecute << endl;
+  return oss.str();
+}
+
+string MpiImpl_OMPI::halt()
+{
+  return "";
+}
+
+string MpiImpl_OMPI::name()
+{
+  return "ompi";
+}
+
 // slurm implementation
 // Constructor
 MpiImpl_SLURM::MpiImpl_SLURM() : MpiImpl()

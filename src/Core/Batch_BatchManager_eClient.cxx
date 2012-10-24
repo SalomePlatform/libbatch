@@ -232,6 +232,8 @@ namespace Batch {
       return new MpiImpl_MPICH2();
     else if(mpiImpl == "openmpi")
       return new MpiImpl_OPENMPI();
+    else if(mpiImpl == "ompi")
+      return new MpiImpl_OMPI();
     else if(mpiImpl == "slurm")
       return new MpiImpl_SLURM();
     else if(mpiImpl == "prun")
