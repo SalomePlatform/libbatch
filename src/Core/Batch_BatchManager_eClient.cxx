@@ -49,6 +49,7 @@
 #include "Batch_Constants.hxx"
 #include "Batch_BatchManager_eClient.hxx"
 #include "Batch_RunTimeException.hxx"
+#include "Batch_Utils.hxx"
 
 #ifdef MSVC
 #define EXISTS(path) _access_s(path, 0) == 0
@@ -166,8 +167,12 @@ namespace Batch {
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
+      string localPath = outputFile.getLocal();
+      if (!Utils::isAbsolutePath(localPath)) {
+        localPath = directory + "/" + localPath;
+      }
       status = _protocol.copyFile(outputFile.getRemote(), _hostname, _username,
-                                  outputFile.getLocal(), "", "");
+                                  localPath, "", "");
       if (status) {
         // Try to get what we can (logs files)
         // throw BatchException("Error of connection on remote host");
