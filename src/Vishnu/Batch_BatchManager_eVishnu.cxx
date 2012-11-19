@@ -76,14 +76,16 @@ namespace Batch {
     Parametre params = job.getParametre();
     ostringstream extraParams;
     if (params.find(NBPROC) != params.end())
-      extraParams << "-P " << params[NBPROC] << " ";
+      // For now (Vishnu 2.0.0), we must use flag -N nbproc:1 to specify the number of procs (nothing else works)
+      extraParams << "-N " << params[NBPROC] << ":1 ";
     if (params.find(MAXRAMSIZE) != params.end())
       extraParams << "-m " << params[MAXRAMSIZE] << " ";
 
     // define command to submit batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2 && ";
-    subCommand += "vishnu_submit_job " + extraParams.str() + _hostname + " " + cmdFile;
+    subCommand += "vishnu_connect && ";
+    subCommand += "vishnu_submit_job " + extraParams.str() + _hostname + " " + cmdFile + " && ";
+    subCommand += "vishnu_close";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " 2>&1";
     cerr << command.c_str() << endl;
@@ -115,7 +117,7 @@ namespace Batch {
   {
     Parametre params = job.getParametre();
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2 && ";
+    subCommand += "vishnu_connect && ";
 
     // create remote directories
     subCommand += "vishnu_create_dir -p " + _hostname + ":" + params[WORKDIR].str() + "/logs && ";
@@ -150,6 +152,7 @@ namespace Batch {
         subCommand += " && ";
       subCommand += "vishnu_copy_file " + abslocal + " " + _hostname + ":" + absremote;
     }
+    subCommand += " && vishnu_close";
 
     // Execute command
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
@@ -238,8 +241,9 @@ namespace Batch {
   {
     // define command to delete job
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2 && ";
-    subCommand += "vishnu_cancel_job " + _hostname + " " + jobid.getReference();
+    subCommand += "vishnu_connect && ";
+    subCommand += "vishnu_cancel_job " + _hostname + " " + jobid.getReference() + " && ";
+    subCommand += "vishnu_close";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
 
@@ -279,8 +283,9 @@ namespace Batch {
   {
     // define command to query batch
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2 && ";
-    subCommand += "vishnu_get_job_info " + _hostname + " " + jobid.getReference();
+    subCommand += "vishnu_connect && ";
+    subCommand += "vishnu_get_job_info " + _hostname + " " + jobid.getReference() + " && ";
+    subCommand += "vishnu_close";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     cerr << command.c_str() << endl;
 
@@ -310,7 +315,7 @@ namespace Batch {
     }
 
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
-    subCommand += "vishnu_connect -p 2 && ";
+    subCommand += "vishnu_connect && ";
 
     // Copy output files
     Parametre params = job.getParametre();
@@ -332,7 +337,8 @@ namespace Batch {
     }
 
     // Copy logs
-    subCommand += "vishnu_copy_file -r " +_hostname + ":" + params[WORKDIR].str() + "/logs" + " " + absdir;
+    subCommand += "vishnu_copy_file -r " +_hostname + ":" + params[WORKDIR].str() + "/logs" + " " + absdir + " && ";
+    subCommand += "vishnu_close";
 
     // Execute command
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
