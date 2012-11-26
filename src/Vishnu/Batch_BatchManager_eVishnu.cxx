@@ -76,8 +76,7 @@ namespace Batch {
     Parametre params = job.getParametre();
     ostringstream extraParams;
     if (params.find(NBPROC) != params.end())
-      // For now (Vishnu 2.0.0), we must use flag -N nbproc:1 to specify the number of procs (nothing else works)
-      extraParams << "-N " << params[NBPROC] << ":1 ";
+      extraParams << "-P " << params[NBPROC] << " ";
     if (params.find(MAXRAMSIZE) != params.end())
       extraParams << "-m " << params[MAXRAMSIZE] << " ";
 
