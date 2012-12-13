@@ -151,11 +151,7 @@ namespace Batch {
       // if the argument contains spaces, we surround it with simple quotes (Linux)
       // or double quotes (Windows)
       if (commandArgs[i].find(' ') != string::npos) {
-#ifdef WIN32
         commandStr += string("\"") + commandArgs[i] + "\"";
-#else
-        commandStr += string("\'") + commandArgs[i] + "\'";
-#endif
       } else {
         commandStr += commandArgs[i];
       }
