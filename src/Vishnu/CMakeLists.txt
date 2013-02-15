@@ -20,13 +20,13 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST Vishnu/Batch_BatchManager_eVishnu
-               Vishnu/Batch_FactBatchManager_eVishnu
-               Vishnu/Batch_JobInfo_eVishnu
+SET(CLASS_LIST Vishnu/BatchManager_Vishnu
+               Vishnu/FactBatchManager_Vishnu
+               Vishnu/JobInfo_Vishnu
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 
 IF (TEST_ENABLED)
-    add_subdirectory(Test)
+    ADD_TEST(VISHNU ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager VISHNU SH)
 ENDIF (TEST_ENABLED)

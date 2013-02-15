@@ -20,4 +20,8 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+/* Environment variable containing the path of the test configuration file */
 #define TEST_CONFIG_FILE_ENV_VAR "${TEST_CONFIG_FILE_ENV_VAR}"
+
+/* Current source directory */
+#define CMAKE_CURRENT_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"

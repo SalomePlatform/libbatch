@@ -20,13 +20,9 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST LoadLeveler/Batch_BatchManager_eLL
-               LoadLeveler/Batch_FactBatchManager_eLL
-               LoadLeveler/Batch_JobInfo_eLL
+SET(CLASS_LIST LoadLeveler/BatchManager_LL
+               LoadLeveler/FactBatchManager_LL
+               LoadLeveler/JobInfo_LL
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
-
-IF (TEST_ENABLED)
-    add_subdirectory(Test)
-ENDIF (TEST_ENABLED)

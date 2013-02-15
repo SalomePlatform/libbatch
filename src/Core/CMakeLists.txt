@@ -20,57 +20,51 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST Core/Batch_APIInternalFailureException
-               Core/Batch_BatchManager_eClient
-               Core/Batch_BatchManager
-               Core/Batch_BatchManagerCatalog
-               Core/Batch_BoolType
-               Core/Batch_CharType
-               Core/Batch_CommunicationProtocol
-               Core/Batch_ConnexionFailureException
-               Core/Batch_Constants
-               Core/Batch_Couple
-               Core/Batch_CoupleType
-               Core/Batch_Date
-               Core/Batch_DateType
-               Core/Batch_EmulationException
-               Core/Batch_Environnement
-               Core/Batch_FactBatchManager_eClient
-               Core/Batch_FactBatchManager
-               Core/Batch_GenericException
-               Core/Batch_GenericType
-               Core/Batch_InvalidArgumentException
-               Core/Batch_InvalidKeyException
-               Core/Batch_Job
-               Core/Batch_JobId
-               Core/Batch_JobInfo
-               Core/Batch_ListIsFullException
-               Core/Batch_LongType
-               Core/Batch_MpiImpl
-               Core/Batch_NotYetImplementedException
-               Core/Batch_ParameterTypeMap
-               Core/Batch_Parametre
-               Core/Batch_RunTimeException
-               Core/Batch_StringType
-               Core/Batch_TypeMismatchException
-               Core/Batch_Versatile
-               Core/Batch_Utils
+SET(CLASS_LIST Core/APIInternalFailureException
+               Core/BatchManager
+               Core/BatchManagerCatalog
+               Core/BoolType
+               Core/CommunicationProtocol
+               Core/Constants
+               Core/Couple
+               Core/CoupleType
+               Core/Environnement
+               Core/FactBatchManager
+               Core/GenericException
+               Core/GenericType
+               Core/InvalidArgumentException
+               Core/InvalidKeyException
+               Core/Job
+               Core/JobId
+               Core/JobInfo
+               Core/ListIsFullException
+               Core/LongType
+               Core/MpiImpl
+               Core/NotYetImplementedException
+               Core/ParameterTypeMap
+               Core/Parametre
+               Core/RunTimeException
+               Core/StringType
+               Core/TypeMismatchException
+               Core/Versatile
    )
 
-APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
+APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST}
+                            Core/Utils
+                            Core/Log)
 APPEND_CLASSES_TO_HDR_FILES(${CLASS_LIST})
-APPEND_CLASSES_TO_HDR_FILES(Core/Batch_Defines)
+APPEND_CLASSES_TO_HDR_FILES(Core/Defines)
 
 IF (HAS_SH)
-    APPEND_CLASSES_TO_SRC_FILES(Core/Batch_CommunicationProtocolSH)
+    APPEND_CLASSES_TO_SRC_FILES(Core/CommunicationProtocolSH)
 ENDIF (HAS_SH)
 
 IF (HAS_RSH)
-    APPEND_CLASSES_TO_SRC_FILES(Core/Batch_CommunicationProtocolRSH)
+    APPEND_CLASSES_TO_SRC_FILES(Core/CommunicationProtocolRSH)
 ENDIF (HAS_RSH)
 
 IF (HAS_SSH)
-    APPEND_CLASSES_TO_SRC_FILES(Core/Batch_CommunicationProtocolSSH)
+    APPEND_CLASSES_TO_SRC_FILES(Core/CommunicationProtocolSSH)
 ENDIF (HAS_SSH)
 
 

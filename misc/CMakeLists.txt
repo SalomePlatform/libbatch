@@ -21,12 +21,12 @@
 #  email : webmaster.salome@opencascade.com
 
 INSTALL(FILES check_libbatch.m4
-        DESTINATION share/Batch/misc)
+        DESTINATION share/libbatch/misc)
 
-GET_TARGET_PROPERTY(LIBBATCH_ABS_PATH Batch LOCATION)
+GET_TARGET_PROPERTY(LIBBATCH_ABS_PATH batch LOCATION)
 GET_FILENAME_COMPONENT(LIBBATCH_REAL_NAME ${LIBBATCH_ABS_PATH} NAME)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libBatchConfig.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/libBatchConfig.cmake @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libbatchConfig.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/libbatchConfig.cmake @ONLY)
 
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libBatchConfig.cmake
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libbatchConfig.cmake
         DESTINATION lib)

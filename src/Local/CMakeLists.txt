@@ -20,15 +20,25 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST Local/Batch_BatchManager_Local
-               Local/Batch_FactBatchManager_Local
-               Local/Batch_IOMutex
-               Local/Batch_Job_Local
-               Local/Batch_JobInfo_Local
+SET(CLASS_LIST Local/BatchManager_Local
+               Local/FactBatchManager_Local
+               Local/IOMutex
+               Local/Job_Local
+               Local/JobInfo_Local
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 
 IF (TEST_ENABLED)
-    add_subdirectory(Test)
+    IF (HAS_SH)
+        ADD_TEST(LOCAL_SH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL SH)
+    ENDIF (HAS_SH)
+    
+    IF (HAS_SSH)
+        ADD_TEST(LOCAL_SSH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL SSH)
+    ENDIF (HAS_SSH)
+    
+    IF (HAS_RSH)
+        ADD_TEST(LOCAL_RSH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL RSH)
+    ENDIF (HAS_RSH)
 ENDIF (TEST_ENABLED)

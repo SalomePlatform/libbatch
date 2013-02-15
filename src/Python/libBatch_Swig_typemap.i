@@ -32,11 +32,11 @@
 #include <string>
 #include <list>
 #include <map>
-#include "Batch_ParameterTypeMap.hxx"
-#include "Batch_Parametre.hxx"
-#include "Batch_JobId.hxx"
-#include "Batch_FactBatchManager.hxx"
-#include "Batch_RunTimeException.hxx"
+#include "ParameterTypeMap.hxx"
+#include "Parametre.hxx"
+#include "JobId.hxx"
+#include "FactBatchManager.hxx"
+#include "RunTimeException.hxx"
 %}
 
 # // supprime toutes les definitions par defaut => sert au debug
@@ -276,13 +276,4 @@ static bool initEnvironment(Batch::Environnement & newEnv, PyObject * input)
 {
   bool res = initEnvironment($1, $input);
   if (!res) return NULL;
-}
-
-// Dynamic cast to FactBatchManager_eClient if necessary
-%typemap(out) Batch::FactBatchManager *
-{
-  if(dynamic_cast<Batch::FactBatchManager_eClient *>($1))
-    $result=SWIG_NewPointerObj((void*)$1,$descriptor(Batch::FactBatchManager_eClient *),$owner);
-  else
-    $result=SWIG_NewPointerObj((void*)$1,$descriptor(Batch::FactBatchManager *),$owner);
 }

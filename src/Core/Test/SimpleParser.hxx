@@ -54,7 +54,11 @@ public:
   void parse(const std::string & filename) throw(ParserException);
   void parseTestConfigFile() throw(ParserException);
   const std::string & getValue(const std::string & key) const throw(ParserException);
+  const std::string & getTestValue(const std::string & bmType, const std::string & protocolStr,
+                                   const std::string & key) const throw(ParserException);
   int getValueAsInt(const std::string & key) const throw(ParserException);
+  int getTestValueAsInt(const std::string & bmType, const std::string & protocolStr,
+                        const std::string & key) const throw(ParserException);
 
   friend std::ostream & operator <<(std::ostream & os, const SimpleParser & parser) throw();
 

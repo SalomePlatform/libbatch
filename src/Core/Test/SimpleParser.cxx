@@ -128,6 +128,21 @@ const string & SimpleParser::getValue(const string & key) const throw(ParserExce
   return iter->second;
 }
 
+const string & SimpleParser::getTestValue(const string & bmType, const string & protocolStr,
+                                          const string & key) const throw(ParserException)
+{
+  string fullkey = string("TEST_") + bmType + "_" + protocolStr + "_" + key;
+  try {
+    return getValue(fullkey);
+  } catch (const ParserException &) {}
+  fullkey = string("TEST_") + bmType + "_" + key;
+  try {
+    return getValue(fullkey);
+  } catch (const ParserException &) {}
+  fullkey = string("TEST_") + key;
+  return getValue(fullkey);
+}
+
 int SimpleParser::getValueAsInt(const string & key) const throw(ParserException)
 {
   const string & valueStr = getValue(key);
@@ -138,6 +153,21 @@ int SimpleParser::getValueAsInt(const string & key) const throw(ParserException)
     throw ParserException(string("Invalid value (not integer) for key ") + key + ".");
   }
   return res;
+}
+
+int SimpleParser::getTestValueAsInt(const string & bmType, const string & protocolStr,
+                                    const string & key) const throw(ParserException)
+{
+  string fullkey = string("TEST_") + bmType + "_" + protocolStr + "_" + key;
+  try {
+    return getValueAsInt(fullkey);
+  } catch (const ParserException &) {}
+  fullkey = string("TEST_") + bmType + "_" + key;
+  try {
+    return getValueAsInt(fullkey);
+  } catch (const ParserException &) {}
+  fullkey = string("TEST_") + key;
+  return getValueAsInt(fullkey);
 }
 
 ostream & operator <<(ostream & os, const SimpleParser & parser) throw()

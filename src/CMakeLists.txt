@@ -20,22 +20,18 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# These macros are used to create the lists of source files and header files in global variables.
-# If we move to cmake 2.6, this can be done more cleanly with the PARENT_SCOPE option.
-MACRO(APPEND_TO_GLOBAL_VAR VAR)
-    SET(${VAR} ${${VAR}} ${ARGN} CACHE INTERNAL "")
-ENDMACRO(APPEND_TO_GLOBAL_VAR)
-
 MACRO(APPEND_CLASSES_TO_SRC_FILES)
     FOREACH(CLASS ${ARGV})
-        APPEND_TO_GLOBAL_VAR(SRC_FILES_BUILD ${CLASS}.cxx)
+        LIST(APPEND SRC_FILES ${CLASS}.cxx)
     ENDFOREACH(CLASS ${ARGV})
+    SET(SRC_FILES ${SRC_FILES} PARENT_SCOPE)
 ENDMACRO(APPEND_CLASSES_TO_SRC_FILES)
 
 MACRO(APPEND_CLASSES_TO_HDR_FILES)
     FOREACH(CLASS ${ARGV})
-        APPEND_TO_GLOBAL_VAR(HDR_FILES_BUILD ${CLASS}.hxx)
+        LIST(APPEND HDR_FILES ${CLASS}.hxx)
     ENDFOREACH(CLASS ${ARGV})
+    SET(HDR_FILES ${HDR_FILES} PARENT_SCOPE)
 ENDMACRO(APPEND_CLASSES_TO_HDR_FILES)
 
 IF (MSVC)
@@ -54,7 +50,6 @@ add_subdirectory (CCC)
 add_subdirectory (LSF)
 add_subdirectory (PBS)
 add_subdirectory (SGE)
-add_subdirectory (SSH)
 add_subdirectory (LoadLeveler)
 add_subdirectory (Slurm)
 
@@ -63,40 +58,22 @@ IF (NOT WIN32)
     add_subdirectory (Vishnu)
 ENDIF (NOT WIN32)
 
-# Make a copy of the built value and clear the built value for the next run of cmake
-SET(SRC_FILES ${SRC_FILES_BUILD} CACHE INTERNAL "")
-SET(SRC_FILES_BUILD CACHE INTERNAL "")
-
-SET(HDR_FILES ${HDR_FILES_BUILD} CACHE INTERNAL "")
-SET(HDR_FILES_BUILD CACHE INTERNAL "")
-
-
-add_library (Batch SHARED ${SRC_FILES})
+add_library(batch SHARED ${SRC_FILES})
 
 include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Local)
-target_link_libraries(Batch ${PTHREAD_LIBRARY})
+target_link_libraries(batch ${PTHREAD_LIBRARY})
 
 IF (WIN32)
-    target_link_libraries(Batch ws2_32)
+    target_link_libraries(batch ws2_32)
 ENDIF (WIN32)
 
 # If necessary, activate all warnings (useful for debugging and code cleaning)
 # add_definitions(-Wall -Werror -ansi -pedantic)
 
-IF (BUILD_LSF_INTERFACE AND LSF_FOUND)
-    include_directories(${LSF_INCLUDE_DIR})
-    target_link_libraries(Batch ${LSF_LIBRARY} ${LSF_BAT_LIBRARY})
-ENDIF (BUILD_LSF_INTERFACE AND LSF_FOUND)
+INSTALL(TARGETS batch DESTINATION lib)
+INSTALL(FILES ${HDR_FILES} DESTINATION include/libbatch)
 
-IF (BUILD_PBS_INTERFACE AND PBS_FOUND)
-    include_directories(${PBS_INCLUDE_DIR})
-    target_link_libraries(Batch ${PBS_LIBRARY})
-ENDIF (BUILD_PBS_INTERFACE AND PBS_FOUND)
-
-INSTALL(TARGETS Batch DESTINATION lib)
-INSTALL(FILES ${HDR_FILES} DESTINATION include/Batch)
-
-IF (BUILD_PYTHON_WRAPPING AND Python_FOUND AND SWIG_FOUND)
+IF (BUILD_PYTHON_WRAPPING AND PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
     add_subdirectory (Python)
-ENDIF (BUILD_PYTHON_WRAPPING AND Python_FOUND AND SWIG_FOUND)
+ENDIF (BUILD_PYTHON_WRAPPING AND PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)

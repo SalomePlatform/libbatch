@@ -24,9 +24,7 @@ IF (BUILD_LOCAL_SUBMISSION AND HAS_SH)
     # Configure the config file for the test script
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.py.in ${CMAKE_CURRENT_BINARY_DIR}/config.py)
     
-    # Just copy the test scripts to the binary dir
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/seta.sh ${CMAKE_CURRENT_BINARY_DIR}/seta.sh COPYONLY)
-    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setb.sh ${CMAKE_CURRENT_BINARY_DIR}/setb.sh COPYONLY)
+    # Just copy the test script to the binary dir
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_Python_Local_SH.py
                    ${CMAKE_CURRENT_BINARY_DIR}/Test_Python_Local_SH.py COPYONLY)
     

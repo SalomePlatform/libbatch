@@ -20,13 +20,13 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST Slurm/Batch_BatchManager_eSlurm
-               Slurm/Batch_FactBatchManager_eSlurm
-               Slurm/Batch_JobInfo_eSlurm
+SET(CLASS_LIST Slurm/BatchManager_Slurm
+               Slurm/FactBatchManager_Slurm
+               Slurm/JobInfo_Slurm
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 
-IF (TEST_ENABLED)
-    add_subdirectory(Test)
-ENDIF (TEST_ENABLED)
+IF (TEST_ENABLED AND HAS_SSH)
+    ADD_TEST(SLURM_SSH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager SLURM SSH)
+ENDIF (TEST_ENABLED AND HAS_SSH)

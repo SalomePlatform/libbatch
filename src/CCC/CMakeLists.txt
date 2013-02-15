@@ -20,9 +20,9 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST CCC/Batch_BatchManager_eCCC
-               CCC/Batch_FactBatchManager_eCCC
-               CCC/Batch_JobInfo_eCCC
+SET(CLASS_LIST CCC/BatchManager_CCC
+               CCC/FactBatchManager_CCC
+               CCC/JobInfo_CCC
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})

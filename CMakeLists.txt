@@ -20,16 +20,13 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-project (libBatch)
+project (libbatch)
 
-cmake_minimum_required (VERSION 2.4)
+cmake_minimum_required (VERSION 2.8)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules/)
 
 find_package (PThread REQUIRED)
-find_package (Makeinfo)
 
-SET (BUILD_LSF_INTERFACE TRUE CACHE BOOL "Build interface for LSF batch system")
-SET (BUILD_PBS_INTERFACE TRUE CACHE BOOL "Build interface for PBS batch system")
 SET (BUILD_LOCAL_SUBMISSION TRUE CACHE BOOL "Build classes for local submission")
 SET (BUILD_PYTHON_WRAPPING TRUE CACHE BOOL "Generate Python wrapping")
 SET (TEST_ENABLED FALSE CACHE BOOL "Enable testing")
@@ -38,39 +35,30 @@ IF (TEST_ENABLED)
     ENABLE_TESTING()
 ENDIF (TEST_ENABLED)
 
-IF (BUILD_LSF_INTERFACE)
-    find_package (LSF)
-ENDIF (BUILD_LSF_INTERFACE)
-IF (BUILD_PBS_INTERFACE)
-    find_package (PBS)
-ENDIF (BUILD_PBS_INTERFACE)
 IF (BUILD_LOCAL_SUBMISSION)
     find_package (Local)
 ENDIF (BUILD_LOCAL_SUBMISSION)
 IF (BUILD_PYTHON_WRAPPING)
-    FIND_PACKAGE(Python)
+    FIND_PACKAGE(PythonInterp)
+    SET(PythonLibs_FIND_VERSION ${PYTHON_VERSION_STRING})
+    FIND_PACKAGE(PythonLibs)
     FIND_PACKAGE(SWIG)
 ENDIF (BUILD_PYTHON_WRAPPING)
 
 SET(CPACK_GENERATOR TGZ)
 SET(CPACK_SOURCE_GENERATOR TGZ ZIP)
-SET(CPACK_PACKAGE_VERSION_MAJOR 1)
-SET(CPACK_PACKAGE_VERSION_MINOR 6)
+SET(CPACK_PACKAGE_VERSION_MAJOR 2)
+SET(CPACK_PACKAGE_VERSION_MINOR 0)
 SET(CPACK_PACKAGE_VERSION_PATCH 0)
 SET(CPACK_SOURCE_IGNORE_FILES /\\\\.;/CVS/;~)
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME
     ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Batch_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Batch_config.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 INCLUDE(Summary)
 
 add_subdirectory (src)
-
-IF (Makeinfo_FOUND)
-    add_subdirectory (doc)
-ENDIF (Makeinfo_FOUND)
-
 add_subdirectory (misc)
 
 INCLUDE(CPack)

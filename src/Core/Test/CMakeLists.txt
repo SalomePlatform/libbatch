@@ -29,13 +29,18 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_config.h.in ${CMAKE_CURRENT_BINA
 
 # Set the include directories
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/src/Core)
 
 # Build SimpleParser library
 add_library (SimpleParser STATIC SimpleParser.cxx)
 
-# Build the test program
+# Build the test program for SimpleParser
 add_executable(Test_SimpleParser Test_SimpleParser.cxx)
 target_link_libraries(Test_SimpleParser SimpleParser)
 
 # Add the test itself
 ADD_TEST(SimpleParser Test_SimpleParser)
+
+# Build the test program for the batch managers
+add_executable(Test_BatchManager Test_BatchManager.cxx)
+target_link_libraries(Test_BatchManager batch SimpleParser)

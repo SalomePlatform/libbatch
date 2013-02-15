@@ -24,8 +24,6 @@ import sys
 import os
 sys.path.append('${CMAKE_CURRENT_BINARY_DIR}/..')
 
-EXEC_TEST_FULL_PATH = "${EXEC_TEST_FULL_PATH}"
-EXEC_TEST_NAME = "${EXEC_TEST_NAME}"
-
 configfile = os.environ["${TEST_CONFIG_FILE_ENV_VAR}"]
 execfile(configfile)
+TEST_SOURCE_DIR = "${CMAKE_SOURCE_DIR}/src/Core/Test"

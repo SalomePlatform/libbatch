@@ -41,7 +41,7 @@
 
 
 /* Le nom du module Python tel qu'il est importe */
-%module libBatch_Swig
+%module libbatch
 
 /* generate docstrings with types */
 %feature("autodoc", "1");
@@ -56,19 +56,17 @@
 %include libBatch_Swig_exception.i
 
 %{
-#include "Batch_Defines.hxx"
-#include "Batch_Constants.hxx"
-#include "Batch_Job.hxx"
-#include "Batch_JobId.hxx"
-#include "Batch_JobInfo.hxx"
+#include "Defines.hxx"
+#include "Constants.hxx"
+#include "Job.hxx"
+#include "JobId.hxx"
+#include "JobInfo.hxx"
 
-#include "Batch_CommunicationProtocol.hxx"
+#include "CommunicationProtocol.hxx"
 
-#include "Batch_BatchManager.hxx"
-#include "Batch_BatchManager_eClient.hxx"
-#include "Batch_BatchManagerCatalog.hxx"
-#include "Batch_FactBatchManager.hxx"
-#include "Batch_FactBatchManager_eClient.hxx"
+#include "BatchManager.hxx"
+#include "BatchManagerCatalog.hxx"
+#include "FactBatchManager.hxx"
 %}
 
 /* Les classes exportees en Python */
@@ -76,20 +74,18 @@
 %ignore operator<<(std::ostream & os, const Job & job);
 %ignore operator<<(std::ostream & os, const JobInfo & ji);
 
-%include Batch_Defines.hxx
-%include Batch_Job.hxx
-%include Batch_JobId.hxx
-%include Batch_JobInfo.hxx
+%include Defines.hxx
+%include Job.hxx
+%include JobId.hxx
+%include JobInfo.hxx
 
-%include Batch_CommunicationProtocol.hxx
+%include CommunicationProtocol.hxx
 
-%include Batch_BatchManager.hxx
-%include Batch_BatchManager_eClient.hxx
-%include Batch_BatchManagerCatalog.hxx
-%include Batch_FactBatchManager.hxx
-%include Batch_FactBatchManager_eClient.hxx
+%include BatchManager.hxx
+%include BatchManagerCatalog.hxx
+%include FactBatchManager.hxx
 
-%include Batch_Constants.hxx
+%include Constants.hxx
 
 
 /* Les methodes alterJob (surchargees et mal gerees en Python) sont

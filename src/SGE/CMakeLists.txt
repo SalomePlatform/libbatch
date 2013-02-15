@@ -20,9 +20,9 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST SGE/Batch_BatchManager_eSGE
-               SGE/Batch_FactBatchManager_eSGE
-               SGE/Batch_JobInfo_eSGE
+SET(CLASS_LIST SGE/BatchManager_SGE
+               SGE/FactBatchManager_SGE
+               SGE/JobInfo_SGE
    )
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})

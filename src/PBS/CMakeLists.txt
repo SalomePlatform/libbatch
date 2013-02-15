@@ -20,22 +20,9 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST PBS/Batch_BatchManager_ePBS
-               PBS/Batch_FactBatchManager_ePBS
-               PBS/Batch_JobInfo_ePBS
+SET(CLASS_LIST PBS/BatchManager_PBS
+               PBS/FactBatchManager_PBS
+               PBS/JobInfo_PBS
    )
 
-IF (BUILD_PBS_INTERFACE AND PBS_FOUND)
-    SET(CLASS_LIST ${CLASS_LIST}
-                   PBS/Batch_BatchManager_PBS
-                   PBS/Batch_FactBatchManager_PBS
-                   PBS/Batch_Job_PBS
-                   PBS/Batch_JobInfo_PBS
-       )
-ENDIF (BUILD_PBS_INTERFACE AND PBS_FOUND)
-
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
-
-IF (TEST_ENABLED)
-    add_subdirectory(Test)
-ENDIF (TEST_ENABLED)

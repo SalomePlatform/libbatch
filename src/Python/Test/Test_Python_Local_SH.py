@@ -25,8 +25,8 @@ import os
 import sys
 import time
 
-# Import libBatch library
-from libBatch_Swig import *
+# Import libbatch library
+from libbatch import *
 
 def work():
     print "*******************************************************************************************"
@@ -35,31 +35,32 @@ def work():
     print "*******************************************************************************************"
 
     # eventually remove any previous result
-    if (os.path.exists('result.txt')):
-        os.remove('result.txt')
+    if (os.path.exists("resultdir/seconddirname/result.txt")):
+        os.remove("resultdir/seconddirname/result.txt")
 
     # Define the job...
     job = Job()
     # ... and its parameters ...
     p = {}
-    p[EXECUTABLE] = './copied-' + config.EXEC_TEST_NAME
-    p[ARGUMENTS]  = ["copied-seta.sh", "copied-setb.sh", "orig-result.txt"];
+    p[EXECUTABLE] = config.TEST_SOURCE_DIR + "/test_script.py";
+    p[ARGUMENTS]  = ["copied_seta.py", "copied_setb.py", "orig_result.txt"];
     p[NAME] = 'Test_Python_Local_SH'
-    p[WORKDIR] = config.TEST_LOCAL_SH_WORK_DIR
-    p[INFILE] = [('seta.sh', 'copied-seta.sh'), ('setb.sh', 'copied-setb.sh'),
-                   (config.EXEC_TEST_FULL_PATH, 'copied-' + config.EXEC_TEST_NAME)]
-    p[OUTFILE] = [('result.txt', 'orig-result.txt')]
+    p[WORKDIR] = config.TEST_LOCAL_SH_WORKDIR
+    p[INFILE] = [(config.TEST_SOURCE_DIR + '/seta.py', 'copied_seta.py'),
+                 (config.TEST_SOURCE_DIR + '/setb.py', 'copied_setb.py')]
+    p[OUTFILE] = [('result.txt', 'orig_result.txt')]
     job.setParametre(p)
     # ... and its environment
     e = {}
+    e["MYENVVAR"] = "MYVALUE";
     job.setEnvironnement(e)
     print job
 
     # Get the catalog
     c = BatchManagerCatalog.getInstance()
 
-    # Create a BatchManager of type Local_SSH on localhost
-    bm = c('SH')('localhost')
+    # Create a BatchManager of type Local_SH on localhost
+    bm = c('LOCAL')('localhost', '', SH)
 
     # Submit the job to the BatchManager
     jobid = bm.submitJob(job)
@@ -71,22 +72,31 @@ def work():
     # Wait for the end of the job
     state = bm.waitForJobEnd(jobid, config.TEST_LOCAL_SH_TIMEOUT);
 
+
+    if state == FINISHED:
+        print "Job", jobid, "is done"
+        bm.importOutputFiles(job, "resultdir/seconddirname")
+    elif state == FAILED:
+        print "Job", jobid, " finished in error"
+        bm.importOutputFiles(job, "resultdir/seconddirname")
+        return 1
+    else:
+        print "Timeout while executing job"
+        return 1
+
     if state != FINISHED and state != FAILED:
         print "Error: Job not finished after timeout"
         return 1;
 
-    print "Job", jobid, "is done"
-
     # test the result file
-    exp = "c = 12"
-    f = open('result.txt')
-    res = f.read().strip()
-    print "result found : %s, expected : %s" % (res, exp)
-
-    if (res == exp):
-        return 0
+    res = {}
+    execfile('resultdir/seconddirname/result.txt', res)
+    if (res["c"] == 12 and res["MYENVVAR"] == "MYVALUE"):
+      print "OK, Expected result found."
+      return 0
     else:
-        return 1
+      print "result found : %s, expected : %s" % (res, 'res["c"] == 12 and res["MYENVVAR"] == "MYVALUE"')
+      return 1
 
 if __name__ == "__main__":
     retcode = work()

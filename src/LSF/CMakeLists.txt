@@ -20,22 +20,13 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-SET(CLASS_LIST LSF/Batch_BatchManager_eLSF
-               LSF/Batch_FactBatchManager_eLSF
-               LSF/Batch_JobInfo_eLSF
+SET(CLASS_LIST LSF/BatchManager_LSF
+               LSF/FactBatchManager_LSF
+               LSF/JobInfo_LSF
    )
-
-IF (BUILD_LSF_INTERFACE AND LSF_FOUND)
-    SET(CLASS_LIST ${CLASS_LIST}
-                   LSF/Batch_BatchManager_LSF
-                   LSF/Batch_FactBatchManager_LSF
-                   LSF/Batch_Job_LSF
-                   LSF/Batch_JobInfo_LSF
-       )
-ENDIF (BUILD_LSF_INTERFACE AND LSF_FOUND)
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 
-IF (TEST_ENABLED)
-    add_subdirectory(Test)
-ENDIF (TEST_ENABLED)
+IF (TEST_ENABLED AND HAS_SSH)
+    ADD_TEST(LSF_SSH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LSF SSH)
+ENDIF (TEST_ENABLED AND HAS_SSH)
