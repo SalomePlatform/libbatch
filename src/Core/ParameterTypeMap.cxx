@@ -46,6 +46,7 @@ namespace Batch {
   {
     // Don't use the string constants in this constructor because they might be uninitialized
     addParameter("ARGUMENTS", STRING, 0);
+    addParameter("ASSIGNEDHOSTNAMES", STRING, 1);
     addParameter("EXECUTABLE", STRING, 1);
     addParameter("ID", STRING, 1);
     addParameter("INFILE", COUPLE, 0);
@@ -61,6 +62,10 @@ namespace Batch {
     addParameter("STATE", STRING, 1);
     addParameter("WORKDIR", STRING, 1);
     addParameter("EXCLUSIVE", BOOL, 1);
+
+	// Parameters for COORM
+    addParameter("LAUNCHER_FILE", STRING, 1);
+    addParameter("LAUNCHER_ARGS", STRING, 1);
   }
 
   ParameterTypeMap::~ParameterTypeMap()

@@ -36,6 +36,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "Parametre.hxx"
 #include "Environnement.hxx"
 
@@ -59,6 +60,9 @@ namespace Batch {
     // des namespace par swig.
     virtual Batch::Parametre getParametre() const;
     virtual Batch::Environnement getEnvironnement() const;
+
+    // To tokenize a string
+    static void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters = " ");
 
     // Methodes pour l'interfacage avec Python (SWIG)
     // TODO : supprimer ces methodes et transferer leur definitions dans SWIG

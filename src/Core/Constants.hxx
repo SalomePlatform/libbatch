@@ -44,6 +44,7 @@ namespace Batch {
 
   // Declaration of the keys for the parameter map
   decl_extern_Constant(ARGUMENTS);
+  decl_extern_Constant(ASSIGNEDHOSTNAMES);
   decl_extern_Constant(EXECUTABLE);
   decl_extern_Constant(ID);
   decl_extern_Constant(INFILE);
@@ -59,6 +60,10 @@ namespace Batch {
   decl_extern_Constant(STATE);
   decl_extern_Constant(WORKDIR);
   decl_extern_Constant(EXCLUSIVE);
+
+  // Parameters for COORM
+  decl_extern_Constant(LAUNCHER_FILE);
+  decl_extern_Constant(LAUNCHER_ARGS);
 
   // These constants define the status of a job (parameter STATE)
   decl_extern_Constant(CREATED);

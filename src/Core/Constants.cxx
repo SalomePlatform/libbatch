@@ -33,6 +33,7 @@ namespace Batch {
 
   // Definition of the string constants (keys for the parameter map)
   def_Constant(ARGUMENTS);
+  def_Constant(ASSIGNEDHOSTNAMES);
   def_Constant(EXECUTABLE);
   def_Constant(ID);
   def_Constant(INFILE);
@@ -48,6 +49,10 @@ namespace Batch {
   def_Constant(STATE);
   def_Constant(WORKDIR);
   def_Constant(EXCLUSIVE);
+
+  // Parameters for COORM
+  def_Constant(LAUNCHER_FILE);
+  def_Constant(LAUNCHER_ARGS);
 
   // These constants define the status of a job (parameter STATE);
   def_Constant(CREATED);
