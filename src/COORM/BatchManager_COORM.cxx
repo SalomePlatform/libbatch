@@ -224,18 +224,6 @@ namespace Batch
     return remoteFileName;
 	}
 
-	const string BatchManager_COORM::convertSecTo_H_M_S(const long seconds)
-	{
-		int h(seconds / 3600);
-		int m((seconds % 3600) / 60);
-		int s((seconds % 3600) % 60);
-
-		stringstream ss;
-		ss << h << ":" << m << ":" << s;
-		
-		return ss.str();
-	}
-
 	void BatchManager_COORM::exportInputFiles(const Job & job)
 	{
 		BatchManager::exportInputFiles(job);

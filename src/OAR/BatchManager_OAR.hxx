@@ -56,7 +56,7 @@ namespace Batch
 
 		protected:
 			std::string buildBatchScript(const Job & job);
-			const std::string convertSecTo_H_M_S(const long seconds);
+			std::string convertSecTo_H_M_S(long seconds) const;
 
 #ifdef SWIG
 		public:

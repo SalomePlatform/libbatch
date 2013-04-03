@@ -134,7 +134,6 @@ namespace Batch
 		string fileToExecute = "";
 		string tmpDir = "";
 		int nbproc		 = 0;
-		int edt		 = 0;
 		int mem              = 0;
 		string queue         = "";
 
@@ -154,8 +153,9 @@ namespace Batch
     int nbprocpernode = 1;
     if (params.find(NBPROCPERNODE) != params.end())
       nbprocpernode = params[NBPROCPERNODE];
+    long walltimeSecs = 0;
 		if (params.find(MAXWALLTIME) != params.end()) 
-			edt = params[MAXWALLTIME];
+		  walltimeSecs = (long)params[MAXWALLTIME] * 60;
 		if (params.find(MAXRAMSIZE) != params.end()) 
 			mem = params[MAXRAMSIZE];
 		if (params.find(QUEUE) != params.end()) 
@@ -191,9 +191,9 @@ namespace Batch
 		if (nb_full_nodes > 0)
 		{
 			tempOutputFile << "#OAR -l nodes=" << nb_full_nodes;
-			if (edt > 0)
+			if (walltimeSecs > 0)
 			{
-				tempOutputFile << ",walltime=" << convertSecTo_H_M_S(edt) << endl;
+				tempOutputFile << ",walltime=" << convertSecTo_H_M_S(walltimeSecs) << endl;
 			}
 			else
 			{
@@ -202,9 +202,9 @@ namespace Batch
 		}
 		else
 		{
-			if (edt > 0)
+			if (walltimeSecs > 0)
 			{
-				tempOutputFile << "#OAR -l walltime=" << convertSecTo_H_M_S(edt) << endl;
+				tempOutputFile << "#OAR -l walltime=" << convertSecTo_H_M_S(walltimeSecs) << endl;
 			}
 		}
 
@@ -237,7 +237,7 @@ namespace Batch
     return remoteFileName;
 	}
 
-	const string BatchManager_OAR::convertSecTo_H_M_S(const long seconds)
+	string BatchManager_OAR::convertSecTo_H_M_S(long seconds) const
 	{
 		int h(seconds / 3600);
 		int m((seconds % 3600) / 60);
