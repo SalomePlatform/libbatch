@@ -38,7 +38,8 @@ IF (MSVC)
   add_definitions(/wd4251 /wd4290)  # Disable annoying Visual C++ warnings
 ENDIF (MSVC)
 
-include_directories(${PTHREAD_INCLUDE_DIR})
+# !!! to avoid using wrong config.h file on win32 platform add include directories only in following order
+include_directories(${CMAKE_BINARY_DIR} ${PTHREAD_INCLUDE_DIR})
 
 add_subdirectory (Core)
 
@@ -62,7 +63,7 @@ ENDIF (NOT WIN32)
 
 add_library(batch SHARED ${SRC_FILES})
 
-include_directories(${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Local)
 target_link_libraries(batch ${PTHREAD_LIBRARY})
 

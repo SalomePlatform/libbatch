@@ -29,6 +29,10 @@
 #include "Utils.hxx"
 #include "Log.hxx"
 
+#ifdef WIN32
+#include <time.h>
+#endif
+
 using namespace std;
 
 namespace Batch {
