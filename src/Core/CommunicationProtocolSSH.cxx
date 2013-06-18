@@ -26,7 +26,7 @@
  *  Author : Renaud BARATE - EDF R&D
  */
 
-#include <config.h>
+#include <libbatch_config.h>
 
 #include "CommunicationProtocolSSH.hxx"
 

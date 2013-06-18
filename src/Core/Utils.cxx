@@ -30,24 +30,21 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <time.h>
 
 #ifdef WIN32
-#include <Windows.h>
-#include <time.h>
-#include <io.h>
+#  include <Windows.h>
+#  include <io.h>
+#  define popen _popen
+#  define pclose _pclose
 #else
-#include <sys/stat.h>
-#include <unistd.h>
+#  include <sys/stat.h>
+#  include <unistd.h>
 #endif
 
-#include <config.h>
+#include <libbatch_config.h>
 #include "Utils.hxx"
 #include "RunTimeException.hxx"
-
-#ifdef MSVC
-#define popen _popen
-#define pclose _pclose
-#endif
 
 using namespace std;
 namespace Batch {

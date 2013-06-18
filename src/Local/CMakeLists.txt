@@ -29,16 +29,15 @@ SET(CLASS_LIST Local/BatchManager_Local
 
 APPEND_CLASSES_TO_SRC_FILES(${CLASS_LIST})
 
-IF (TEST_ENABLED)
-    IF (HAS_SH)
-        ADD_TEST(LOCAL_SH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL SH)
-    ENDIF (HAS_SH)
+IF (HAS_SH)
+  ADD_TEST(LOCAL_SH ${PROJECT_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL SH)
+ENDIF ()
     
-    IF (HAS_SSH)
-        ADD_TEST(LOCAL_SSH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL SSH)
-    ENDIF (HAS_SSH)
+IF (HAS_SSH)
+  ADD_TEST(LOCAL_SSH ${PROJECT_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL SSH)
+ENDIF ()
     
-    IF (HAS_RSH)
-        ADD_TEST(LOCAL_RSH ${CMAKE_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL RSH)
-    ENDIF (HAS_RSH)
-ENDIF (TEST_ENABLED)
+IF (HAS_RSH)
+  ADD_TEST(LOCAL_RSH ${PROJECT_BINARY_DIR}/src/Core/Test/Test_BatchManager LOCAL RSH)
+ENDIF ()
+

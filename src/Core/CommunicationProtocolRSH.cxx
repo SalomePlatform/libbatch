@@ -33,7 +33,7 @@
 #include <RunTimeException.hxx>
 #endif
 
-#include <config.h>
+#include <libbatch_config.h>
 
 #include "CommunicationProtocolRSH.hxx"
 #include "Log.hxx"

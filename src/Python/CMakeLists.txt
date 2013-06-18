@@ -26,18 +26,35 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(SWIG_SRC_FILE libBatch_Swig.i)
+SET(SWIG_LB_DPYS
+    libBatch_Swig_exception.i
+    libBatch_Swig_typemap.i 
+    ../Core/Defines.hxx
+    ../Core/Constants.hxx
+    ../Core/Job.hxx
+    ../Core/JobId.hxx
+    ../Core/JobInfo.hxx
+    ../Core/CommunicationProtocol.hxx
+    ../Core/BatchManager.hxx
+    ../Core/BatchManagerCatalog.hxx
+    ../Core/FactBatchManager.hxx
+    )
+
 SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES CPLUSPLUS ON
                                                         SWIG_FLAGS "-shadow")
+# SWIG source file and module name differ - the following needs to be
+# set to avoid unnecessary rebuilds:
+SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES SWIG_MODULE_NAME libbatch)
+
+SET(SWIG_MODULE_libbatch_EXTRA_DEPS ${SWIG_LB_DPYS})
 SWIG_ADD_MODULE(libbatch python ${SWIG_SRC_FILE})
 SWIG_LINK_LIBRARIES(libbatch batch ${PYTHON_LIBRARIES})
 
 SET(PYTHON_VERSION "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
-INSTALL(TARGETS ${SWIG_MODULE_libbatch_REAL_NAME} DESTINATION lib/python${PYTHON_VERSION}/site-packages)
+INSTALL(TARGETS ${SWIG_MODULE_libbatch_REAL_NAME} DESTINATION ${LIBBATCH_PYTHONPATH})
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libbatch.py
-        DESTINATION lib/python${PYTHON_VERSION}/site-packages)
+        DESTINATION ${LIBBATCH_PYTHONPATH})
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES libbatch.py)
-
-IF (TEST_ENABLED)
-    add_subdirectory(Test)
-ENDIF (TEST_ENABLED)
+IF (LIBBATCH_TESTS)
+  ADD_SUBDIRECTORY(Test)
+ENDIF ()

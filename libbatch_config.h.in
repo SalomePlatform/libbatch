@@ -19,53 +19,41 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-/*
- *  Log.cxx :
- *
- *  Created on: 28 jan. 2013
- *  Author : Renaud BARATE - EDF R&D
- */
 
-#include "Utils.hxx"
-#include "Log.hxx"
-#include <time.h>
+#ifndef BATCH_CONFIG_H
+#define BATCH_CONFIG_H
 
-#ifdef WIN32
-#include <time.h>
+/* SH tools (sh, cp, rm, mkdir) found on the system */
+#cmakedefine HAS_SH
+
+/* A path to a sh-like command */
+#cmakedefine SH_COMMAND "@SH_COMMAND@"
+
+/* A path to a rm-like command */
+#cmakedefine RM_COMMAND "@RM_COMMAND@"
+
+/* A path to a cp-like command */
+#cmakedefine CP_COMMAND "@CP_COMMAND@"
+
+/* A path to a mkdir-like command */
+#cmakedefine MKDIR_COMMAND "@MKDIR_COMMAND@"
+
+/* RSH tools (rsh, rcp) found on the system */
+#cmakedefine HAS_RSH
+
+/* A path to a rsh-like command */
+#cmakedefine RSH_COMMAND "@RSH_COMMAND@"
+
+/* A path to a rcp-like command */
+#cmakedefine RCP_COMMAND "@RCP_COMMAND@"
+
+/* SSH tools (ssh, scp) found on the system */
+#cmakedefine HAS_SSH
+
+/* A path to a ssh-like command */
+#cmakedefine SSH_COMMAND "@SSH_COMMAND@"
+
+/* A path to a scp-like command */
+#cmakedefine SCP_COMMAND "@SCP_COMMAND@"
+
 #endif
-
-using namespace std;
-
-namespace Batch {
-
-  Log::Log()
-  {
-    const size_t BUFSIZE = 32;
-    char date[BUFSIZE];
-    time_t curtime = time(NULL);
-    strftime(date, BUFSIZE, "%Y-%m-%d_%H-%M-%S", localtime(&curtime));
-    string prefix = string("log-") + date;
-    Utils::createAndOpenTemporaryFile(prefix, _stream);
-  }
-
-  Log::~Log()
-  {
-    _stream.close();
-  }
-
-  void Log::log(const string & msg)
-  {
-    const size_t BUFSIZE = 32;
-    char timestamp[BUFSIZE];
-    time_t curtime = time(NULL);
-    strftime(timestamp, BUFSIZE, "%Y-%m-%d_%H-%M-%S", localtime(&curtime));
-    getInstance()._stream << timestamp << ": " << msg << endl;
-  }
-
-  Log & Log::getInstance()
-  {
-    static Log instance;
-    return instance;
-  }
-
-}

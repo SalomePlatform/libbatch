@@ -34,49 +34,51 @@ MACRO(APPEND_CLASSES_TO_HDR_FILES)
     SET(HDR_FILES ${HDR_FILES} PARENT_SCOPE)
 ENDMACRO(APPEND_CLASSES_TO_HDR_FILES)
 
-IF (MSVC)
-  add_definitions(/wd4251 /wd4290)  # Disable annoying Visual C++ warnings
-ENDIF (MSVC)
+IF (WIN32)
+  ADD_DEFINITIONS(/wd4251 /wd4290)  # Disable annoying Visual C++ warnings
+ENDIF (WIN32)
 
-# !!! to avoid using wrong config.h file on win32 platform add include directories only in following order
-include_directories(${CMAKE_BINARY_DIR} ${PTHREAD_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR} 
+     ${PTHREAD_INCLUDE_DIR})
 
-add_subdirectory (Core)
+ADD_SUBDIRECTORY (Core)
 
-IF (BUILD_LOCAL_SUBMISSION)
-    add_subdirectory (Local)
-ENDIF (BUILD_LOCAL_SUBMISSION)
+IF (LIBBATCH_LOCAL_SUBMISSION)
+    ADD_SUBDIRECTORY (Local)
+ENDIF ()
 
-add_subdirectory (CCC)
-add_subdirectory (LSF)
-add_subdirectory (PBS)
-add_subdirectory (OAR)
-add_subdirectory (COORM)
-add_subdirectory (SGE)
-add_subdirectory (LoadLeveler)
-add_subdirectory (Slurm)
+ADD_SUBDIRECTORY (CCC)
+ADD_SUBDIRECTORY (LSF)
+ADD_SUBDIRECTORY (PBS)
+ADD_SUBDIRECTORY (OAR)
+ADD_SUBDIRECTORY (COORM)
+ADD_SUBDIRECTORY (SGE)
+ADD_SUBDIRECTORY (LoadLeveler)
+ADD_SUBDIRECTORY (Slurm)
 
 # Vishnu is not available for Windows
 IF (NOT WIN32)
-    add_subdirectory (Vishnu)
+    ADD_SUBDIRECTORY (Vishnu)
 ENDIF (NOT WIN32)
 
-add_library(batch SHARED ${SRC_FILES})
+ADD_LIBRARY (batch SHARED ${SRC_FILES})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Core)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Local)
-target_link_libraries(batch ${PTHREAD_LIBRARY})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/Core)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/Local)
+TARGET_LINK_LIBRARIES(batch ${PTHREAD_LIBRARY})
 
 IF (WIN32)
-    target_link_libraries(batch ws2_32)
+    TARGET_LINK_LIBRARIES(batch ws2_32)
 ENDIF (WIN32)
 
 # If necessary, activate all warnings (useful for debugging and code cleaning)
 # add_definitions(-Wall -Werror -ansi -pedantic)
 
-INSTALL(TARGETS batch DESTINATION lib)
+INSTALL(TARGETS batch 
+        EXPORT LibBatchTargets 
+        DESTINATION lib)
 INSTALL(FILES ${HDR_FILES} DESTINATION include/libbatch)
 
-IF (BUILD_PYTHON_WRAPPING AND PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
-    add_subdirectory (Python)
-ENDIF (BUILD_PYTHON_WRAPPING AND PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
+IF (LIBBATCH_PYTHON_WRAPPING AND PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND SWIG_FOUND)
+    ADD_SUBDIRECTORY(Python)
+ENDIF ()

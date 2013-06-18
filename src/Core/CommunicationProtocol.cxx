@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 
-#include <config.h>
+#include <libbatch_config.h>
 
 #include "CommunicationProtocol.hxx"
 #ifdef HAS_RSH

@@ -1,3 +1,22 @@
+# - Find PThread
+# This module finds an installed PThread using the variable PTHREAD_ROOT_DIR 
+# as a lookup path.
+# It sets the following variables:
+#  PTHREAD_FOUND       - set to true if PThread is found
+#  PTHREAD_INCLUDE_DIR - the directory where the include files are located
+#  PTHREAD_LIBRARY     - the path to PThread library
+#
+# The file "pthread.h" is looked for PTHREAD_INCLUDE_DIR.
+# Libraries are searched with following names: 
+#    pthread
+# On Win32:
+#    pthreadVSE2 pthreadVC2
+# or in Debug mode:
+#    pthreadVSE2d pthreadVC2d
+#
+
+
+#############################################################
 #  Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 #  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
@@ -19,51 +38,37 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+#############################################################
 
 IF (NOT PThread_FIND_QUIETLY)
     MESSAGE(STATUS "Looking for PThread...")
-ENDIF (NOT PThread_FIND_QUIETLY)
+ENDIF ()
 
 IF(WIN32)
-    SET(PTHREADS_ROOT_USER $ENV{PTHREADS_ROOT})
     SET(PTHREADS_FIND_PATHS_OPTION NO_DEFAULT_PATH)
     SET(PTHREADS_INCLUDE_TO_FIND pthread.h)
-    SET(PTHREADS_INCLUDE_PATHS ${PTHREADS_ROOT_USER}/include)
+    SET(PTHREADS_INCLUDE_PATHS ${PTHREAD_ROOT_DIR}/include)
     FIND_PATH(PTHREAD_INCLUDE_DIR ${PTHREADS_INCLUDE_TO_FIND}
               PATHS ${PTHREADS_INCLUDE_PATHS} ${PTHREADS_FIND_PATHS_OPTION})
-    SET(PTHREADS_LIB_PATHS ${PTHREADS_ROOT_USER}/lib)
-    IF(CMAKE_BUILD_TYPE STREQUAL Release)
+    SET(PTHREADS_LIB_PATHS ${PTHREAD_ROOT_DIR}/lib)
+    # Default build type is assumed to be Release:
+    IF(NOT CMAKE_BUILD_TYPE STREQUAL Debug)
         FIND_LIBRARY(PTHREAD_LIBRARY pthreadVSE2 pthreadVC2
                      PATHS ${PTHREADS_LIB_PATHS} ${PTHREADS_FIND_PATHS_OPTION})
-    ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+    ELSE()
         FIND_LIBRARY(PTHREAD_LIBRARY pthreadVSE2d pthreadVC2d
                      PATHS ${PTHREADS_LIB_PATHS} ${PTHREADS_FIND_PATHS_OPTION})
-    ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+    ENDIF()
 ELSE(WIN32)
     FIND_PATH(PTHREAD_INCLUDE_DIR pthread.h)
     FIND_LIBRARY(PTHREAD_LIBRARY NAMES pthread)
 ENDIF(WIN32)
 
-IF (PTHREAD_INCLUDE_DIR AND PTHREAD_LIBRARY)
-    SET(PThread_FOUND True)
-ENDIF (PTHREAD_INCLUDE_DIR AND PTHREAD_LIBRARY)
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(PThread REQUIRED_VARS PTHREAD_INCLUDE_DIR PTHREAD_LIBRARY)
 
-IF (PThread_FOUND)
-
+IF (PTHREAD_FOUND)
     IF (NOT PThread_FIND_QUIETLY)
-        MESSAGE(STATUS "Found PThread:")
-        MESSAGE(STATUS "PThread include directory: ${PTHREAD_INCLUDE_DIR}")
         MESSAGE(STATUS "PThread library: ${PTHREAD_LIBRARY}")
     ENDIF (NOT PThread_FIND_QUIETLY)
-
-ELSE (PThread_FOUND)
-
-    IF (PThread_FIND_REQUIRED)
-        MESSAGE(FATAL_ERROR "PThread not found")
-    ELSE (PThread_FIND_REQUIRED)
-        IF (NOT PThread_FIND_QUIETLY)
-            MESSAGE(STATUS "PThread not found")
-        ENDIF (NOT PThread_FIND_QUIETLY)
-    ENDIF (PThread_FIND_REQUIRED)
-
-ENDIF (PThread_FOUND)
+ENDIF()

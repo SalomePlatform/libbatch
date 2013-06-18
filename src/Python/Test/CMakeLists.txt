@@ -20,7 +20,7 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-IF (BUILD_LOCAL_SUBMISSION AND HAS_SH)
+IF (LIBBATCH_LOCAL_SUBMISSION AND HAS_SH)
     # Configure the config file for the test script
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.py.in ${CMAKE_CURRENT_BINARY_DIR}/config.py)
     
@@ -30,4 +30,4 @@ IF (BUILD_LOCAL_SUBMISSION AND HAS_SH)
     
     # Add the test
     ADD_TEST(Python_Local_SH ${PYTHON_EXECUTABLE} Test_Python_Local_SH.py)
-ENDIF (BUILD_LOCAL_SUBMISSION AND HAS_SH)
+ENDIF ()

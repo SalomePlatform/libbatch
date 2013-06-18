@@ -21,7 +21,7 @@
 #
 
 # Declare the configuration variable for the test scripts
-SET (TEST_CONFIG_FILE_ENV_VAR "BATCH_TEST_CONFIG_FILE" CACHE STRING
+SET (LIBBATCH_TEST_CONF_ENV_VAR "BATCH_TEST_CONFIG_FILE" CACHE STRING
      "Name of the environment variable containing the configuration file name for the tests (only necessary for test target)")
 
 # Configure the config file for the test scripts
@@ -29,7 +29,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Test_config.h.in ${CMAKE_CURRENT_BINA
 
 # Set the include directories
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/src/Core)
+include_directories(${PROJECT_SOURCE_DIR}/src/Core)
 
 # Build SimpleParser library
 add_library (SimpleParser STATIC SimpleParser.cxx)
