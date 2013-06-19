@@ -232,7 +232,7 @@ MACRO(SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS pkg referenceVariable upCount)
     MARK_AS_ADVANCED(${pkg}_DIR)
       
     IF (NOT ${pkg_UC}_FOUND)  
-      LIST(APPEND CMAKE_PREFIX_PATH "${${pkg_UC}_ROOT_DIR}")
+      SET(CMAKE_PREFIX_PATH "${${pkg_UC}_ROOT_DIR}")
     ELSE()
       MESSAGE(STATUS "Found ${pkg} in CONFIG mode!")
     ENDIF()
