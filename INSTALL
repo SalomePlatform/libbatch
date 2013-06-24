@@ -110,7 +110,7 @@ some features of the library. The test coverage for this library is currently
 quite poor. Remember that since the tests use connections to remote batch
 systems, the first causes of failure are network and authentication errors. To
 run the tests, you will first have to enable them by setting CMake variable
-LIBBATCH_TESTS to ON. Then copy the file src/Core/Test/batchtest.conf to your
+LIBBATCH_BUILD_TESTS to ON. Then copy the file src/Core/Test/batchtest.conf to your
 home directory for instance. Edit this file according to your local
 configuration. Set the environment variable BATCH_TEST_CONFIG_FILE to the path
 to your own configuration file. To execute the autotests, just go to your build
