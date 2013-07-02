@@ -40,7 +40,14 @@ INCLUDE(libbatchMacros)
 
 # User options
 # ============
-SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/libbatch)
+IF(WIN32 AND NOT CYGWIN)
+  # This is really stupid: in the FIND_PACKAGE() command, the default paths 
+  # are not the same under Win and Nix (see CMake doc). This means we have to specify 
+  # different installation directories for LibBatchConfig.cmake:
+  SET(INSTALL_CMAKE_CONFIG_DIR cmake)
+ELSE()
+  SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/libbatch)
+ENDIF()
 SET(INSTALL_INCLUDE_DIR include)
 
 SET(LIBBATCH_LOCAL_SUBMISSION TRUE CACHE BOOL "Build classes for local submission")
