@@ -78,8 +78,6 @@ IF (PYTHONINTERP_FOUND)
   # Prepare call to FIND_PACKAGE(PythonLibs) and ensure priority is given to 
   # the location found for the interpreter:
   GET_FILENAME_COMPONENT(_tmp "${_python_dir}" PATH)
-#  SET(PYTHON_LIBRARY ${_tmp}/lib)
-#  SET(PYTHON_INCLUDE_DIR ${_tmp}/include)
   SALOME_FIND_PACKAGE(LibbatchPython PythonLibs MODULE)
   # Restore variables:
   SET(LibbatchPython_FIND_VERSION_EXACT ${_old_EXACT})
