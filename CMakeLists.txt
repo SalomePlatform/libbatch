@@ -40,7 +40,7 @@ INCLUDE(libbatchMacros)
 
 # User options
 # ============
-SET(INSTALL_CMAKE_CONFIG_DIR share/cmake)
+SET(INSTALL_CMAKE_CONFIG_DIR share/cmake/libbatch)
 SET(INSTALL_INCLUDE_DIR include)
 
 SET(LIBBATCH_LOCAL_SUBMISSION TRUE CACHE BOOL "Build classes for local submission")

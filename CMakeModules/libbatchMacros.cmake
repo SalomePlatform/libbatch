@@ -278,7 +278,8 @@ MACRO(SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS pkg referenceVariable upCount)
         MESSAGE(STATUS "${pkg} found directory matches what was specified in the ${pkg_UC}_ROOT_DIR variable, all good!")    
       ENDIF()
     ELSE()
-        MESSAGE(STATUS "Environment variable ${pkg_UC}_ROOT_DIR is not defined. The system installation was found.")
+        MESSAGE(STATUS "Variable ${pkg_UC}_ROOT_DIR was not explicitly defined: "
+          "an installation was found anyway: ${_tmp_ROOT_DIR}")
     ENDIF()
 
     # 5. Conflict detection
