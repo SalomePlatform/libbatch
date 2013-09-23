@@ -148,6 +148,8 @@ namespace Batch {
       tempOutputFile << "#SBATCH --time=" << params[MAXWALLTIME] << endl;
     if (params.find(MAXRAMSIZE) != params.end())
       tempOutputFile << "#SBATCH --mem=" << params[MAXRAMSIZE] << endl;
+    else if (params.find(MEMPERCPU) != params.end())
+      tempOutputFile << "#SBATCH --mem-per-cpu=" << params[MEMPERCPU] << endl;
     if (params.find(QUEUE) != params.end())
       tempOutputFile << "#SBATCH --partition=" << params[QUEUE] << endl;
 

@@ -62,6 +62,7 @@ namespace Batch {
     addParameter("STATE", STRING, 1);
     addParameter("WORKDIR", STRING, 1);
     addParameter("EXCLUSIVE", BOOL, 1);
+    addParameter("MEMPERCPU", LONG, 1);
 
 	// Parameters for COORM
     addParameter("LAUNCHER_FILE", STRING, 1);
