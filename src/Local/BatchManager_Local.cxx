@@ -321,6 +321,11 @@ namespace Batch {
       tempOutputFile << "ulimit -H -v " << maxramsize << endl;
     }
 
+    // Number of cores to use
+    int nbproc = 1;
+    if (param.find(NBPROC) != param.end())
+      nbproc = param[NBPROC];
+
     // Define environment for the job
     Environnement env = job.getEnvironnement();
     for (Environnement::const_iterator iter = env.begin() ; iter != env.end() ; ++iter) {
@@ -329,7 +334,8 @@ namespace Batch {
 
     // generate nodes file
     tempOutputFile << "LIBBATCH_NODEFILE=`mktemp nodefile-XXXXXXXXXX`" << endl;
-    tempOutputFile << "echo `hostname` > $LIBBATCH_NODEFILE" << endl;
+    for (int i=0 ; i<nbproc ; i++)
+      tempOutputFile << "echo `hostname` >> $LIBBATCH_NODEFILE" << endl;
     tempOutputFile << "export LIBBATCH_NODEFILE" << endl;
 
     // Launch the executable
