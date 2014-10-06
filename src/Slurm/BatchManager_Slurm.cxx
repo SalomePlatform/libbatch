@@ -152,6 +152,8 @@ namespace Batch {
       tempOutputFile << "#SBATCH --mem-per-cpu=" << params[MEMPERCPU] << endl;
     if (params.find(QUEUE) != params.end())
       tempOutputFile << "#SBATCH --partition=" << params[QUEUE] << endl;
+    if (params.find(WCKEY) != params.end())
+      tempOutputFile << "#SBATCH --wckey=" << params[WCKEY] << endl;
 
     // Define environment for the job
     Environnement env = job.getEnvironnement();
