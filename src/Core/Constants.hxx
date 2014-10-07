@@ -62,6 +62,7 @@ namespace Batch {
   decl_extern_Constant(EXCLUSIVE);
   decl_extern_Constant(MEMPERCPU);
   decl_extern_Constant(WCKEY);
+  decl_extern_Constant(EXTRAPARAMS);
 
   // Parameters for COORM
   decl_extern_Constant(LAUNCHER_FILE);

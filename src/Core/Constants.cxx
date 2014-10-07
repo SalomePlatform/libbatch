@@ -51,6 +51,7 @@ namespace Batch {
   def_Constant(EXCLUSIVE);
   def_Constant(MEMPERCPU);
   def_Constant(WCKEY);
+  def_Constant(EXTRAPARAMS);
 
   // Parameters for COORM
   def_Constant(LAUNCHER_FILE);
