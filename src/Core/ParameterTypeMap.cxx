@@ -63,6 +63,8 @@ namespace Batch {
     addParameter("WORKDIR", STRING, 1);
     addParameter("EXCLUSIVE", BOOL, 1);
     addParameter("MEMPERCPU", LONG, 1);
+    addParameter("WCKEY", STRING, 1);
+    addParameter("EXTRAPARAMS", STRING, 1);
 
 	// Parameters for COORM
     addParameter("LAUNCHER_FILE", STRING, 1);

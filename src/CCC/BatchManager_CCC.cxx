@@ -229,6 +229,9 @@ namespace Batch {
     tempOutputFile << "#MSUB -o " << baseDir << "/logs/output.log." << rootNameToExecute << endl ;
     tempOutputFile << "#MSUB -e " << baseDir << "/logs/error.log." << rootNameToExecute << endl ;
 
+    if (params.find(EXTRAPARAMS) != params.end())
+      tempOutputFile << params[EXTRAPARAMS] << endl;
+
     tempOutputFile << "cd " << workDir << endl ;
 
     // generate nodes file
