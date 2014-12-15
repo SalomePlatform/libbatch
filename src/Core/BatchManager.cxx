@@ -293,6 +293,28 @@ namespace Batch {
     return ret;
   }
 
+  bool BatchManager::importWorkFile( const Job & job,
+                                     const std::string& work_file,
+                                     const std::string& directory )
+  {
+    Parametre params = job.getParametre();
+
+    // Create local result directory
+    int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
+    if (status)
+      LOG("Directory creation failed. Status is: " << status);
+
+    bool ret = true;
+    status = _protocol.copyFile(string(params[WORKDIR]) + "/" + work_file,
+                                _hostname, _username,
+                                directory, "", "");
+    if (status) {
+      LOG("Copy command failed. Status is: " << status);
+      ret = false;
+    }
+    return ret;
+  }
+
   MpiImpl *BatchManager::FactoryMpiImpl(string mpiImpl)
   {
     if(mpiImpl == "lam")

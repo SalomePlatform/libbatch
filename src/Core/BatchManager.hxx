@@ -77,6 +77,8 @@ namespace Batch {
                                       long initSleepTime = 1, long maxSleepTime = 600);
     virtual void importOutputFiles( const Job & job, const std::string directory );
     bool importDumpStateFile( const Job & job, const std::string directory );
+    // copier le fichier work_file à partir du working_directory vers directory
+    virtual bool importWorkFile( const Job & job, const std::string& work_file, const std::string& directory );
 
     // Get the underlying communication protocol
     const CommunicationProtocol & getProtocol() const;
