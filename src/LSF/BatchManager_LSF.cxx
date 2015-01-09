@@ -219,7 +219,7 @@ namespace Batch {
     tempOutputFile << "cd " << workDir << endl ;
 
     // generate nodes file
-    tempOutputFile << "LIBBATCH_NODEFILE=`mktemp nodefile-XXXXXXXXXX` || exit 1" << endl;
+    tempOutputFile << "LIBBATCH_NODEFILE=$(mktemp nodefile-XXXXXXXXXX) || exit 1" << endl;
     tempOutputFile << "bool=0" << endl;
     tempOutputFile << "for i in $LSB_MCPU_HOSTS; do" << endl;
     tempOutputFile << "  if test $bool = 0; then" << endl;

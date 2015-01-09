@@ -302,7 +302,7 @@ namespace Batch {
     } else {
 #endif
 
-    tempOutputFile << "#!/bin/sh" << endl;
+    tempOutputFile << "#!/bin/sh -f" << endl;
     tempOutputFile << "cd " << workDir << endl;
 
     // Optional parameters (system limits on the job process)
@@ -332,10 +332,17 @@ namespace Batch {
       tempOutputFile << "export " << iter->first << "=" << iter->second << endl;
     }
 
-    // generate nodes file
-    tempOutputFile << "LIBBATCH_NODEFILE=`mktemp nodefile-XXXXXXXXXX`" << endl;
-    for (int i=0 ; i<nbproc ; i++)
-      tempOutputFile << "echo `hostname` >> $LIBBATCH_NODEFILE" << endl;
+    // generate nodes file (one line per required proc)
+    tempOutputFile << "LIBBATCH_NODEFILE=$(mktemp nodefile-XXXXXXXXXX)" << endl;
+    tempOutputFile << "i=" << nbproc << endl;
+    tempOutputFile << "hn=$(hostname)" << endl;
+    tempOutputFile << "{" << endl;
+    tempOutputFile << "while [ $i -gt 0 ]" << endl;
+    tempOutputFile << "do" << endl;
+    tempOutputFile << "    echo \"$hn\"" << endl;
+    tempOutputFile << "    i=$((i-1))" << endl;
+    tempOutputFile << "done" << endl;
+    tempOutputFile << "} > \"$LIBBATCH_NODEFILE\"" << endl;
     tempOutputFile << "export LIBBATCH_NODEFILE" << endl;
 
     // Launch the executable
@@ -374,7 +381,7 @@ namespace Batch {
     tempOutputFile << " 1>" << stdoutFile << " 2>" << stderrFile << endl;
 
     // Remove the node file
-    tempOutputFile << "rm $LIBBATCH_NODEFILE" << endl;
+    tempOutputFile << "rm \"$LIBBATCH_NODEFILE\"" << endl;
 
 #ifdef WIN32
     }

@@ -124,7 +124,7 @@ namespace Batch {
     ofstream tempOutputFile;
     string tmpFileName = Utils::createAndOpenTemporaryFile("slurm-script", tempOutputFile);
 
-    tempOutputFile << "#!/bin/bash" << endl;
+    tempOutputFile << "#!/bin/sh -f" << endl;
     tempOutputFile << "#SBATCH --output=" << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "#SBATCH --error=" << workDir << "/logs/error.log." << rootNameToExecute << endl;
 
@@ -164,8 +164,8 @@ namespace Batch {
     }
 
     // generate nodes file
-    tempOutputFile << "LIBBATCH_NODEFILE=`mktemp nodefile-XXXXXXXXXX`" << endl;
-    tempOutputFile << "srun hostname > $LIBBATCH_NODEFILE" << endl;
+    tempOutputFile << "LIBBATCH_NODEFILE=$(mktemp nodefile-XXXXXXXXXX)" << endl;
+    tempOutputFile << "srun hostname > \"$LIBBATCH_NODEFILE\"" << endl;
     tempOutputFile << "export LIBBATCH_NODEFILE" << endl;
 
     // Launch the executable
@@ -182,7 +182,7 @@ namespace Batch {
     tempOutputFile << endl;
 
     // Remove the node file
-    tempOutputFile << "rm $LIBBATCH_NODEFILE" << endl;
+    tempOutputFile << "rm \"$LIBBATCH_NODEFILE\"" << endl;
 
     tempOutputFile.flush();
     tempOutputFile.close();
