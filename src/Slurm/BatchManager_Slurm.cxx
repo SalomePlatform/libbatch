@@ -151,7 +151,7 @@ namespace Batch {
     else if (params.find(MEMPERCPU) != params.end())
       tempOutputFile << "#SBATCH --mem-per-cpu=" << params[MEMPERCPU] << endl;
     if (params.find(QUEUE) != params.end())
-      tempOutputFile << "#SBATCH --partition=" << params[QUEUE] << endl;
+      tempOutputFile << "#SBATCH --qos=" << params[QUEUE] << endl;
     if (params.find(WCKEY) != params.end())
       tempOutputFile << "#SBATCH --wckey=" << params[WCKEY] << endl;
     if (params.find(EXTRAPARAMS) != params.end())
