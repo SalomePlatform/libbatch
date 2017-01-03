@@ -124,7 +124,7 @@ namespace Batch {
     ofstream tempOutputFile;
     string tmpFileName = Utils::createAndOpenTemporaryFile("slurm-script", tempOutputFile);
 
-    tempOutputFile << "#!/bin/sh -f" << endl;
+    tempOutputFile << "#!/bin/bash -l" << endl;
     tempOutputFile << "#SBATCH --output=" << workDir << "/logs/output.log." << rootNameToExecute << endl;
     tempOutputFile << "#SBATCH --error=" << workDir << "/logs/error.log." << rootNameToExecute << endl;
 
