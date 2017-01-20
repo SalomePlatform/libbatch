@@ -30,6 +30,7 @@
  */
 
 #include "Couple.hxx"
+#include <iostream>
 using namespace std;
 
 namespace Batch {
