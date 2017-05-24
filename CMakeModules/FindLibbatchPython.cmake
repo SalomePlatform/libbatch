@@ -47,6 +47,10 @@ ENDIF()
 #   Make cache entry 
 SET(PYTHON_ROOT_DIR "${_dflt_value}" CACHE PATH "Path to Python directory (interpreter and libs)")
 
+# python 3
+SET(PythonInterp_FIND_VERSION 3)
+SET(PythonInterp_FIND_VERSION_MAJOR 3)
+
 # 2. Find package - config mode first (i.e. looking for XYZ-config.cmake)
 IF(WIN32)
  IF(CMAKE_BUILD_TYPE STREQUAL Debug)
