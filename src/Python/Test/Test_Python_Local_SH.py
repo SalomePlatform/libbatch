@@ -29,10 +29,10 @@ import time
 from libbatch import *
 
 def work():
-    print "*******************************************************************************************"
-    print "This script tests the local batch submission based on SH. No specific configuration is"
-    print "needed for this test."
-    print "*******************************************************************************************"
+    print("*******************************************************************************************")
+    print("This script tests the local batch submission based on SH. No specific configuration is")
+    print("needed for this test.")
+    print("*******************************************************************************************")
 
     # eventually remove any previous result
     if (os.path.exists("resultdir/seconddirname/result.txt")):
@@ -54,7 +54,7 @@ def work():
     e = {}
     e["MYENVVAR"] = "MYVALUE";
     job.setEnvironnement(e)
-    print job
+    print(job)
 
     # Get the catalog
     c = BatchManagerCatalog.getInstance()
@@ -64,7 +64,7 @@ def work():
 
     # Submit the job to the BatchManager
     jobid = bm.submitJob(job)
-    print jobid
+    print(jobid)
 
     # Query the job
     jobid.queryJob()
@@ -74,28 +74,28 @@ def work():
 
 
     if state == FINISHED:
-        print "Job", jobid, "is done"
+        print("Job", jobid, "is done")
         bm.importOutputFiles(job, "resultdir/seconddirname")
     elif state == FAILED:
-        print "Job", jobid, " finished in error"
+        print("Job", jobid, " finished in error")
         bm.importOutputFiles(job, "resultdir/seconddirname")
         return 1
     else:
-        print "Timeout while executing job"
+        print("Timeout while executing job")
         return 1
 
     if state != FINISHED and state != FAILED:
-        print "Error: Job not finished after timeout"
+        print("Error: Job not finished after timeout")
         return 1;
 
     # test the result file
     res = {}
-    execfile('resultdir/seconddirname/result.txt', res)
+    exec(compile(open('resultdir/seconddirname/result.txt').read(), 'resultdir/seconddirname/result.txt', 'exec'), res)
     if (res["c"] == 12 and res["MYENVVAR"] == "MYVALUE"):
-      print "OK, Expected result found."
+      print("OK, Expected result found.")
       return 0
     else:
-      print "result found : %s, expected : %s" % (res, 'res["c"] == 12 and res["MYENVVAR"] == "MYVALUE"')
+      print("result found : %s, expected : %s" % (res, 'res["c"] == 12 and res["MYENVVAR"] == "MYVALUE"'))
       return 1
 
 if __name__ == "__main__":
