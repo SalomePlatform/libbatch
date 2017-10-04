@@ -68,10 +68,10 @@ static bool initVersatile(Batch::Versatile & newVersatile, PyObject * input)
 
   } else if (PyString_Check(input)) { // c'est une string
     newVersatile = PyString_AsString(input);
-  } else if (PyInt_Check(input)) { // c'est un int
-    newVersatile = PyInt_AsLong(input);
   } else if (PyBool_Check(input)) { // c'est un bool
     newVersatile = (input == Py_True);
+  } else if (PyInt_Check(input)) { // c'est un int
+    newVersatile = PyInt_AsLong(input);
   } else { // erreur
     PyErr_SetString(PyExc_RuntimeWarning, "initVersatile : invalid PyObject");
     return false;
