@@ -315,6 +315,21 @@ namespace Batch {
     return ret;
   }
 
+  void BatchManager::clearWorkingDir( const Job & job)
+  {
+    Parametre params = job.getParametre();
+
+    string wd = params[WORKDIR];
+    if(!wd.empty() && wd != "/")
+    {
+      int status = _protocol.removeDirectory(wd, _hostname, _username);
+      if (status)
+        LOG("removeDirectory command failed. Status is: " << status);
+    }
+    else
+      LOG("removeDirectory command failed. Invalid working directory: " << wd);
+  }
+
   MpiImpl *BatchManager::FactoryMpiImpl(string mpiImpl)
   {
     if(mpiImpl == "lam")

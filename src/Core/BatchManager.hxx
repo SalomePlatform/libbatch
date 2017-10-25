@@ -79,6 +79,7 @@ namespace Batch {
     bool importDumpStateFile( const Job & job, const std::string directory );
     // copier le fichier work_file à partir du working_directory vers directory
     virtual bool importWorkFile( const Job & job, const std::string& work_file, const std::string& directory );
+    virtual void clearWorkingDir( const Job & job );
 
     // Get the underlying communication protocol
     const CommunicationProtocol & getProtocol() const;

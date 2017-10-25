@@ -64,6 +64,10 @@ namespace Batch {
                            const std::string & host,
                            const std::string & user) const;
 
+    virtual int removeDirectory(const std::string & path,
+                                const std::string & host,
+                                const std::string & user) const;
+
     virtual int makeDirectory(const std::string & path,
                               const std::string & host,
                               const std::string & user) const;
@@ -82,6 +86,8 @@ namespace Batch {
                                                         const std::string & destinationUser) const=0;
 
     virtual std::string getRemoveSubCommand(const std::string & path) const;
+
+    virtual std::string getRemoveDirectorySubCommand(const std::string & path) const;
 
     virtual std::string getMakeDirectorySubCommand(const std::string & path) const;
 
