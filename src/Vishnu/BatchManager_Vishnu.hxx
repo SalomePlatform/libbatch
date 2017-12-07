@@ -51,7 +51,7 @@ namespace Batch {
     virtual ~BatchManager_Vishnu();
 
     // Methods to control jobs
-    virtual const JobId submitJob(const Job & job);
+    virtual const JobId runJob(const Job & job);
     virtual void deleteJob(const JobId & jobid);
     virtual JobInfo queryJob(const JobId & jobid);
     virtual void importOutputFiles(const Job & job, const std::string directory);

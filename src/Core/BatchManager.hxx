@@ -94,7 +94,15 @@ namespace Batch {
     MpiImpl *_mpiImpl; // Mpi implementation to launch executable in batch script
 
     MpiImpl* FactoryMpiImpl(std::string mpiImpl);
-    void exportInputFiles(const Job & job);
+    virtual void exportInputFiles(const Job & job);
+    
+    // Preprocessing done on the frontal using "PREPROCESS" parameter as a script.
+    // May throw exceptions in case of failure.
+    virtual void preprocess(const Batch::Job & job);
+    
+    // Submit to batch manager, but we suppose input files are already copied
+    // and preprocess finished without error
+    virtual const Batch::JobId runJob(const Batch::Job & job);
 
   private:
 

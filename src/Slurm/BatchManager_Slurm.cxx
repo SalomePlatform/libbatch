@@ -55,13 +55,10 @@ namespace Batch {
   }
 
   // Method to submit a job to the batch manager
-  const JobId BatchManager_Slurm::submitJob(const Job & job)
+  const JobId BatchManager_Slurm::runJob(const Job & job)
   {
     Parametre params = job.getParametre();
     const string workDir = params[WORKDIR];
-
-    // export input files on cluster
-    exportInputFiles(job);
 
     // build command file to submit the job and copy it on the server
     string cmdFile = buildCommandFile(job);

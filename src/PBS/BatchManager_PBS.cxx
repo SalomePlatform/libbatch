@@ -60,13 +60,10 @@ namespace Batch {
   }
 
   // Methode pour le controle des jobs : soumet un job au gestionnaire
-  const JobId BatchManager_PBS::submitJob(const Job & job)
+  const JobId BatchManager_PBS::runJob(const Job & job)
   {
     Parametre params = job.getParametre();
     const std::string workDir = params[WORKDIR];
-
-    // export input files on cluster
-    exportInputFiles(job);
 
     // build batch script for job
     string scriptFile = buildSubmissionScript(job);

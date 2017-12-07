@@ -78,7 +78,9 @@ namespace Batch {
   // Methode pour le controle des jobs : soumet un job au gestionnaire
   const JobId BatchManager::submitJob(const Job & job)
   {
-    throw NotYetImplementedException("Method submitJob not implemented by Batch Manager \"" + _type + "\"");
+    exportInputFiles(job);
+    preprocess(job);
+    return runJob(job);
   }
 
   // Methode pour le controle des jobs : retire un job du gestionnaire
@@ -360,4 +362,35 @@ namespace Batch {
     return _protocol;
   }
 
+  void BatchManager::preprocess(const Batch::Job & job)
+  {
+    std::string preproCommand;
+    std::string workDir;
+    Parametre params = job.getParametre();
+    if (params.find(PREPROCESS) != params.end())
+      preproCommand = params[PREPROCESS].str();
+    if (params.find(WORKDIR) != params.end())
+      workDir = params[WORKDIR].str();
+
+    if(!preproCommand.empty() && !workDir.empty())
+    {
+      std::string subCommand = "cd " + workDir + "; " + preproCommand;
+      std::string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+      command += " 2>&1";
+      LOG(command);
+
+      // submit job
+      std::string output;
+      int status = Utils::getCommandOutput(command, output);
+      LOG(output);
+      if (status != 0)
+        throw RunTimeException("Error when executing: " + command +
+                               "\nOutput:" + output);
+    }
+  }
+  
+  const Batch::JobId BatchManager::runJob(const Batch::Job & job)
+  {
+    throw NotYetImplementedException("Method runJob not implemented by Batch Manager \"" + _type + "\"");
+  }
 }

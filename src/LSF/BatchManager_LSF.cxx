@@ -59,14 +59,10 @@ namespace Batch {
   }
 
   // Methode pour le controle des jobs : soumet un job au gestionnaire
-  const JobId BatchManager_LSF::submitJob(const Job & job)
+  const JobId BatchManager_LSF::runJob(const Job & job)
   {
     Parametre params = job.getParametre();
     const std::string workDir = params[WORKDIR];
-
-    // export input files on cluster
-    LOG("Export des fichiers en entree");
-    exportInputFiles(job);
 
     // build batch script for job
     LOG("Construction du script de batch");

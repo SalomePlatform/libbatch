@@ -132,7 +132,7 @@ namespace Batch {
     // static string BatchManager_Local::getDefaultServer();
 
     // Methodes pour le controle des jobs
-    virtual const JobId submitJob(const Job & job); // soumet un job au gestionnaire
+    virtual const JobId runJob(const Job & job); // soumet un job au gestionnaire
     virtual void deleteJob(const JobId & jobid); // retire un job du gestionnaire
     virtual void holdJob(const JobId & jobid); // suspend un job en file d'attente
     virtual void releaseJob(const JobId & jobid); // relache un job suspendu

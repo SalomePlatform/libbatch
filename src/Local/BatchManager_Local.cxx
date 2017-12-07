@@ -93,11 +93,8 @@ namespace Batch {
   }
 
   // Methode pour le controle des jobs : soumet un job au gestionnaire
-  const JobId BatchManager_Local::submitJob(const Job & job)
+  const JobId BatchManager_Local::runJob(const Job & job)
   {
-    // export input files in the working directory of the execution host
-    exportInputFiles(job);
-
     Job_Local jobLocal = job;
     Id id = _idCounter++;
     ThreadAdapter * p_ta = new ThreadAdapter(*this, job, id);

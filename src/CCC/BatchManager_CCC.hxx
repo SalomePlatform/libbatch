@@ -53,7 +53,7 @@ namespace Batch {
     // static string BatchManager_LSF::getDefaultServer();
 
     // Methodes pour le controle des jobs
-    virtual const JobId submitJob(const Job & job); // soumet un job au gestionnaire
+    virtual const JobId runJob(const Job & job); // soumet un job au gestionnaire
     virtual void deleteJob(const JobId & jobid); // retire un job du gestionnaire
     virtual JobInfo queryJob(const JobId & jobid); // renvoie l'etat du job
     virtual bool isRunning(const JobId & jobid); // teste si un job est present en machine

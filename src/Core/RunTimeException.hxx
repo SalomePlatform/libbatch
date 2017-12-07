@@ -42,7 +42,7 @@ namespace Batch {
   class BATCH_EXPORT RunTimeException : public GenericException
   {
   public:
-		// Constructeur
+    // Constructeur
     RunTimeException(std::string ch = "undefined") : GenericException("RunTimeException", ch) {}
   };
 

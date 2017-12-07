@@ -72,7 +72,7 @@ namespace Batch {
   }
 
   // Methode pour le controle des jobs : soumet un job au gestionnaire
-  const JobId BatchManager_SGE::submitJob(const Job & job)
+  const JobId BatchManager_SGE::runJob(const Job & job)
   {
     Parametre params = job.getParametre();
     const std::string workDir = params[WORKDIR];
@@ -80,9 +80,6 @@ namespace Batch {
     string::size_type p1 = fileToExecute.find_last_of("/");
     string::size_type p2 = fileToExecute.find_last_of(".");
     std::string fileNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
-
-    // export input files on cluster
-    exportInputFiles(job);
 
     // build batch script for job
     buildBatchScript(job);

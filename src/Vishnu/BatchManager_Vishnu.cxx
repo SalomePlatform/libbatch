@@ -61,11 +61,8 @@ namespace Batch {
   }
 
   // Method to submit a job to the batch manager
-  const JobId BatchManager_Vishnu::submitJob(const Job & job)
+  const JobId BatchManager_Vishnu::runJob(const Job & job)
   {
-    // export input files on cluster
-    exportInputFiles(job);
-
     // build command file to submit the job
     string cmdFile = buildCommandFile(job);
 
