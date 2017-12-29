@@ -83,6 +83,20 @@ bool Utils::isAbsolutePath(const string & path)
   return path[0] == '/';
 }
 
+std::string Utils::dirname(const std::string & path)
+{
+#ifdef WIN32
+  const char separator = '\\';
+#else
+  const char separator = '/';
+#endif
+  std::size_t found = path.rfind(separator);
+  if(found != std::string::npos)
+    return path.substr(0, found+1);
+  else
+    return std::string(".");
+}
+
 string Utils::createAndOpenTemporaryFile(const string & prefix, ofstream & outputStream)
 {
   if (outputStream.is_open())

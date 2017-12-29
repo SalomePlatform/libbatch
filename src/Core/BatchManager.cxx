@@ -263,6 +263,10 @@ namespace Batch {
       if (!Utils::isAbsolutePath(localPath)) {
         localPath = directory + "/" + localPath;
       }
+      status = CommunicationProtocol::getInstance(SH).makeDirectory(
+                                             Utils::dirname(localPath), "", "");
+      if (status)
+        LOG("Directory creation failed. Status is: " << status);
       status = _protocol.copyFile(remotePath, _hostname, _username,
                                   localPath, "", "");
       if (status)

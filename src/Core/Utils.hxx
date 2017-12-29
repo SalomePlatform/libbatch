@@ -49,6 +49,14 @@ public:
   static bool isAbsolutePath(const std::string & path);
 
   /**
+   * Returns the directory name of a path.
+   * "/a/b/file.txt" -> "/a/b"
+   * "a/file.txt" -> "a"
+   * "file.txt" -> "."
+   */
+  static std::string dirname(const std::string & path);
+
+  /**
    * Create a temporary file and open an output stream to write into this file.
    * The file is created with the pattern "<tmpdir>/libbatch-<prefix>-XXXXXX" where <tmpdir> is the
    * directory for temporary files and the X's are replaced by random characters. The caller is
