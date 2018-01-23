@@ -64,6 +64,8 @@ namespace Batch {
   decl_extern_Constant(WCKEY);
   decl_extern_Constant(EXTRAPARAMS);
   decl_extern_Constant(PREPROCESS);
+  decl_extern_Constant(PARTITION);
+  decl_extern_Constant(NBNODE);
 
   // Parameters for COORM
   decl_extern_Constant(LAUNCHER_FILE);

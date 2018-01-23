@@ -149,8 +149,12 @@ namespace Batch {
       tempOutputFile << "#SBATCH --mem-per-cpu=" << params[MEMPERCPU] << endl;
     if (params.find(QUEUE) != params.end())
       tempOutputFile << "#SBATCH --qos=" << params[QUEUE] << endl;
+    if (params.find(PARTITION) != params.end())
+      tempOutputFile << "#SBATCH --partition=" << params[PARTITION] << endl;
     if (params.find(WCKEY) != params.end())
       tempOutputFile << "#SBATCH --wckey=" << params[WCKEY] << endl;
+    if (params.find(NBNODE) != params.end())
+      tempOutputFile << "#SBATCH --nodes=" << params[NBNODE] << endl;
     if (params.find(EXTRAPARAMS) != params.end())
       tempOutputFile << params[EXTRAPARAMS] << endl;
 

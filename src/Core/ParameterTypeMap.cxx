@@ -66,6 +66,8 @@ namespace Batch {
     addParameter("WCKEY", STRING, 1);
     addParameter("EXTRAPARAMS", STRING, 1);
     addParameter("PREPROCESS", STRING, 1);
+    addParameter("PARTITION", STRING, 1);
+    addParameter("NBNODE", LONG, 1);
 
     // Parameters for COORM
     addParameter("LAUNCHER_FILE", STRING, 1);
