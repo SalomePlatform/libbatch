@@ -57,6 +57,17 @@ public:
   static std::string dirname(const std::string & path);
 
   /**
+   * Test if the string in parameter begins with '-' and it should be processed
+   * as an option, not as a path.
+   */
+  static bool isOption(const std::string & val);
+
+  /**
+   * Test if the path in parameter contains a "/./" sequence.
+   */
+  static bool usesRsyncRelativePath(const std::string & path);
+
+  /**
    * Create a temporary file and open an output stream to write into this file.
    * The file is created with the pattern "<tmpdir>/libbatch-<prefix>-XXXXXX" where <tmpdir> is the
    * directory for temporary files and the X's are replaced by random characters. The caller is

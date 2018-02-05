@@ -97,6 +97,16 @@ std::string Utils::dirname(const std::string & path)
     return std::string(".");
 }
 
+bool Utils::isOption(const std::string & val)
+{
+  return val.size() > 0 && val[0] == '-';
+}
+
+bool Utils::usesRsyncRelativePath(const std::string & path)
+{
+  return path.find("/./") != std::string::npos;
+}
+
 string Utils::createAndOpenTemporaryFile(const string & prefix, ofstream & outputStream)
 {
   if (outputStream.is_open())

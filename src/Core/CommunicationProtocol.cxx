@@ -40,9 +40,13 @@
 #ifdef HAS_SSH
  #include "CommunicationProtocolSSH.hxx"
 #endif
+#ifdef HAS_RSYNC
+ #include "CommunicationProtocolRsync.hxx"
+#endif
 #include "APIInternalFailureException.hxx"
 #include "RunTimeException.hxx"
 #include "Log.hxx"
+#include "Utils.hxx"
 
 using namespace std;
 
@@ -81,6 +85,14 @@ namespace Batch {
       return instanceSSH;
 #else
       throw RunTimeException("Can't use SSH protocol (SSH tools were "
+                             "not found on the system at compile time).");
+#endif
+    } else if (protocolType == RSYNC) {
+#ifdef HAS_RSYNC
+      static CommunicationProtocolRsync instanceRsync;
+      return instanceRsync;
+#else
+      throw RunTimeException("Can't use RSYNC protocol (RSYNC tools were "
                              "not found on the system at compile time).");
 #endif
     } else
@@ -169,7 +181,8 @@ namespace Batch {
 
       // if the argument contains spaces, we surround it with simple quotes (Linux)
       // or double quotes (Windows)
-      if (commandArgs[i].find(' ') != string::npos) {
+      if (commandArgs[i].find(' ') != string::npos &&
+          !Utils::isOption(commandArgs[i])){
         commandStr += string("\"") + commandArgs[i] + "\"";
       } else {
         commandStr += commandArgs[i];

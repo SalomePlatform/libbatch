@@ -19,47 +19,41 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+/*
+ *  CommunicationProtocolRsync.hxx :
+ *
+ *  Author : EDF R&D
+ */
 
-#ifndef BATCH_CONFIG_H
-#define BATCH_CONFIG_H
+#ifndef _BATCHCOMMUNICATIONPROTOCOLRSYNC_H_
+#define _BATCHCOMMUNICATIONPROTOCOLRSYNC_H_
 
-/* SH tools (sh, cp, rm, mkdir) found on the system */
-#cmakedefine HAS_SH
+#include <string>
+#include <vector>
 
-/* A path to a sh-like command */
-#cmakedefine SH_COMMAND "@SH_COMMAND@"
+#include "Defines.hxx"
+#include "CommunicationProtocolSSH.hxx"
 
-/* A path to a rm-like command */
-#cmakedefine RM_COMMAND "@RM_COMMAND@"
+namespace Batch {
 
-/* A path to a cp-like command */
-#cmakedefine CP_COMMAND "@CP_COMMAND@"
+  class BATCH_EXPORT CommunicationProtocolRsync : public CommunicationProtocolSSH
+  {
+    friend class CommunicationProtocol;
 
-/* A path to a mkdir-like command */
-#cmakedefine MKDIR_COMMAND "@MKDIR_COMMAND@"
+  public:
+    std::vector<std::string> getCopyCommandArgs(const std::string & sourcePath,
+                                                const std::string & sourceHost,
+                                                const std::string & sourceUser,
+                                                const std::string & destinationPath,
+                                                const std::string & destinationHost,
+                                                const std::string & destinationUser) const;
 
-/* RSH tools (rsh, rcp) found on the system */
-#cmakedefine HAS_RSH
+  protected:
 
-/* A path to a rsh-like command */
-#cmakedefine RSH_COMMAND "@RSH_COMMAND@"
+    CommunicationProtocolRsync();
 
-/* A path to a rcp-like command */
-#cmakedefine RCP_COMMAND "@RCP_COMMAND@"
+  };
 
-/* SSH tools (ssh, scp) found on the system */
-#cmakedefine HAS_SSH
-
-/* SSH tools and rsync found */
-#cmakedefine HAS_RSYNC
-
-/* A path to a ssh-like command */
-#cmakedefine SSH_COMMAND "@SSH_COMMAND@"
-
-/* A path to a scp-like command */
-#cmakedefine SCP_COMMAND "@SCP_COMMAND@"
-
-/* A path to a scp-like command */
-#cmakedefine RSYNC_COMMAND "@RSYNC_COMMAND@"
+}
 
 #endif

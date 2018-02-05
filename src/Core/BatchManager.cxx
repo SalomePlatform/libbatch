@@ -256,17 +256,14 @@ namespace Batch {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
       Couple outputFile = cpt;
       string remotePath = outputFile.getRemote();
-      if (!Utils::isAbsolutePath(remotePath)) {
-        remotePath = params[WORKDIR].str() + "/" + remotePath;
+      if (!Utils::isAbsolutePath(remotePath) && !Utils::isOption(remotePath)) {
+        // rsync creates the whole tree after /./ in the destination folder
+        remotePath = params[WORKDIR].str() + "/./" + remotePath;
       }
       string localPath = outputFile.getLocal();
       if (!Utils::isAbsolutePath(localPath)) {
         localPath = directory + "/" + localPath;
       }
-      status = CommunicationProtocol::getInstance(SH).makeDirectory(
-                                             Utils::dirname(localPath), "", "");
-      if (status)
-        LOG("Directory creation failed. Status is: " << status);
       status = _protocol.copyFile(remotePath, _hostname, _username,
                                   localPath, "", "");
       if (status)

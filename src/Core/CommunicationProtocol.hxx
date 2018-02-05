@@ -36,7 +36,7 @@
 
 namespace Batch {
 
-  enum CommunicationProtocolType {SH, SSH, RSH};
+  enum CommunicationProtocolType {SH, SSH, RSH, RSYNC};
 
   class BATCH_EXPORT CommunicationProtocol
   {
