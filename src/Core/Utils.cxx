@@ -119,10 +119,9 @@ string Utils::createAndOpenTemporaryFile(const string & prefix, ofstream & outpu
   if (tmpDirName == NULL) tmpDirName = getenv("TMPDIR");
   if (tmpDirName == NULL) tmpDirName = "/tmp";
 
-  string fileName = (string)tmpDirName + "/libbatch-" + prefix + "-XXXXXX";
-
 #ifdef WIN32
 
+  string fileName = (string)tmpDirName + "\\libbatch-" + prefix + "-XXXXXX";
   char randstr[7];
   srand(time(NULL));
 
@@ -135,7 +134,7 @@ string Utils::createAndOpenTemporaryFile(const string & prefix, ofstream & outpu
   outputStream.open(fileName.c_str(), ios_base::binary | ios_base::out);
 
 #else
-
+  string fileName = (string)tmpDirName + "/libbatch-" + prefix + "-XXXXXX";
   char * buf = new char[fileName.size()+1];
   fileName.copy(buf, fileName.size());
   buf[fileName.size()] = '\0';

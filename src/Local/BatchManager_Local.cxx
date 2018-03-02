@@ -263,12 +263,16 @@ namespace Batch {
       fileToExecute = param[EXECUTABLE].str();
     else
       throw RunTimeException("param[EXECUTABLE] is not defined. Please define it, cannot submit this job.");
-
-    string::size_type p1 = fileToExecute.find_last_of("/");
+#ifdef WIN32
+    const char separator = '\\';
+#else
+    const char separator = '/';
+#endif
+    string::size_type p1 = fileToExecute.find_last_of(separator);
     string::size_type p2 = fileToExecute.find_last_of(".");
     string rootNameToExecute = fileToExecute.substr(p1+1,p2-p1-1);
     string fileNameToExecute = fileToExecute.substr(p1+1);
-    string remotePath = workDir + "/" + rootNameToExecute + "_launch_job";
+    string remotePath = workDir + separator + rootNameToExecute + "_launch_job";
 
     // Create batch submit file
     ofstream tempOutputFile;
