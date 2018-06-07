@@ -464,7 +464,10 @@ namespace Batch {
     child = p_ta->launchWin32ChildProcess();
     p_ta->pere(child);
 #else
+    // LOCK&UNLOCK needed to avoid potential deadlock if a thread holds the lock
+    LOCK_IO
     child = fork();
+    UNLOCK_IO
     if (child < 0) { // erreur
       UNDER_LOCK( LOG("Fork impossible (rc=" << child << ")") );
 
