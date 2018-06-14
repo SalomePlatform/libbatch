@@ -41,7 +41,7 @@ SET(SWIG_LB_DPYS
     )
 
 SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES CPLUSPLUS ON
-                                                        SWIG_FLAGS "-shadow")
+                                                        SWIG_FLAGS "-py3")
 # SWIG source file and module name differ - the following needs to be
 # set to avoid unnecessary rebuilds:
 SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES SWIG_MODULE_NAME libbatch)
