@@ -26,9 +26,12 @@ INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(SWIG_SRC_FILE libBatch_Swig.i)
-SET(SWIG_LB_DPYS
+
+SET(SWIG_EXTAR_DEPS 
     libBatch_Swig_exception.i
     libBatch_Swig_typemap.i 
+    )
+SET(SWIG_LB_DPYS
     ../Core/Defines.hxx
     ../Core/Constants.hxx
     ../Core/Job.hxx
@@ -39,17 +42,22 @@ SET(SWIG_LB_DPYS
     ../Core/BatchManagerCatalog.hxx
     ../Core/FactBatchManager.hxx
     )
-
-SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES CPLUSPLUS ON
+IF(${CMAKE_VERSION} VERSION_LESS "3.8.0") 
+  SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES CPLUSPLUS ON
                                                         SWIG_FLAGS "-py3")
-# SWIG source file and module name differ - the following needs to be
-# set to avoid unnecessary rebuilds:
-SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES SWIG_MODULE_NAME libbatch)
+  # SWIG source file and module name differ - the following needs to be
+  # set to avoid unnecessary rebuilds:
+  SET_SOURCE_FILES_PROPERTIES(${SWIG_SRC_FILE} PROPERTIES SWIG_MODULE_NAME libbatch)
 
-SET(SWIG_MODULE_libbatch_EXTRA_DEPS ${SWIG_LB_DPYS})
-SWIG_ADD_MODULE(libbatch python ${SWIG_SRC_FILE})
+  SET(SWIG_MODULE_libbatch_EXTRA_DEPS ${SWIG_EXTAR_DEPS} ${SWIG_LB_DPYS})
+  SWIG_ADD_MODULE(libbatch python ${SWIG_SRC_FILE})
+ELSE()
+  SET(CMAKE_SWIG_FLAGS "-py3")
+  SET_PROPERTY(SOURCE ${SWIG_SRC_FILE} PROPERTY CPLUSPLUS ON)
+  SET(SWIG_MODULE_libbatch_EXTRA_DEPS ${SWIG_EXTAR_DEPS})
+  SWIG_ADD_LIBRARY(libbatch LANGUAGE python SOURCES ${SWIG_LB_DPYS} ${SWIG_SRC_FILE})
+ENDIF()
 SWIG_LINK_LIBRARIES(libbatch batch ${PYTHON_LIBRARIES})
-
 INSTALL(TARGETS ${SWIG_MODULE_libbatch_REAL_NAME} DESTINATION ${LIBBATCH_PYTHONPATH})
 INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/libbatch.py
         DESTINATION ${LIBBATCH_PYTHONPATH})

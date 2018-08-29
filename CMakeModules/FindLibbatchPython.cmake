@@ -88,6 +88,7 @@ IF (PYTHONINTERP_FOUND)
   IF(WIN32)
     LIST(APPEND CMAKE_LIBRARY_PATH "${_python_dir}/libs" ABSOLUTE)
     LIST(APPEND CMAKE_INCLUDE_PATH "${_python_dir}/include" ABSOLUTE)
+    SET(PYTHON_INCLUDE_DIR "${_python_dir}/include")
   ENDIF()
   # Override the EXACT and VERSION settings of the LibbatchPython module
   # to force the next call to SALOME_FIND_PACKAGE() to find the exact matching
