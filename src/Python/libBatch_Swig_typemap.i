@@ -43,21 +43,6 @@
 # %typemap(in) SWIGTYPE ;
 
 %{
-static std::string pystr2stdstr(PyObject * val)
-{
-  std::string str_val;
-  if (PyUnicode_Check(val))
-  {
-    PyObject * temp_bytes = PyUnicode_AsEncodedString(val, "UTF-8", "strict");
-    if (temp_bytes != NULL)
-    {
-      str_val = PyBytes_AS_STRING(temp_bytes);
-      Py_DECREF(temp_bytes);
-    }
-  }
-  return str_val;
-}
-
 // Helper function to initialize a Batch::Versatile from a PyObj
 static bool initVersatile(Batch::Versatile & newVersatile, PyObject * input)
 {
@@ -65,13 +50,13 @@ static bool initVersatile(Batch::Versatile & newVersatile, PyObject * input)
     for (Py_ssize_t i=0; i<PyList_Size(input); i++) {
       PyObject * val = PyList_GetItem(input, i);
       if (PyUnicode_Check(val)) {
-        newVersatile += pystr2stdstr(val);
+        newVersatile += PyUnicode_AsUTF8(val);
       } else if (PyTuple_Check(val) &&
           (PyTuple_Size(val) == 2) &&
           PyUnicode_Check( PyTuple_GetItem(val,0) ) &&
           PyUnicode_Check( PyTuple_GetItem(val,1) )   ) {
-        newVersatile += Batch::Couple( pystr2stdstr(PyTuple_GetItem(val,0)),
-                                       pystr2stdstr(PyTuple_GetItem(val,1)));
+        newVersatile += Batch::Couple( PyUnicode_AsUTF8(PyTuple_GetItem(val,0)),
+                                       PyUnicode_AsUTF8(PyTuple_GetItem(val,1)));
 
       } else {
         PyErr_SetString(PyExc_RuntimeWarning, "initVersatile : invalid PyObject");
@@ -80,7 +65,7 @@ static bool initVersatile(Batch::Versatile & newVersatile, PyObject * input)
     }
 
   } else if (PyUnicode_Check(input)) { // c'est une string
-    newVersatile = pystr2stdstr(input);
+    newVersatile = PyUnicode_AsUTF8(input);
   } else if (PyBool_Check(input)) { // c'est un bool
     newVersatile = (input == Py_True);
   } else if (PyInt_Check(input)) { // c'est un int
@@ -169,7 +154,7 @@ static bool initParameter(Batch::Parametre & newParam, PyObject * input)
     PyObject *key, *value;
     Py_ssize_t pos = 0;
     while (PyDict_Next(input, &pos, &key, &value)) {
-      std::string mk = pystr2stdstr(key);
+      std::string mk = PyUnicode_AsUTF8(key);
       bool res = initVersatile(newParam[mk], value);
       if (!res)
         return false;
@@ -199,8 +184,8 @@ static bool initEnvironment(Batch::Environnement & newEnv, PyObject * input)
   PyObject *key, *value;
   Py_ssize_t pos = 0;
   while (PyDict_Next(input, &pos, &key, &value)) {
-    std::string mk  = pystr2stdstr(key);
-    std::string val = pystr2stdstr(value);
+    std::string mk  = PyUnicode_AsUTF8(key);
+    std::string val = PyUnicode_AsUTF8(value);
     newEnv[mk] = val;
   }
   return true;
