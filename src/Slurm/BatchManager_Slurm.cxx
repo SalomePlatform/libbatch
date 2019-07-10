@@ -216,17 +216,44 @@ namespace Batch {
 
   JobInfo BatchManager_Slurm::queryJob(const JobId & jobid)
   {
-    // define command to query batch
-    string subCommand = "squeue -o %t -j " + jobid.getReference();
+    // First try to query the job with "squeue" command
+    string subCommand = "squeue -h -o %T -j " + jobid.getReference() + " 2>/dev/null";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
     string output;
-    Utils::getCommandOutput(command, output);
-    // We don't test the return code here because with jobs finished since a long time Slurm
-    // returns an error and a message like "slurm_load_jobs error: Invalid job id specified".
-    // So we consider that the job is finished when we get an error.
+    int status = Utils::getCommandOutput(command, output);
+    LOG("status: " << status << ", output: " << output);
+    bool found = false;
+    JobInfo jobinfo;
+    if (status == 0) {
+        try {
+            jobinfo = JobInfo_Slurm(jobid.getReference(), output);
+            found = true;
+        } catch (const RunTimeException & exc) {
+            LOG(exc);
+        }
+    }
 
-    JobInfo_Slurm jobinfo = JobInfo_Slurm(jobid.getReference(), output);
+    // If "squeue" failed, the job may be finished. In this case, try to query the job with
+    // "sacct".
+    if (not found) {
+        string subCommand = "sacct -X -o State%-10 -n -j " + jobid.getReference();
+        string command = _protocol.getExecCommand(subCommand, _hostname, _username);
+        LOG(command);
+        string output;
+        int status = Utils::getCommandOutput(command, output);
+        LOG("status: " << status << ", output: " << output);
+        if (status == 0) {
+            try {
+                jobinfo = JobInfo_Slurm(jobid.getReference(), output);
+            } catch (const RunTimeException & exc) {
+                LOG(exc);
+                throw(exc);
+            }
+        } else {
+            throw RunTimeException("sacct command failed with return code: " + status);
+        }
+    }
     return jobinfo;
   }
 

@@ -35,6 +35,16 @@
 
 using namespace std;
 
+// Utility function to test if string str1 starts with str2
+bool starts_with(const std::string & str1, const std::string & str2)
+{
+	if (str1.length() < str2.length()) {
+		return false;
+	}
+	return (str1.substr(0, str2.length()) == str2);
+}
+
+
 namespace Batch {
 
   JobInfo_Slurm::JobInfo_Slurm(const std::string & id, const std::string & queryOutput)
@@ -42,39 +52,54 @@ namespace Batch {
   {
     _param[ID] = id;
 
-    // read query output, status should be on the second line
-    istringstream iss(queryOutput);
-    string status;
-    for (int i=0 ; i<2 ; i++)
-      getline(iss, status);
-
-    if (status.size() == 0) {
-      // On some batch managers, the job is deleted as soon as it is finished,
-      // so we have to consider that an unknown job is a finished one, even if
-      // it is not always true.
+    // We test only the beginning of the string because some extra info can be added by sacct
+    // command (e.g. CANCELLED+)
+    if (starts_with(queryOutput, "BOOT_FAIL")) {
+        _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "CANCELLED")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "COMPLETED")) {
       _param[STATE] = FINISHED;
-    } else if (status == "CA") { // Canceled
-      _param[STATE] = FAILED;
-    } else if (status == "CD") { // Completed
-      _param[STATE] = FINISHED;
-    } else if (status == "CF") { // Configuring
-      _param[STATE] = QUEUED;
-    } else if (status == "CG") { // Completing
+    } else if (starts_with(queryOutput, "CONFIGURI")) {
       _param[STATE] = RUNNING;
-    } else if (status == "F") {  // Failed
-      _param[STATE] = FAILED;
-    } else if (status == "NF") { // Node Fail
-      _param[STATE] = FAILED;
-    } else if (status == "PD") { // Pending
-      _param[STATE] = QUEUED;
-    } else if (status == "R") {  // Running
+    } else if (starts_with(queryOutput, "COMPLETIN")) {
       _param[STATE] = RUNNING;
-    } else if (status == "S") {  // Suspended
+    } else if (starts_with(queryOutput, "DEADLINE")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "FAILED")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "NODE_FAIL")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "OUT_OF_ME")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "PENDING")) {
+      _param[STATE] = QUEUED;
+    } else if (starts_with(queryOutput, "PREEMPTED")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "RUNNING")) {
+      _param[STATE] = RUNNING;
+    } else if (starts_with(queryOutput, "RESV_DEL_")) {
       _param[STATE] = PAUSED;
-    } else if (status == "TO") { // Timeout
+    } else if (starts_with(queryOutput, "REQUEUE")) {
+      _param[STATE] = PAUSED;
+    } else if (starts_with(queryOutput, "RESIZING")) {
+      _param[STATE] = PAUSED;
+    } else if (starts_with(queryOutput, "REVOKED")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "SIGNALING")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "SPECIAL_E")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "STAGE_OUT")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "STOPPED")) {
+      _param[STATE] = FAILED;
+    } else if (starts_with(queryOutput, "SUSPENDED")) {
+      _param[STATE] = PAUSED;
+    } else if (starts_with(queryOutput, "TIMEOUT")) {
       _param[STATE] = FAILED;
     } else {
-      throw RunTimeException("Unknown job state code: \"" + status + "\"");
+      throw RunTimeException("Unknown job state: \"" + queryOutput + "\"");
     }
   }
 
