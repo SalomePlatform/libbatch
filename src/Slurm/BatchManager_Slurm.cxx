@@ -236,7 +236,7 @@ namespace Batch {
 
     // If "squeue" failed, the job may be finished. In this case, try to query the job with
     // "sacct".
-    if (not found) {
+    if (! found) {
         string subCommand = "sacct -X -o State%-10 -n -j " + jobid.getReference();
         string command = _protocol.getExecCommand(subCommand, _hostname, _username);
         LOG(command);
