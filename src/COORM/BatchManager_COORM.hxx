@@ -54,9 +54,9 @@ namespace Batch
                       // Modifie un job en file d'attente
                       virtual void setEnvironnement(const JobId & jobid, const Environnement & env) { return alterJob(jobid, env); }
 
+                      virtual void exportInputFiles(const Job & job);
               protected:
                       std::string buildBatchScript(const Job & job);
-                      void exportInputFiles(const Job & job);
 
 #ifdef SWIG
               public:

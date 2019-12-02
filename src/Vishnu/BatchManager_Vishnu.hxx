@@ -55,11 +55,11 @@ namespace Batch {
     virtual void deleteJob(const JobId & jobid);
     virtual JobInfo queryJob(const JobId & jobid);
     virtual void importOutputFiles(const Job & job, const std::string directory);
+    virtual void exportInputFiles(const Job & job);
 
   protected:
 
     std::string buildCommandFile(const Job & job);
-    void exportInputFiles(const Job & job);
 
   };
 

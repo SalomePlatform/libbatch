@@ -83,6 +83,7 @@ namespace Batch {
 
     // Get the underlying communication protocol
     const CommunicationProtocol & getProtocol() const;
+    virtual void exportInputFiles(const Job & job);
 
   protected:
     std::string _hostname; // serveur ou tourne le BatchManager
@@ -94,7 +95,6 @@ namespace Batch {
     MpiImpl *_mpiImpl; // Mpi implementation to launch executable in batch script
 
     MpiImpl* FactoryMpiImpl(std::string mpiImpl);
-    virtual void exportInputFiles(const Job & job);
     
     // Preprocessing done on the frontal using "PREPROCESS" parameter as a script.
     // May throw exceptions in case of failure.
