@@ -123,17 +123,29 @@ namespace Batch {
 
   string CommunicationProtocol::getRemoveSubCommand(const string & path) const
   {
+#ifdef WIN32
+    return string("del /s ") + path;
+#else
     return string("rm ") + path;
+#endif
   }
 
   string CommunicationProtocol::getRemoveDirectorySubCommand(const string & path) const
   {
+#ifdef WIN32
+    return string("rd /s /q ") + path;
+#else
     return string("rm -fR ") + path;
+#endif
   }
 
   string CommunicationProtocol::getMakeDirectorySubCommand(const string & path) const
   {
+#ifdef WIN32
+    return string("md ") + path;
+#else
     return string("mkdir -p ") + path;
+#endif
   }
 
   int CommunicationProtocol::removeFile(const std::string & path,
