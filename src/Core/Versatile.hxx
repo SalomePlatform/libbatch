@@ -65,32 +65,32 @@ namespace Batch {
     virtual ~Versatile();
 
     // Affectation and concatenation operators from base types
-    Versatile & operator = (const long     l)    throw(TypeMismatchException);
-    Versatile & operator = (const std::string & ch)   throw(TypeMismatchException);
-    Versatile & operator +=(const std::string & ch)   throw(TypeMismatchException,ListIsFullException);
-    Versatile & operator , (const std::string & ch)   throw(TypeMismatchException,ListIsFullException);
-    Versatile & operator = (const char * ch)   throw(TypeMismatchException);
-    Versatile & operator +=(const char * ch)   throw(TypeMismatchException,ListIsFullException);
-    Versatile & operator , (const char * ch)   throw(TypeMismatchException,ListIsFullException);
-    Versatile & operator = (const Couple & cp)   throw(TypeMismatchException);
-    Versatile & operator +=(const Couple & cp)   throw(TypeMismatchException,ListIsFullException);
-    Versatile & operator , (const Couple & cp)   throw(TypeMismatchException,ListIsFullException);
-    Versatile & operator = (const int i) throw(TypeMismatchException);
-    Versatile & operator = (const bool b) throw(TypeMismatchException);
+    Versatile & operator = (const long     l);
+    Versatile & operator = (const std::string & ch);
+    Versatile & operator +=(const std::string & ch);
+    Versatile & operator , (const std::string & ch);
+    Versatile & operator = (const char * ch);
+    Versatile & operator +=(const char * ch);
+    Versatile & operator , (const char * ch);
+    Versatile & operator = (const Couple & cp);
+    Versatile & operator +=(const Couple & cp);
+    Versatile & operator , (const Couple & cp);
+    Versatile & operator = (const int i);
+    Versatile & operator = (const bool b);
 
     // Type conversion to base types
-    operator long() const throw(TypeMismatchException);
-    operator std::string() const throw(TypeMismatchException);
-    operator Couple() const throw(TypeMismatchException);
-    std::string str() const throw(TypeMismatchException);
-    operator bool() const throw(TypeMismatchException);
-    operator int() const throw(TypeMismatchException);
+    operator long() const;
+    operator std::string() const;
+    operator Couple() const;
+    std::string str() const;
+    operator bool() const;
+    operator int() const;
 
     // Display on a stream
     BATCH_EXPORT friend std::ostream & operator << (std::ostream & os, const Versatile & );
 
     // Check the type
-    void checkType(DiscriminatorType t) const throw (TypeMismatchException);
+    void checkType(DiscriminatorType t) const;
 
     // Getter methods
     DiscriminatorType getType() const;
@@ -108,8 +108,8 @@ namespace Batch {
 
   private:
 
-    // Forbid the use of affectation operator
-    void operator= (const Versatile & V) {}
+    // Forbid the use of assignment operator
+    void operator= (const Versatile &) {}
 
   };
 

@@ -35,7 +35,7 @@
 
 using namespace std;
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
   cout << "*******************************************************************************************" << endl;
   cout << "This program tests the simple parser that parses the configuration file used in the other" << endl;
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   try {
     // Parse the configuration file
     parser.parseTestConfigFile();
-  } catch (ParserException e) {
+  } catch (const ParserException& e) {
     cerr << "Parser error: " << e.what() << endl;
     return 1;
   }

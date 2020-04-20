@@ -41,8 +41,8 @@ namespace Batch {
   }
 
   vector<string> CommunicationProtocolSH::getExecCommandArgs(const string & subCommand,
-                                                             const string & host,
-                                                             const string & user) const
+                                                             const string & /*host*/,
+                                                             const string & /*user*/) const
   {
     vector<string> cmd;
 
@@ -60,11 +60,11 @@ namespace Batch {
   }
 
   vector<string> CommunicationProtocolSH::getCopyCommandArgs(const string & sourcePath,
-                                                             const string & sourceHost,
-                                                             const string & sourceUser,
+                                                             const string & /*sourceHost*/,
+                                                             const string & /*sourceUser*/,
                                                              const string & destinationPath,
-                                                             const string & destinationHost,
-                                                             const string & destinationUser) const
+                                                             const string & /*destinationHost*/,
+                                                             const string & /*destinationUser*/) const
   {
     vector<string> cmd;
     cmd.push_back(CP_COMMAND);

@@ -66,8 +66,8 @@ namespace Batch {
   private:
 
     // Forbid the use of copy constructor and assignment operator
-    BatchManagerCatalog(const BatchManagerCatalog & orig) {}
-    void operator=(const BatchManagerCatalog & orig) {}
+    BatchManagerCatalog(const BatchManagerCatalog &) {}
+    void operator=(const BatchManagerCatalog &) {}
 
   };
 

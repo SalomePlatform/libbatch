@@ -225,7 +225,7 @@ namespace Batch {
   // On force donc l'état du job à erreur - pour cela on ne donne pas d'Id
   // au JobId
   const Batch::JobId
-  BatchManager_Local::addJob(const Batch::Job & job, const std::string & reference)
+  BatchManager_Local::addJob(const Batch::Job & /*job*/, const std::string & /*reference*/)
   {
     return JobId(this, "undefined");
   }

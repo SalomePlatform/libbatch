@@ -52,9 +52,10 @@ namespace Batch {
   }
 
   Versatile::Versatile(const Versatile & V)
-   : _discriminator(V._discriminator),
-     _maxsize(V._maxsize),
-     _name(V._name)
+    : list(),
+      _discriminator(V._discriminator),
+      _maxsize(V._maxsize),
+      _name(V._name)
   {
     Versatile::const_iterator it;
     for(it=V.begin(); it!=V.end(); it++)
@@ -66,7 +67,7 @@ namespace Batch {
     eraseAll();
   }
 
-  Versatile & Versatile::operator = (const long l) throw(TypeMismatchException)
+  Versatile & Versatile::operator = (const long l)
   {
     checkType(LONG);
     eraseAll();
@@ -74,7 +75,7 @@ namespace Batch {
     return *this;
   }
 
-  Versatile & Versatile::operator = (const string & ch) throw(TypeMismatchException)
+  Versatile & Versatile::operator = (const string & ch)
   {
     checkType(STRING);
     eraseAll();
@@ -82,7 +83,7 @@ namespace Batch {
     return *this;
   }
 
-  Versatile & Versatile::operator +=(const string & ch) throw(TypeMismatchException,ListIsFullException)
+  Versatile & Versatile::operator +=(const string & ch)
   {
     checkType(STRING);
 
@@ -97,28 +98,28 @@ namespace Batch {
     return *this;
   }
 
-  Versatile & Versatile::operator , (const string & ch) throw(TypeMismatchException,ListIsFullException)
+  Versatile & Versatile::operator , (const string & ch)
   {
     *this += ch;
     return *this;
   }
 
-  Versatile & Versatile::operator = (const char * ch) throw(TypeMismatchException)
+  Versatile & Versatile::operator = (const char * ch)
   {
     return operator=(string(ch));
   }
 
-  Versatile & Versatile::operator +=(const char * ch) throw(TypeMismatchException,ListIsFullException)
+  Versatile & Versatile::operator +=(const char * ch)
   {
     return operator+=(string(ch));
   }
 
-  Versatile & Versatile::operator , (const char * ch) throw(TypeMismatchException,ListIsFullException)
+  Versatile & Versatile::operator , (const char * ch)
   {
     return operator,(string(ch));
   }
 
-  Versatile & Versatile::operator = (const Couple & cp) throw(TypeMismatchException)
+  Versatile & Versatile::operator = (const Couple & cp)
   {
     checkType(COUPLE);
     eraseAll();
@@ -126,7 +127,7 @@ namespace Batch {
     return *this;
   }
 
-  Versatile & Versatile::operator +=(const Couple & cp) throw(TypeMismatchException,ListIsFullException)
+  Versatile & Versatile::operator +=(const Couple & cp)
   {
     checkType(COUPLE);
     // If max size is reached, throw a ListIsFullException
@@ -140,7 +141,7 @@ namespace Batch {
     return *this;
   }
 
-  Versatile & Versatile::operator , (const Couple & cp) throw(TypeMismatchException,ListIsFullException)
+  Versatile & Versatile::operator , (const Couple & cp)
   {
     *this += cp;
     return *this;
@@ -158,7 +159,7 @@ namespace Batch {
     return os;
   }
 
-  Versatile & Versatile::operator = (const int i) throw(TypeMismatchException)
+  Versatile & Versatile::operator = (const int i)
   {
     checkType(LONG);
     eraseAll();
@@ -166,7 +167,7 @@ namespace Batch {
     return *this;
   }
 
-  Versatile & Versatile::operator = (const bool b) throw(TypeMismatchException)
+  Versatile & Versatile::operator = (const bool b)
   {
     checkType(BOOL);
     eraseAll();
@@ -174,13 +175,13 @@ namespace Batch {
     return *this;
   }
 
-  void Versatile::checkType(DiscriminatorType t) const throw(TypeMismatchException)
+  void Versatile::checkType(DiscriminatorType t) const
   {
     if (_discriminator != t)
       throw (TypeMismatchException("Trying to change type of Versatile object \"" + _name + "\""));
   }
 
-  Versatile::operator long() const throw(TypeMismatchException)
+  Versatile::operator long() const
   {
     // If the type does not correspond or if the list has more than one element,
     // throw a TypeMismatchException
@@ -192,7 +193,7 @@ namespace Batch {
 	return *( static_cast<LongType *>(this->front()) );
   }
 
-  Versatile::operator bool() const throw(TypeMismatchException)
+  Versatile::operator bool() const
   {
     // If the type does not correspond or if the list has more than one element,
     // throw a TypeMismatchException
@@ -204,12 +205,12 @@ namespace Batch {
     return *( static_cast<BoolType *>(this->front()) );
   }
 
-  Versatile::operator int() const throw(TypeMismatchException)
+  Versatile::operator int() const
   {
     return operator long();
   }
 
-  Versatile::operator Couple() const throw(TypeMismatchException)
+  Versatile::operator Couple() const
   {
     // If the type does not correspond or if the list has more than one element,
     // throw a TypeMismatchException
@@ -221,7 +222,7 @@ namespace Batch {
     return *( static_cast<CoupleType *>(this->front()) );
   }
 
-  string Versatile::str() const throw(TypeMismatchException)
+  string Versatile::str() const
   {
     // If the type does not correspond, throw a TypeMismatchException
     if ( _discriminator != STRING || size() == 0 ) {
@@ -240,7 +241,7 @@ namespace Batch {
     return s;
   }
 
-  Versatile::operator string () const throw(TypeMismatchException)
+  Versatile::operator string () const
   {
     return str();
   }

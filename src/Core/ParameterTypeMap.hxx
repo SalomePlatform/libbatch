@@ -67,8 +67,8 @@ namespace Batch {
   private:
 
     // Forbid the use of copy constructor and assignment operator
-    ParameterTypeMap(const ParameterTypeMap & orig) {}
-    void operator=(const ParameterTypeMap & orig) {}
+    ParameterTypeMap(const ParameterTypeMap &) {}
+    void operator=(const ParameterTypeMap &) {}
 
   };
 

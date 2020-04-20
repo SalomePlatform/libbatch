@@ -49,7 +49,7 @@ namespace Batch {
   BatchManager_Vishnu::BatchManager_Vishnu(const FactBatchManager * parent,
                                              const char * host,
                                              const char * username,
-                                             CommunicationProtocolType protocolType,
+                                             CommunicationProtocolType /*protocolType*/,
                                              const char * mpiImpl)
     : // Force SH protocol for Vishnu
       BatchManager(parent, host, username, SH, mpiImpl)

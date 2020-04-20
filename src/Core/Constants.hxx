@@ -39,6 +39,7 @@
 // TODO: replace those static declarations by an external description file (XML for instance)
 #define decl_extern_Constant(constant) extern BATCH_EXPORT const std::string constant
 #define def_Constant(constant) const std::string constant = #constant
+#define LIBBATCH_UNUSED(var) (void)var
 
 namespace Batch {
 

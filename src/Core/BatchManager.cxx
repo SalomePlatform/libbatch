@@ -84,48 +84,48 @@ namespace Batch {
   }
 
   // Methode pour le controle des jobs : retire un job du gestionnaire
-  void BatchManager::deleteJob(const JobId & jobid)
+  void BatchManager::deleteJob(const JobId & /*jobid*/)
   {
     throw NotYetImplementedException("Method deleteJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
   // Methode pour le controle des jobs : suspend un job en file d'attente
-  void BatchManager::holdJob(const JobId & jobid)
+  void BatchManager::holdJob(const JobId & /*jobid*/)
   {
     throw NotYetImplementedException("Method holdJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
   // Methode pour le controle des jobs : relache un job suspendu
-  void BatchManager::releaseJob(const JobId & jobid)
+  void BatchManager::releaseJob(const JobId & /*jobid*/)
   {
     throw NotYetImplementedException("Method releaseJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
   // Methode pour le controle des jobs : modifie un job en file d'attente
-  void BatchManager::alterJob(const JobId & jobid, const Parametre & param, const Environnement & env)
+  void BatchManager::alterJob(const JobId & /*jobid*/, const Parametre & /*param*/, const Environnement & /*env*/)
   {
     throw NotYetImplementedException("Method alterJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
   // Methode pour le controle des jobs : modifie un job en file d'attente
-  void BatchManager::alterJob(const JobId & jobid, const Parametre & param)
+  void BatchManager::alterJob(const JobId & /*jobid*/, const Parametre & /*param*/)
   {
     throw NotYetImplementedException("Method alterJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
   // Methode pour le controle des jobs : modifie un job en file d'attente
-  void BatchManager::alterJob(const JobId & jobid, const Environnement & env)
+  void BatchManager::alterJob(const JobId & /*jobid*/, const Environnement & /*env*/)
   {
     throw NotYetImplementedException("Method alterJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
   // Methode pour le controle des jobs : renvoie l'etat du job
-  JobInfo BatchManager::queryJob(const JobId & jobid)
+  JobInfo BatchManager::queryJob(const JobId & /*jobid*/)
   {
     throw NotYetImplementedException("Method queryJob not implemented by Batch Manager \"" + _type + "\"");
   }
 
-  const JobId BatchManager::addJob(const Job & job, const string & reference)
+  const JobId BatchManager::addJob(const Job & /*job*/, const string & reference)
   {
     return JobId(this, reference);
   }
@@ -390,7 +390,7 @@ namespace Batch {
     }
   }
   
-  const Batch::JobId BatchManager::runJob(const Batch::Job & job)
+  const Batch::JobId BatchManager::runJob(const Batch::Job & /*job*/)
   {
     throw NotYetImplementedException("Method runJob not implemented by Batch Manager \"" + _type + "\"");
   }

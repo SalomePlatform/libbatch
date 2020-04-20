@@ -58,14 +58,14 @@ string MpiImpl_LAM::rank()
   return "${LAMRANK}";
 }
 
-string MpiImpl_LAM::boot(const string machinefile, const unsigned int nbnodes)
+string MpiImpl_LAM::boot(const string machinefile, const unsigned int /*nbnodes*/)
 {
   ostringstream oss;
   oss << "lamboot " << machinefile << endl;
   return oss.str();
 }
 
-string MpiImpl_LAM::run(const string machinefile, const unsigned int nbproc, const string fileNameToExecute)
+string MpiImpl_LAM::run(const string /*machinefile*/, const unsigned int nbproc, const string fileNameToExecute)
 {
   ostringstream oss;
   oss << "mpirun -np " << nbproc << " " << fileNameToExecute << endl;
@@ -105,7 +105,7 @@ string MpiImpl_MPICH1::rank()
   return "${MPIRUN_RANK}";
 }
 
-string MpiImpl_MPICH1::boot(const string machinefile, const unsigned int nbnodes)
+string MpiImpl_MPICH1::boot(const string /*machinefile*/, const unsigned int /*nbnodes*/)
 {
   return "";
 }
@@ -158,7 +158,7 @@ string MpiImpl_MPICH2::boot(const string machinefile, const unsigned int nbnodes
   return oss.str();
 }
 
-string MpiImpl_MPICH2::run(const string machinefile, const unsigned int nbproc, const string fileNameToExecute)
+string MpiImpl_MPICH2::run(const string /*machinefile*/, const unsigned int nbproc, const string fileNameToExecute)
 {
   ostringstream oss;
   oss << "mpirun -np " << nbproc << " " << fileNameToExecute << endl;
@@ -198,7 +198,7 @@ string MpiImpl_OPENMPI::rank()
   return "${OMPI_MCA_ns_nds_vpid}";
 }
 
-string MpiImpl_OPENMPI::boot(const string machinefile, const unsigned int nbnodes)
+string MpiImpl_OPENMPI::boot(const string /*machinefile*/, const unsigned int /*nbnodes*/)
 {
   return "";
 }
@@ -241,7 +241,7 @@ string MpiImpl_OMPI::rank()
   return "${OMPI_MCA_ns_nds_vpid}";
 }
 
-string MpiImpl_OMPI::boot(const string machinefile, const unsigned int nbnodes)
+string MpiImpl_OMPI::boot(const string /*machinefile*/, const unsigned int /*nbnodes*/)
 {
   return "";
 }
@@ -284,12 +284,12 @@ string MpiImpl_SLURM::rank()
   return "${SLURM_PROCID}";
 }
 
-string MpiImpl_SLURM::boot(const string machinefile, const unsigned int nbnodes)
+string MpiImpl_SLURM::boot(const string /*machinefile*/, const unsigned int /*nbnodes*/)
 {
   return "";
 }
 
-string MpiImpl_SLURM::run(const string machinefile, const unsigned int nbproc, const string fileNameToExecute)
+string MpiImpl_SLURM::run(const string /*machinefile*/, const unsigned int /*nbproc*/, const string fileNameToExecute)
 {
   ostringstream oss;
   oss << "srun " << fileNameToExecute << endl;
@@ -327,12 +327,12 @@ string MpiImpl_PRUN::rank()
   return "${RMS_RANK}";
 }
 
-string MpiImpl_PRUN::boot(const string machinefile, const unsigned int nbnodes)
+string MpiImpl_PRUN::boot(const string /*machinefile*/, const unsigned int /*nbnodes*/)
 {
   return "";
 }
 
-string MpiImpl_PRUN::run(const string machinefile, const unsigned int nbproc, const string fileNameToExecute)
+string MpiImpl_PRUN::run(const string /*machinefile*/, const unsigned int nbproc, const string fileNameToExecute)
 {
   ostringstream oss;
   oss << "prun -n " << nbproc << " " << "-p mpi " << fileNameToExecute << endl;

@@ -157,6 +157,7 @@ namespace Batch
             mem = params[MAXRAMSIZE];
     if (params.find(QUEUE) != params.end())
             queue = params[QUEUE].str();
+    LIBBATCH_UNUSED(mem);
 
     string::size_type p1 = fileToExecute.find_last_of("/");
     string::size_type p2 = fileToExecute.find_last_of(".");

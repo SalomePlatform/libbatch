@@ -179,6 +179,9 @@ namespace Batch
         int edt		 = 0;
         int mem              = 0;
         string queue         = "";
+        LIBBATCH_UNUSED(nbproc);
+        LIBBATCH_UNUSED(edt);
+        LIBBATCH_UNUSED(mem);
 
         // Mandatory parameters
         if (params.find(WORKDIR) != params.end())

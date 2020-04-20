@@ -147,7 +147,7 @@ namespace Batch {
   }
 
   // Methode pour le controle des jobs : teste si un job est present en machine
-  bool BatchManager_SGE::isRunning(const JobId & jobid)
+  bool BatchManager_SGE::isRunning(const JobId & /*jobid*/)
   {
     throw NotYetImplementedException("BatchManager_SGE::isRunning");
   }

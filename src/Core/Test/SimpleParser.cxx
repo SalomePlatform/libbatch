@@ -38,31 +38,31 @@
 using namespace std;
 
 
-ParserException::ParserException(string msg) throw()
+ParserException::ParserException(string msg) noexcept
   : exception(),
     _msg(msg)
 {
 }
 
-ParserException::~ParserException() throw()
+ParserException::~ParserException() noexcept
 {
 }
 
-const char * ParserException::what() const throw()
+const char * ParserException::what() const noexcept
 {
   return _msg.c_str();
 }
 
 
-SimpleParser::SimpleParser() throw()
+SimpleParser::SimpleParser() noexcept
 {
 }
 
-SimpleParser::~SimpleParser() throw()
+SimpleParser::~SimpleParser() noexcept
 {
 }
 
-std::string SimpleParser::trim(const std::string & str) const throw()
+std::string SimpleParser::trim(const std::string & str) const noexcept
 {
   size_t beg = str.find_first_not_of(" \t");
   if (beg == string::npos) beg = 0;
@@ -70,7 +70,7 @@ std::string SimpleParser::trim(const std::string & str) const throw()
   return str.substr(beg, end-beg+1);
 }
 
-void SimpleParser::parse(const string & filename) throw(ParserException)
+void SimpleParser::parse(const string & filename)
 {
   ifstream fileStream(filename.c_str());
   if (!fileStream) {
@@ -109,7 +109,7 @@ void SimpleParser::parse(const string & filename) throw(ParserException)
   fileStream.close();
 }
 
-void SimpleParser::parseTestConfigFile() throw(ParserException)
+void SimpleParser::parseTestConfigFile()
 {
   char * filename = getenv(TEST_CONFIG_FILE_ENV_VAR);
   if (filename == NULL) {
@@ -119,7 +119,7 @@ void SimpleParser::parseTestConfigFile() throw(ParserException)
   }
 }
 
-const string & SimpleParser::getValue(const string & key) const throw(ParserException)
+const string & SimpleParser::getValue(const string & key) const
 {
   map<string,string>::const_iterator iter = _configmap.find(key);
   if (iter == _configmap.end()) {
@@ -129,7 +129,7 @@ const string & SimpleParser::getValue(const string & key) const throw(ParserExce
 }
 
 const string & SimpleParser::getTestValue(const string & bmType, const string & protocolStr,
-                                          const string & key) const throw(ParserException)
+                                          const string & key) const
 {
   string fullkey = string("TEST_") + bmType + "_" + protocolStr + "_" + key;
   try {
@@ -143,7 +143,7 @@ const string & SimpleParser::getTestValue(const string & bmType, const string & 
   return getValue(fullkey);
 }
 
-int SimpleParser::getValueAsInt(const string & key) const throw(ParserException)
+int SimpleParser::getValueAsInt(const string & key) const
 {
   const string & valueStr = getValue(key);
   const char * valueCStr = valueStr.c_str();
@@ -156,7 +156,7 @@ int SimpleParser::getValueAsInt(const string & key) const throw(ParserException)
 }
 
 int SimpleParser::getTestValueAsInt(const string & bmType, const string & protocolStr,
-                                    const string & key) const throw(ParserException)
+                                    const string & key) const
 {
   string fullkey = string("TEST_") + bmType + "_" + protocolStr + "_" + key;
   try {
@@ -170,7 +170,7 @@ int SimpleParser::getTestValueAsInt(const string & bmType, const string & protoc
   return getValueAsInt(fullkey);
 }
 
-ostream & operator <<(ostream & os, const SimpleParser & parser) throw()
+ostream & operator <<(ostream & os, const SimpleParser & parser) noexcept
 {
   if (parser._configmap.empty()) {
     os << "Empty map" << endl;

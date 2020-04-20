@@ -53,8 +53,8 @@ namespace Batch {
     static Log & getInstance();
 
     // Forbid the use of copy constructor and assignment operator
-    Log(const Log & orig) {}
-    void operator=(const Log & orig) {}
+    Log(const Log &) {}
+    void operator=(const Log &) {}
 
     std::ofstream _stream;
 

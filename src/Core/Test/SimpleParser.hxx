@@ -36,10 +36,10 @@
 class ParserException : public std::exception
 {
 public:
-  ParserException(std::string msg) throw();
-  virtual ~ParserException() throw();
+  ParserException(std::string msg) noexcept;
+  virtual ~ParserException() noexcept;
 
-  virtual const char *what() const throw();
+  virtual const char *what() const noexcept;
 
 private:
   std::string _msg;
@@ -48,22 +48,22 @@ private:
 class SimpleParser
 {
 public:
-  SimpleParser() throw();
-  virtual ~SimpleParser() throw();
+  SimpleParser() noexcept;
+  virtual ~SimpleParser() noexcept;
 
-  void parse(const std::string & filename) throw(ParserException);
-  void parseTestConfigFile() throw(ParserException);
-  const std::string & getValue(const std::string & key) const throw(ParserException);
+  void parse(const std::string & filename);
+  void parseTestConfigFile();
+  const std::string & getValue(const std::string & key) const;
   const std::string & getTestValue(const std::string & bmType, const std::string & protocolStr,
-                                   const std::string & key) const throw(ParserException);
-  int getValueAsInt(const std::string & key) const throw(ParserException);
+                                   const std::string & key) const;
+  int getValueAsInt(const std::string & key) const;
   int getTestValueAsInt(const std::string & bmType, const std::string & protocolStr,
-                        const std::string & key) const throw(ParserException);
+                        const std::string & key) const;
 
-  friend std::ostream & operator <<(std::ostream & os, const SimpleParser & parser) throw();
+  friend std::ostream & operator <<(std::ostream & os, const SimpleParser & parser) noexcept;
 
 private:
-  std::string trim(const std::string & str) const throw();
+  std::string trim(const std::string & str) const noexcept;
 
   std::map<std::string, std::string> _configmap;
 };
