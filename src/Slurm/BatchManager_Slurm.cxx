@@ -64,7 +64,7 @@ namespace Batch {
     string cmdFile = buildCommandFile(job);
 
     // define command to submit batch
-    string subCommand = string("cd ") + workDir + "; sbatch " + cmdFile;
+    string subCommand = string("bash -l -c \\\"cd ") + workDir + "; sbatch " + cmdFile + "\\\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " 2>&1";
     LOG(command);
@@ -203,7 +203,7 @@ namespace Batch {
   void BatchManager_Slurm::deleteJob(const JobId & jobid)
   {
     // define command to delete job
-    string subCommand = "scancel " + jobid.getReference();
+    string subCommand = string("bash -l -c \\\"scancel ") + jobid.getReference() + "\\\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
 
@@ -217,7 +217,7 @@ namespace Batch {
   JobInfo BatchManager_Slurm::queryJob(const JobId & jobid)
   {
     // First try to query the job with "squeue" command
-    string subCommand = "squeue -h -o %T -j " + jobid.getReference() + " 2>/dev/null";
+    string subCommand = string("bash -l -c \\\"squeue -h -o %T -j ") + jobid.getReference() + " 2>/dev/null" + "\\\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
     string output;
@@ -237,7 +237,7 @@ namespace Batch {
     // If "squeue" failed, the job may be finished. In this case, try to query the job with
     // "sacct".
     if (! found) {
-        string subCommand = "sacct -X -o State%-10 -n -j " + jobid.getReference();
+        string subCommand = string("bash -l -c \\\"sacct -X -o State%-10 -n -j ") + jobid.getReference() + "\\\"";
         string command = _protocol.getExecCommand(subCommand, _hostname, _username);
         LOG(command);
         string output;
