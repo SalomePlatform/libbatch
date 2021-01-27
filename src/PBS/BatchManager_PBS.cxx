@@ -154,9 +154,18 @@ namespace Batch {
     int nbproc = 1;
     if (params.find(NBPROC) != params.end())
       nbproc = params[NBPROC];
-    int nbprocpernode = 1;
+    int nbprocpernode = 0;
     if (params.find(NBPROCPERNODE) != params.end())
       nbprocpernode = params[NBPROCPERNODE];
+    int nbnode = 0;
+    if (params.find(NBNODE) != params.end())
+    {
+      nbnode = params[NBNODE];
+      if(nbnode > 0 && nbprocpernode == 0)
+        nbprocpernode = nbproc / nbnode;
+    }
+    if(nbprocpernode == 0) // if not defined
+      nbprocpernode = 1;
     int edt = 0;
     if (params.find(MAXWALLTIME) != params.end()) 
       edt = params[MAXWALLTIME];
