@@ -162,7 +162,11 @@ namespace Batch {
     {
       nbnode = params[NBNODE];
       if(nbnode > 0 && nbprocpernode == 0)
+      {
         nbprocpernode = nbproc / nbnode;
+        if(nbprocpernode * nbnode < nbproc)
+          ++nbprocpernode;
+      }
     }
     if(nbprocpernode == 0) // if not defined
       nbprocpernode = 1;
