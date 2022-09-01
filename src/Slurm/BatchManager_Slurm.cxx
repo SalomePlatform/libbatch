@@ -251,7 +251,7 @@ namespace Batch {
                 throw(exc);
             }
         } else {
-            throw RunTimeException("sacct command failed with return code: " + status);
+            throw RunTimeException("sacct command failed with return code: " + to_string(status));
         }
     }
     return jobinfo;
