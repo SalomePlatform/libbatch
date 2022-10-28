@@ -29,6 +29,7 @@
 #include "Utils.hxx"
 
 #include "CommunicationProtocolRsync.hxx"
+#include "CommandsOverloader.hxx"
 
 using namespace std;
 
@@ -87,7 +88,7 @@ namespace Batch {
 
     // Option -p is used to keep the same permissions for the destination file
     // (particularly useful to keep scripts executable when copying them)
-    cmd.push_back(RSYNC_COMMAND);
+    cmd.push_back(CommandsOverloader::getInstance().RSYNC_Command());
     if(!Utils::isOption(sourcePath))
     {
       cmd.push_back("-p");

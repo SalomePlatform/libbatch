@@ -29,6 +29,7 @@
 #include <libbatch_config.h>
 
 #include "CommunicationProtocolSH.hxx"
+#include "CommandsOverloader.hxx"
 #include "Utils.hxx"
 
 using namespace std;
@@ -46,7 +47,7 @@ namespace Batch {
   {
     vector<string> cmd;
 
-    cmd.push_back(Utils::fixPath(SH_COMMAND));
+    cmd.push_back(Utils::fixPath(CommandsOverloader::getInstance().SH_Command()));
 
 #ifdef WIN32
     cmd.push_back("/c");
@@ -67,7 +68,7 @@ namespace Batch {
                                                              const string & /*destinationUser*/) const
   {
     vector<string> cmd;
-    cmd.push_back(CP_COMMAND);
+    cmd.push_back(CommandsOverloader::getInstance().CP_Command());
 #ifndef WIN32
     cmd.push_back("-r");
 #endif
@@ -78,12 +79,12 @@ namespace Batch {
 
   string CommunicationProtocolSH::getRemoveSubCommand(const string & path) const
   {
-    return string(RM_COMMAND) + " " + Utils::fixPath(path);
+    return string(CommandsOverloader::getInstance().RM_Command()) + " " + Utils::fixPath(path);
   }
 
   string CommunicationProtocolSH::getMakeDirectorySubCommand(const string & path) const
   {
-    string subCommand = MKDIR_COMMAND;
+    string subCommand = CommandsOverloader::getInstance().MKDIR_Command();
 #ifndef WIN32
     subCommand += " -p";
 #endif

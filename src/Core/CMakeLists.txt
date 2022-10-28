@@ -24,6 +24,7 @@ SET(CLASS_LIST Core/APIInternalFailureException
                Core/BatchManager
                Core/BatchManagerCatalog
                Core/BoolType
+               Core/CommandsOverloader
                Core/CommunicationProtocol
                Core/Constants
                Core/Couple

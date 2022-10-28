@@ -25,5 +25,7 @@ import os
 sys.path.append('${CMAKE_CURRENT_BINARY_DIR}/..')
 
 configfile = os.environ["${LIBBATCH_TEST_CONF_ENV_VAR}"]
-execfile(configfile)
+with open(configfile, "rb") as source_file:
+    code = compile(source_file.read(), configfile, "exec")
+exec(code)
 TEST_SOURCE_DIR = "${CMAKE_SOURCE_DIR}/src/Core/Test"

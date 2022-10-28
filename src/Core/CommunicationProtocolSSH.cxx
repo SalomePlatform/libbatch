@@ -29,6 +29,7 @@
 #include <libbatch_config.h>
 
 #include "CommunicationProtocolSSH.hxx"
+#include "CommandsOverloader.hxx"
 
 using namespace std;
 
@@ -45,7 +46,7 @@ namespace Batch {
   {
     vector<string> cmd;
 
-    cmd.push_back(SSH_COMMAND);
+    cmd.push_back(CommandsOverloader::getInstance().SSH_Command());
     cmd.push_back(host);
 
     if (user.size() != 0) {
@@ -99,7 +100,7 @@ namespace Batch {
 
     // Option -p is used to keep the same permissions for the destination file
     // (particularly useful to keep scripts executable when copying them)
-    cmd.push_back(SCP_COMMAND);
+    cmd.push_back(CommandsOverloader::getInstance().SCP_Command());
     cmd.push_back("-p");
     cmd.push_back("-r");
     cmd.push_back(fullSource);

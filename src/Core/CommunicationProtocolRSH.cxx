@@ -36,6 +36,7 @@
 #include <libbatch_config.h>
 
 #include "CommunicationProtocolRSH.hxx"
+#include "CommandsOverloader.hxx"
 #include "Log.hxx"
 
 using namespace std;
@@ -53,7 +54,7 @@ namespace Batch {
   {
     vector<string> cmd;
 
-    cmd.push_back(RSH_COMMAND);
+    cmd.push_back(CommandsOverloader::getInstance().RSH_Command());
     cmd.push_back(host);
 
     if (user.size() > 0) {
@@ -107,7 +108,7 @@ namespace Batch {
     }
     fullDestination += destinationPath;
 
-    cmd.push_back(RCP_COMMAND);
+    cmd.push_back(CommandsOverloader::getInstance().RCP_Command());
     cmd.push_back("-r");
     cmd.push_back(fullSource);
     cmd.push_back(fullDestination);
