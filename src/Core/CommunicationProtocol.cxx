@@ -31,18 +31,10 @@
 #include <libbatch_config.h>
 
 #include "CommunicationProtocol.hxx"
-#ifdef HAS_RSH
- #include "CommunicationProtocolRSH.hxx"
-#endif
-#ifdef HAS_SH
- #include "CommunicationProtocolSH.hxx"
-#endif
-#ifdef HAS_SSH
- #include "CommunicationProtocolSSH.hxx"
-#endif
-#ifdef HAS_RSYNC
- #include "CommunicationProtocolRsync.hxx"
-#endif
+#include "CommunicationProtocolRSH.hxx"
+#include "CommunicationProtocolSH.hxx"
+#include "CommunicationProtocolSSH.hxx"
+#include "CommunicationProtocolRsync.hxx"
 #include "APIInternalFailureException.hxx"
 #include "RunTimeException.hxx"
 #include "Log.hxx"
@@ -64,37 +56,17 @@ namespace Batch {
   const CommunicationProtocol & CommunicationProtocol::getInstance(CommunicationProtocolType protocolType)
   {
     if (protocolType == SH) {
-#ifdef HAS_SH
       static CommunicationProtocolSH instanceSH;
       return instanceSH;
-#else
-      throw RunTimeException("Can't use SH protocol (SH tools were "
-                             "not found on the system at compile time).");
-#endif
     } else if (protocolType == RSH) {
-#ifdef HAS_RSH
       static CommunicationProtocolRSH instanceRSH;
       return instanceRSH;
-#else
-      throw RunTimeException("Can't use RSH protocol (RSH tools were "
-                             "not found on the system at compile time).");
-#endif
     } else if (protocolType == SSH) {
-#ifdef HAS_SSH
       static CommunicationProtocolSSH instanceSSH;
       return instanceSSH;
-#else
-      throw RunTimeException("Can't use SSH protocol (SSH tools were "
-                             "not found on the system at compile time).");
-#endif
     } else if (protocolType == RSYNC) {
-#ifdef HAS_RSYNC
       static CommunicationProtocolRsync instanceRsync;
       return instanceRsync;
-#else
-      throw RunTimeException("Can't use RSYNC protocol (RSYNC tools were "
-                             "not found on the system at compile time).");
-#endif
     } else
       throw APIInternalFailureException("Unknown communication protocol.");
   }

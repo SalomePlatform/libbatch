@@ -23,9 +23,6 @@
 #ifndef BATCH_CONFIG_H
 #define BATCH_CONFIG_H
 
-/* SH tools (sh, cp, rm, mkdir) found on the system */
-#cmakedefine HAS_SH
-
 /* A path to a sh-like command */
 #cmakedefine SH_COMMAND "@SH_COMMAND@"
 
@@ -38,20 +35,11 @@
 /* A path to a mkdir-like command */
 #cmakedefine MKDIR_COMMAND "@MKDIR_COMMAND@"
 
-/* RSH tools (rsh, rcp) found on the system */
-#cmakedefine HAS_RSH
-
 /* A path to a rsh-like command */
 #cmakedefine RSH_COMMAND "@RSH_COMMAND@"
 
 /* A path to a rcp-like command */
 #cmakedefine RCP_COMMAND "@RCP_COMMAND@"
-
-/* SSH tools (ssh, scp) found on the system */
-#cmakedefine HAS_SSH
-
-/* SSH tools and rsync found */
-#cmakedefine HAS_RSYNC
 
 /* A path to a ssh-like command */
 #cmakedefine SSH_COMMAND "@SSH_COMMAND@"

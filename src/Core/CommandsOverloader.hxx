@@ -63,6 +63,9 @@ namespace Batch {
     void parse(const std::string & theFilename);
     std::string trim(const std::string & theStr) const noexcept;
 
+    const char * isCmdFileDefined(bool & theIsDefined) const;
+    bool isCheckCmdsDefined() const;
+
     std::string CMD_Command(const std::string & theKey);
 
     bool hasKey(const std::string & theKey) const;

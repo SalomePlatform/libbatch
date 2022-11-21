@@ -30,6 +30,7 @@
 #include <fstream>
 #include <set>
 #include <sstream>
+#include <iostream>
 
 #include <libbatch_config.h>
 
@@ -48,7 +49,14 @@ namespace Batch {
    * Constructor.
    */
   CommandsOverloader::CommandsOverloader()
-  {    
+  {
+    bool isFileDefined;
+    isCmdFileDefined(isFileDefined);
+    if (!isFileDefined && isCheckCmdsDefined()) {
+      cout << "================================================================" << endl;
+      cout << "Commands found on the system at compile time are used." << endl;
+      cout << "================================================================" << endl;
+    }
   }
 
   /*!
@@ -71,7 +79,18 @@ namespace Batch {
    */
   string CommandsOverloader::RM_Command() {
     string cmd = CMD_Command("RM");
-    return (cmd.empty() ? RM_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef RM_COMMAND
+      return RM_COMMAND;
+#else
+      throw RunTimeException("Can't use SH protocol (RM command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -79,7 +98,18 @@ namespace Batch {
    */
   string CommandsOverloader::SH_Command() {
     string cmd = CMD_Command("SH");
-    return (cmd.empty() ? SH_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef SH_COMMAND
+      return SH_COMMAND;
+#else
+      throw RunTimeException("Can't use SH protocol (SH command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -87,7 +117,18 @@ namespace Batch {
    */
   string CommandsOverloader::CP_Command() {
     string cmd = CMD_Command("CP");
-    return (cmd.empty() ? CP_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef CP_COMMAND
+      return CP_COMMAND;
+#else
+      throw RunTimeException("Can't use SH protocol (CP command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -95,7 +136,18 @@ namespace Batch {
    */
   string CommandsOverloader::MKDIR_Command() {
     string cmd = CMD_Command("MKDIR");
-    return (cmd.empty() ? MKDIR_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef MKDIR_COMMAND
+      return MKDIR_COMMAND;
+#else
+      throw RunTimeException("Can't use SH protocol (MKDIR command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -103,7 +155,18 @@ namespace Batch {
    */
   string CommandsOverloader::RSH_Command() {
     string cmd = CMD_Command("RSH");
-    return (cmd.empty() ? RSH_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef RSH_COMMAND
+      return RSH_COMMAND;
+#else
+      throw RunTimeException("Can't use RSH protocol (RSH command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -111,7 +174,18 @@ namespace Batch {
    */
   string CommandsOverloader::RCP_Command() {
     string cmd = CMD_Command("RCP");
-    return (cmd.empty() ? RCP_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef RCP_COMMAND
+      return RCP_COMMAND;
+#else
+      throw RunTimeException("Can't use RSH protocol (RCP command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -119,7 +193,18 @@ namespace Batch {
    */
   string CommandsOverloader::SSH_Command() {
     string cmd = CMD_Command("SSH");
-    return (cmd.empty() ? SSH_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef SSH_COMMAND
+      return SSH_COMMAND;
+#else
+      throw RunTimeException("Can't use SSH protocol (SSH command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -127,7 +212,18 @@ namespace Batch {
    */
   string CommandsOverloader::SCP_Command() {
     string cmd = CMD_Command("SCP");
-    return (cmd.empty() ? SCP_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef SCP_COMMAND
+      return SCP_COMMAND;
+#else
+      throw RunTimeException("Can't use SSH protocol (SCP command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -135,7 +231,18 @@ namespace Batch {
    */
   string CommandsOverloader::RSYNC_Command() {
     string cmd = CMD_Command("RSYNC");
-     return (cmd.empty() ? RSYNC_COMMAND : cmd);
+    if (cmd.empty()) {
+#ifdef RSYNC_COMMAND
+      return RSYNC_COMMAND;
+#else
+      throw RunTimeException("Can't use RSYNC protocol (RSYNC command was "
+                             "not found neither in the file pointed by "
+                             "LIBBATCH_OVERRIDE_CMDS environment variable "
+                             "nor on the system at compile time).");
+#endif
+    } else {
+      return cmd;
+    }
   }
 
   /*!
@@ -151,10 +258,12 @@ namespace Batch {
       throw RunTimeException(errMsg.str());
     }
     string line;
+    bool empty = true;
     int lineNumber = 1;
     while (getline(fileStream, line)) {
       string str = line;
       if (!str.empty()) {
+        empty = false;
         // Find ' ' symbol and split the line
         size_t pos = str.find_first_of(' ');
         if (pos == string::npos) {
@@ -198,6 +307,11 @@ namespace Batch {
       }
       ++lineNumber;
     }
+    if (empty) {
+      stringstream errMsg;
+      errMsg << "Wrong format of " << theFilename << " file: Empty file.";
+      throw RunTimeException(errMsg.str());
+    }
     fileStream.close();
   }
 
@@ -215,19 +329,67 @@ namespace Batch {
   }
 
   /*!
+   * Check, if file with overloaded commands is defined by
+   * LIBBATCH_OVERRIDE_CMDS environment variable.
+   * \param theIsDefined in/out parameter; true, if file is defined; false - otherwise
+   * \return the name of file with overloaded commands
+   */
+  const char * CommandsOverloader::isCmdFileDefined(bool & theIsDefined) const
+  {
+    const char * filename = getenv("LIBBATCH_OVERRIDE_CMDS");
+    theIsDefined = (filename != NULL && !string(filename).empty());
+    return filename;
+  }
+
+  /*!
+   * Check, if it is needed to show information about overloaded or not
+   * commands are used. It can be switched ON via the environment
+   * variable LIBBATCH_CHECK_CMDS=1.
+   * \return true, if it is needed to show information; false - otherwise
+   */
+  bool CommandsOverloader::isCheckCmdsDefined() const
+  {
+    char * check_cmds_env = getenv("LIBBATCH_CHECK_CMDS");
+    if (check_cmds_env && atoi(check_cmds_env) == 1)
+      return true;
+    return false;
+  }
+
+  /*!
    * Return an overridden definition of the given command.
    * \param theKey command name
    * \return overridden definition of the given command
    */
   string CommandsOverloader::CMD_Command(const std::string & theKey) {
     if (_cmdmap.empty()) {
-      const char * filename = getenv("LIBBATCH_OVERRIDE_CMDS");
-      if (filename != NULL) {
+      bool isFileDefined;
+      const char * filename = isCmdFileDefined(isFileDefined);
+      if (isFileDefined) {
         // Environment variable LIBBATCH_OVERRIDE_CMDS is defined.
         // Parse text file pointed by LIBBATCH_OVERRIDE_CMDS environment variable.
         parse(filename);
         // Note: If environment variable LIBBATCH_OVERRIDE_CMDS is not defined,
         // use command configuration established at compile time.
+        
+        // Showing information about overloaded or not commands are used is disabled by default.
+        // It can be switched ON via the environment variable: LIBBATCH_CHECK_CMDS=1
+        if (isCheckCmdsDefined()) {
+          cout << "================================================================" << endl;
+          if (_cmdmap.empty()) {
+            cout << "Commands found on the system at compile time are used." << endl;
+          } else if (_cmdmap.size() == supportedCmds.size()) {
+            cout << "Overloaded commands are used." << endl;
+          } else {
+            cout << "Command(s)" << endl;
+            map<string,string>::const_iterator iter;
+            for (iter = _cmdmap.begin() ; iter != _cmdmap.end() ; ++iter) {
+              cout << "\t" << iter->first << endl;
+            }
+            cout << "is(are) overloaded." << endl;
+            cout << "The rest command(s) is(are) found on the system at compile time." << endl;
+          }
+          cout << "================================================================" << endl;
+        }
       }
     }
 
