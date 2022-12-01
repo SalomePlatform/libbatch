@@ -749,6 +749,7 @@ namespace Batch {
     Parametre param = _job.getParametre();
     Parametre::iterator it;
     PROCESS_INFORMATION pi;
+    ZeroMemory( &pi, sizeof(pi) );
 
     try {
 
@@ -770,7 +771,6 @@ namespace Batch {
       STARTUPINFO si;
       ZeroMemory( &si, sizeof(si) );
       si.cb = sizeof(si);
-      ZeroMemory( &pi, sizeof(pi) );
 
       // Copy the command to a non-const buffer
       char * buffer = strdup(comstr.c_str());

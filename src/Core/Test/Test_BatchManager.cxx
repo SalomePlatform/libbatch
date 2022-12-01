@@ -102,11 +102,17 @@ int main(int argc, char** argv)
     const string & user = parser.getTestValue(bmType, protocolStr, "USER");
     int timeout = parser.getTestValueAsInt(bmType, protocolStr, "TIMEOUT");
 
+#ifdef WIN32
+    const char separator = '\\';
+#else
+    const char separator = '/';
+#endif
+
     // Define the job...
     Job job;
     // ... and its parameters ...
     Parametre p;
-    p[EXECUTABLE]    = string(CMAKE_CURRENT_SOURCE_DIR) + "/test_script.py";
+    p[EXECUTABLE]    = string(CMAKE_CURRENT_SOURCE_DIR) + separator + "test_script.py";
     p[ARGUMENTS]     = "copied_seta.py";
     p[ARGUMENTS]    += "copied_setb.py";
     p[ARGUMENTS]    += "orig_result.txt";
