@@ -35,7 +35,8 @@
 #include <map>
 #include <string>
 
-namespace Batch {
+namespace Batch
+{
 
   /*!
    * This class is used to parametrize commands in LIBBATCH.
@@ -63,7 +64,8 @@ namespace Batch {
     void parse(const std::string & theFilename);
     std::string trim(const std::string & theStr) const noexcept;
 
-    const char * isCmdFileDefined(bool & theIsDefined) const;
+    std::string getCmdFileName() const;
+    bool isCmdFileDefined() const;
     bool isCheckCmdsDefined() const;
 
     std::string CMD_Command(const std::string & theKey);
@@ -74,8 +76,10 @@ namespace Batch {
 
   private:
     // Forbid the use of copy constructor and assignment operator
-    CommandsOverloader(const CommandsOverloader &) {}
-    void operator=(const CommandsOverloader &) {}
+    CommandsOverloader(const CommandsOverloader &) = delete;
+    CommandsOverloader(const CommandsOverloader &&) = delete;
+    void operator=(const CommandsOverloader &) = delete;
+    void operator=(const CommandsOverloader &&) = delete;
   };
 
 }
