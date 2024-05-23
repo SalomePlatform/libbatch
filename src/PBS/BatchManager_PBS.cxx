@@ -114,7 +114,7 @@ namespace Batch {
     iss >> id;
 
     // define command to query batch
-    string subCommand = string("qstat -f ") + iss.str();
+    string subCommand = string("qstat -f -x ") + iss.str();
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
 

@@ -64,7 +64,7 @@ namespace Batch {
       iss >> status;
       iss >> status;
 
-      if (status == "C") {        // Completed
+      if (status == "F") {        // Completed
         _param[STATE] = FINISHED;
       } else if (status == "E") { // Exiting
         _param[STATE] = RUNNING;
