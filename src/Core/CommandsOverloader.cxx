@@ -44,7 +44,8 @@ using namespace std;
 namespace Batch
 {
 
-  static set<string> supportedCmds({"RM", "SH", "CP", "MKDIR", "RSH", "RCP", "SSH", "SCP", "RSYNC"});
+  static set<string> supportedCmds({"RM", "SH", "CP", "MKDIR", "RSH", "RCP", "SSH", "SCP", "RSYNC", "BASH_LOGIN"});
+  const std::string CommandsOverloader::BASH_LOGIN = "bash -l -c";
 
   /*!
    * Constructor.
@@ -264,6 +265,20 @@ namespace Batch
 #endif
   }
 
+  /*!
+   * Return an overridden definition of bash -l -c command.
+   */
+  string CommandsOverloader::BASH_LOGIN_Command()
+  {
+    string cmd = CMD_Command("BASH_LOGIN");
+    if (!cmd.empty())
+    {
+      return cmd;
+    }
+
+    return BASH_LOGIN;
+  }
+  
   /*!
    * Parse text file with the given file name and fill in the map of 
    * <CMD> - <associated command desired by the user at runtime>.

@@ -46,6 +46,7 @@ namespace Batch
   {
   public:
     static CommandsOverloader& getInstance();
+    static const std::string BASH_LOGIN;
 
     std::string RM_Command();
     std::string SH_Command();
@@ -56,6 +57,7 @@ namespace Batch
     std::string SSH_Command();
     std::string SCP_Command();
     std::string RSYNC_Command();
+    std::string BASH_LOGIN_Command();
 
   protected:
     CommandsOverloader();

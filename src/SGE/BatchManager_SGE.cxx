@@ -52,6 +52,7 @@
 #include "BatchManager_SGE.hxx"
 #include "JobInfo_SGE.hxx"
 #include "Log.hxx"
+#include "CommandsOverloader.hxx"
 
 using namespace std;
 
@@ -85,7 +86,8 @@ namespace Batch {
     buildBatchScript(job);
 
     // define command to submit batch
-    string subCommand = string("bash -l -c \\\"cd ") + workDir + "; qsub " + fileNameToExecute + "_Batch.sh\\\"";
+    string subCommand = CommandsOverloader::getInstance().BASH_LOGIN_Command()
+                        + " \\\"cd " + workDir + "; qsub " + fileNameToExecute + "_Batch.sh\\\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " 2>&1";
     LOG(command);
@@ -115,7 +117,8 @@ namespace Batch {
     iss >> ref;
 
     // define command to delete batch
-    string subCommand = string("bash -l -c \\\"qdel ") + iss.str() + string("\\\"");
+    string subCommand = CommandsOverloader::getInstance().BASH_LOGIN_Command()
+                        + " \\\"qdel " + iss.str() + string("\\\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
     status = system(command.c_str());
@@ -133,7 +136,8 @@ namespace Batch {
     iss >> id;
 
     // define command to query batch
-    string subCommand = string("bash -l -c \\\"qstat | grep ") + iss.str() + string("\\\"");
+    string subCommand = CommandsOverloader::getInstance().BASH_LOGIN_Command()
+                        + " \\\"qstat | grep " + iss.str() + string("\\\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
 

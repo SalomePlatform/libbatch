@@ -53,6 +53,7 @@
 #include "BatchManager_CCC.hxx"
 #include "JobInfo_CCC.hxx"
 #include "Log.hxx"
+#include "CommandsOverloader.hxx"
 
 using namespace std;
 
@@ -88,7 +89,8 @@ namespace Batch {
     LOG("Script envoye");
 
     // define command to submit batch
-    string subCommand = string("bash -l -c \\\"cd ") + workDir + "; ccc_msub " + fileNameToExecute + "_Batch.sh\\\"";
+    string subCommand = CommandsOverloader::getInstance().BASH_LOGIN_Command()
+                        + " \\\"cd " + workDir + "; ccc_msub " + fileNameToExecute + "_Batch.sh\\\"";
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     command += " 2>&1";
     LOG(command);
@@ -122,7 +124,8 @@ namespace Batch {
     iss >> ref;
 
     // define command to delete batch
-    string subCommand = string("bash -l -c \\\"ccc_mdel ") + iss.str() + string("\\\"");
+    string subCommand = CommandsOverloader::getInstance().BASH_LOGIN_Command()
+                        + " \\\"ccc_mdel " + iss.str() + string("\\\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
     status = system(command.c_str());
@@ -140,7 +143,8 @@ namespace Batch {
     iss >> id;
 
     // define command to query batch
-    string subCommand = string("bash -l -c \\\"bjobs ") + iss.str() + string("\\\"");
+    string subCommand = CommandsOverloader::getInstance().BASH_LOGIN_Command()
+                        + " \\\"bjobs " + iss.str() + string("\\\"");
     string command = _protocol.getExecCommand(subCommand, _hostname, _username);
     LOG(command);
 
