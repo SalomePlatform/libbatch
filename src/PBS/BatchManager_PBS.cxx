@@ -253,11 +253,11 @@ namespace Batch {
     LOG("Batch script file generated is: " << TmpFileName.c_str());
 
     string remoteFileName = rootNameToExecute + "_Batch.sh";
-    int status = _protocol.copyFile(TmpFileName, "", "",
+    Status status = _protocol.copyFile(TmpFileName, "", "",
                                     workDir + "/" + remoteFileName,
                                     _hostname, _username);
-    if (status)
-      throw RunTimeException("Error of connection on remote host, cannot copy batch submission file");
+    if (status.hasErrors())
+      throw RunTimeException(status.errorMessage());
     return remoteFileName;
   }
 }

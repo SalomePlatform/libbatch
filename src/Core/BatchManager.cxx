@@ -171,19 +171,15 @@ namespace Batch {
 
   void BatchManager::exportInputFiles(const Job& job)
   {
-    int status;
     Parametre params = job.getParametre();
     const Versatile & V = params[INFILE];
     Versatile::const_iterator Vit;
 
     // Create remote directories
     string logdir = string(params[WORKDIR]) + "/logs";
-    status = _protocol.makeDirectory(logdir, _hostname, _username);
-    if (status) {
-      std::ostringstream oss;
-      oss << "Cannot create directory " << logdir << " on host " << _hostname;
-      oss << ". Return status is " << status;
-      throw RunTimeException(oss.str());
+    Status status = _protocol.makeDirectory(logdir, _hostname, _username);
+    if (status.hasErrors()) {
+      throw RunTimeException(status.errorMessage());
     }
 
     // Copy the file to execute into the remote working directory
@@ -191,11 +187,8 @@ namespace Batch {
     if (executeFile.size() != 0) {
       status = _protocol.copyFile(executeFile, "", "",
                                   params[WORKDIR], _hostname, _username);
-      if (status) {
-        std::ostringstream oss;
-        oss << "Cannot copy file " << executeFile << " on host " << _hostname;
-        oss << ". Return status is " << status;
-        throw RunTimeException(oss.str());
+      if (status.hasErrors()) {
+        throw RunTimeException(status.errorMessage());
       }
 
 #ifdef WIN32
@@ -210,6 +203,7 @@ namespace Batch {
         string subCommand = string("chmod u+x ") + remoteExec;
         string command = _protocol.getExecCommand(subCommand, _hostname, _username);
         LOG(command);
+        int status;
         status = system(command.c_str());
         if (status) {
           std::ostringstream oss;
@@ -231,11 +225,8 @@ namespace Batch {
       }
       status = _protocol.copyFile(inputFile.getLocal(), "", "",
                                   remotePath, _hostname, _username);
-      if (status) {
-        std::ostringstream oss;
-        oss << "Cannot copy file " << inputFile.getLocal() << " on host " << _hostname;
-        oss << ". Return status is " << status;
-        throw RunTimeException(oss.str());
+      if (status.hasErrors()) {
+        throw RunTimeException(status.errorMessage());
       }
     }
 
@@ -248,9 +239,9 @@ namespace Batch {
     Versatile::const_iterator Vit;
 
     // Create local result directory
-    int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
-    if (status)
-      LOG("Directory creation failed. Status is: " << status);
+    Status status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
+    if (status.hasErrors())
+      LOG("Directory creation failed. Error is: " << status.errorMessage());
 
     for(Vit=V.begin(); Vit!=V.end(); Vit++) {
       CoupleType cpt  = *static_cast< CoupleType * >(*Vit);
@@ -266,15 +257,15 @@ namespace Batch {
       }
       status = _protocol.copyFile(remotePath, _hostname, _username,
                                   localPath, "", "");
-      if (status)
-        LOG("Copy command failed. Status is: " << status);
+      if (status.hasErrors())
+        LOG("Copy command failed. Error is: " << status.errorMessage());
     }
 
     // Copy logs
     status = _protocol.copyFile(string(params[WORKDIR]) + string("/logs"), _hostname, _username,
                                 directory, "", "");
-    if (status)
-      LOG("Copy logs directory failed. Status is: " << status);
+    if (status.hasErrors())
+      LOG("Copy logs directory failed. Error is: " << status.errorMessage());
   }
 
   bool BatchManager::importDumpStateFile( const Job & job, const string directory )
@@ -282,15 +273,15 @@ namespace Batch {
     Parametre params = job.getParametre();
 
     // Create local result directory
-    int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
-    if (status)
-      LOG("Directory creation failed. Status is: " << status);
+    Status status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
+    if (status.hasErrors())
+      LOG("Directory creation failed. Error is: " << status.errorMessage());
 
     bool ret = true;
     status = _protocol.copyFile(string(params[WORKDIR]) + string("/dumpState*.xml"), _hostname, _username,
                                 directory, "", "");
-    if (status) {
-      LOG("Copy command failed. Status is: " << status);
+    if (status.hasErrors()) {
+      LOG("Copy command failed. Error is: " << status.errorMessage());
       ret = false;
     }
     return ret;
@@ -303,16 +294,16 @@ namespace Batch {
     Parametre params = job.getParametre();
 
     // Create local result directory
-    int status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
-    if (status)
-      LOG("Directory creation failed. Status is: " << status);
+    Status status = CommunicationProtocol::getInstance(SH).makeDirectory(directory, "", "");
+    if (status.hasErrors())
+      LOG("Directory creation failed. Error is: " << status.errorMessage());
 
     bool ret = true;
     status = _protocol.copyFile(string(params[WORKDIR]) + "/" + work_file,
                                 _hostname, _username,
                                 directory, "", "");
-    if (status) {
-      LOG("Copy command failed. Status is: " << status);
+    if (status.hasErrors()) {
+      LOG("Copy command failed. Error is: " << status.errorMessage());
       ret = false;
     }
     return ret;
@@ -325,9 +316,9 @@ namespace Batch {
     string wd = params[WORKDIR];
     if(!wd.empty() && wd != "/")
     {
-      int status = _protocol.removeDirectory(wd, _hostname, _username);
-      if (status)
-        LOG("removeDirectory command failed. Status is: " << status);
+      Status status = _protocol.removeDirectory(wd, _hostname, _username);
+      if (status.hasErrors())
+        LOG("removeDirectory command failed. Error is: " << status.errorMessage());
     }
     else
       LOG("removeDirectory command failed. Invalid working directory: " << wd);

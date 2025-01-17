@@ -44,6 +44,40 @@ using namespace std;
 
 namespace Batch {
 
+  Status::Status(int status, const std::string & error)
+  : _status(status),
+  _error(error)
+  {
+  }
+
+  Status::Status(const Status& copy)
+  : _status(copy._status),
+  _error(copy._error)
+  {
+  }
+
+  Status& Status::operator=(const Status& copy)
+  {
+      _status = copy._status;
+      _error = copy._error;
+      return *this;
+  }
+
+  bool Status::hasErrors()const
+  {
+      return _status != 0;
+  }
+
+  const std::string & Status::errorMessage()const
+  {
+      return _error;
+  }
+
+  int Status::getStatus()const
+  {
+      return _status;
+  }
+
   CommunicationProtocol::CommunicationProtocol(CommunicationProtocolType type)
   : _type(type)
   {
@@ -78,7 +112,7 @@ namespace Batch {
     return commandStringFromArgs(getExecCommandArgs(subCommand, host, user));
   }
 
-  int CommunicationProtocol::copyFile(const std::string & sourcePath,
+  Status CommunicationProtocol::copyFile(const std::string & sourcePath,
                                       const std::string & sourceHost,
                                       const std::string & sourceUser,
                                       const std::string & destinationPath,
@@ -89,8 +123,17 @@ namespace Batch {
                                                               destinationPath, destinationHost,
                                                               destinationUser));
     LOG(command);
-    int status = system(command.c_str());
-    return status;
+    string output;
+    int status = Utils::getCommandOutput(command + " 2>&1", output);
+    std::ostringstream oss;
+    if (status != 0)
+    {
+        oss << "Cannot copy file " << sourcePath << " from host " << sourceHost
+            << " to " << destinationPath << " on " << destinationHost << std::endl;
+        oss << "  Command : " << command << std::endl;
+        oss << "  Output : " << output << std::endl;;
+    }
+    return Status(status, oss.str());
   }
 
   string CommunicationProtocol::getRemoveSubCommand(const string & path) const
@@ -120,34 +163,58 @@ namespace Batch {
 #endif
   }
 
-  int CommunicationProtocol::removeFile(const std::string & path,
+  Status CommunicationProtocol::removeFile(const std::string & path,
                                         const std::string & host,
                                         const std::string & user) const
   {
     string command = getExecCommand(getRemoveSubCommand(path), host, user);
     LOG(command);
-    int status = system(command.c_str());
-    return status;
+    string output;
+    int status = Utils::getCommandOutput(command + " 2>&1", output);
+    std::ostringstream oss;
+    if (status != 0)
+    {
+        oss << "Cannot remove file " << path << " on host " << host << std::endl;
+        oss << "  Command : " << command << std::endl;
+        oss << "  Output : " << output << std::endl;;
+    }
+    return Status(status, oss.str());
   }
 
-  int CommunicationProtocol::removeDirectory(const std::string & path,
-                                        const std::string & host,
-                                        const std::string & user) const
+  Status CommunicationProtocol::removeDirectory(const std::string & path,
+                                                const std::string & host,
+                                                const std::string & user) const
   {
     string command = getExecCommand(getRemoveDirectorySubCommand(path), host, user);
     LOG(command);
-    int status = system(command.c_str());
-    return status;
+    string output;
+    int status = Utils::getCommandOutput(command + " 2>&1", output);
+    std::ostringstream oss;
+    if (status != 0)
+    {
+        oss << "Cannot remove directory " << path << " on host " << host << std::endl;
+        oss << "  Command : " << command << std::endl;
+        oss << "  Output : " << output << std::endl;;
+    }
+    return Status(status, oss.str());
   }
 
-  int CommunicationProtocol::makeDirectory(const std::string & path,
+  Status CommunicationProtocol::makeDirectory(const std::string & path,
                                            const std::string & host,
                                            const std::string & user) const
   {
     string command = getExecCommand(getMakeDirectorySubCommand(path), host, user);
     LOG(command);
-    int status = system(command.c_str());
-    return status;
+    string output;
+    int status = Utils::getCommandOutput(command + " 2>&1", output);
+    std::ostringstream oss;
+    if (status != 0)
+    {
+        oss << "Cannot create directory " << path << " on host " << host << std::endl;
+        oss << "  Command : " << command << std::endl;
+        oss << "  Output : " << output << std::endl;;
+    }
+    return Status(status, oss.str());
   }
 
   string CommunicationProtocol::commandStringFromArgs(const vector<string> & commandArgs) const

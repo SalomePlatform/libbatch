@@ -281,9 +281,9 @@ namespace Batch {
     string cwd = buf;
     free(buf);
     string absdir = (Utils::isAbsolutePath(directory))? directory : cwd + "/" + directory;
-    int status = CommunicationProtocol::getInstance(SH).makeDirectory(absdir, "", "");
-    if (status != 0) {
-      throw RunTimeException("Can't create result directory");
+    Status status = CommunicationProtocol::getInstance(SH).makeDirectory(absdir, "", "");
+    if (status.hasErrors()) {
+      throw RunTimeException(status.errorMessage());
     }
 
     string subCommand = string("export OMNIORB_CONFIG=$VISHNU_CONFIG_FILE; ");
@@ -317,9 +317,9 @@ namespace Batch {
     command += " 2>&1";
     LOG(command);
     string output;
-    status = Utils::getCommandOutput(command, output);
+    int exe_status = Utils::getCommandOutput(command, output);
     LOG(output);
-    if (status != 0)
+    if (exe_status != 0)
       throw RunTimeException("Can't import output files, error was: " + output);
   }
 

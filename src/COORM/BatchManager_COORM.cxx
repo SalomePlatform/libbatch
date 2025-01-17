@@ -214,10 +214,10 @@ namespace Batch
         LOG("Batch script file generated is: " << tmpFileName);
 
         string remoteFileName = rootNameToExecute + "_Batch.sh";
-        int status = _protocol.copyFile(tmpFileName, "", "",
+        Status status = _protocol.copyFile(tmpFileName, "", "",
                                         workDir + "/" + remoteFileName,
                                         _hostname, _username);
-        if (status)
+        if (status.hasErrors())
           throw RunTimeException("Cannot copy batch submission file on host " + _hostname);
 
         return remoteFileName;
@@ -227,7 +227,6 @@ namespace Batch
       {
         BatchManager::exportInputFiles(job);
 
-        int status;
         Parametre params = job.getParametre();
 
         string launcherFile = params[LAUNCHER_FILE];
@@ -235,13 +234,10 @@ namespace Batch
         if (launcherFile.size() != 0)
         {
           // Copy launcherFile into batch working directory
-          status = _protocol.copyFile(launcherFile, "", "",
+          Status status = _protocol.copyFile(launcherFile, "", "",
                                       params[WORKDIR], _hostname, _username);
-          if (status) {
-            std::ostringstream oss;
-            oss << "Cannot copy file " << launcherFile << " on host " << _hostname;
-            oss << ". Return status is " << status;
-            throw RunTimeException(oss.str());
+          if (status.hasErrors()) {
+            throw RunTimeException(status.errorMessage());
           }
 
           string remoteLauncher = launcherFile;
@@ -251,11 +247,11 @@ namespace Batch
           string subCommand = string("chmod u+x ") + remoteLauncher;
           string command = _protocol.getExecCommand(subCommand, _hostname, _username);
           LOG(command);
-          status = system(command.c_str());
-          if (status) {
+          int exe_status = system(command.c_str());
+          if (exe_status) {
             std::ostringstream oss;
             oss << "Cannot change permissions of file " << remoteLauncher << " on host " << _hostname;
-            oss << ". Return status is " << status;
+            oss << ". Return status is " << exe_status;
             throw RunTimeException(oss.str());
           }
         }

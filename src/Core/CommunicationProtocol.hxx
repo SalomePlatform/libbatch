@@ -38,6 +38,20 @@ namespace Batch {
 
   enum CommunicationProtocolType {SH, SSH, RSH, RSYNC};
 
+  class BATCH_EXPORT Status
+  {
+  public:
+      Status(int status, const std::string & error);
+      Status(const Status& copy);
+      Status& operator=(const Status& copy);
+      bool hasErrors()const;
+      const std::string & errorMessage()const;
+      int getStatus()const;
+  private:
+      int _status;
+      std::string _error;
+  };
+
   class BATCH_EXPORT CommunicationProtocol
   {
   public:
@@ -53,24 +67,24 @@ namespace Batch {
                                                         const std::string & host,
                                                         const std::string & user) const=0;
 
-    virtual int copyFile(const std::string & sourcePath,
-                         const std::string & sourceHost,
-                         const std::string & sourceUser,
-                         const std::string & destinationPath,
-                         const std::string & destinationHost,
-                         const std::string & destinationUser) const;
+    virtual Status copyFile(const std::string & sourcePath,
+                            const std::string & sourceHost,
+                            const std::string & sourceUser,
+                            const std::string & destinationPath,
+                            const std::string & destinationHost,
+                            const std::string & destinationUser) const;
 
-    virtual int removeFile(const std::string & path,
-                           const std::string & host,
-                           const std::string & user) const;
-
-    virtual int removeDirectory(const std::string & path,
-                                const std::string & host,
-                                const std::string & user) const;
-
-    virtual int makeDirectory(const std::string & path,
+    virtual Status removeFile(const std::string & path,
                               const std::string & host,
                               const std::string & user) const;
+
+    virtual Status removeDirectory(const std::string & path,
+                                   const std::string & host,
+                                   const std::string & user) const;
+
+    virtual Status makeDirectory(const std::string & path,
+                                 const std::string & host,
+                                 const std::string & user) const;
 
     CommunicationProtocolType getType() const;
 

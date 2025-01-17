@@ -394,10 +394,10 @@ namespace Batch {
     LOG("Batch script file generated is: " << tmpFileName);
 
     Utils::chmod(tmpFileName.c_str(), 0x1ED);
-    int status = _bm._protocol.copyFile(tmpFileName, "", "",
+    Status status = _bm._protocol.copyFile(tmpFileName, "", "",
                                         remotePath, _bm._hostname, _bm._username);
-    if (status)
-      throw RunTimeException("Cannot copy command file on host " + _bm._hostname);
+    if (status.hasErrors())
+      throw RunTimeException(status.errorMessage());
 
 #ifdef WIN32
     if (_bm._protocol.getType() != SH) {
@@ -406,7 +406,7 @@ namespace Batch {
       string subCommand = string("chmod u+x ") + remotePath;
       string command = _bm._protocol.getExecCommand(subCommand, _bm._hostname, _bm._username);
       LOG(command);
-      status = system(command.c_str());
+      int status = system(command.c_str());
       if (status) {
         std::ostringstream oss;
         oss << "Cannot change permissions of file " << remotePath << " on host " << _bm._hostname;

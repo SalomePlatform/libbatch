@@ -262,11 +262,11 @@ namespace Batch {
     Utils::chmod(TmpFileName.c_str(), 0x1ED);
     LOG("Batch script file generated is: " << TmpFileName.c_str());
 
-    int status = _protocol.copyFile(TmpFileName, "", "",
+    Status status = _protocol.copyFile(TmpFileName, "", "",
                                     workDir + "/" + rootNameToExecute + "_Batch.sh",
                                     _hostname, _username);
-    if (status)
-      throw RunTimeException("Error of connection on remote host");
+    if (status.hasErrors())
+      throw RunTimeException(status.errorMessage());
 
 #endif
 

@@ -200,11 +200,11 @@ namespace Batch {
     LOG("Batch script file generated is: " << tmpFileName);
 
     string remoteFileName = rootNameToExecute + "_LL.cmd";
-    int status = _protocol.copyFile(tmpFileName, "", "",
+    Status status = _protocol.copyFile(tmpFileName, "", "",
                                     workDir + "/" + remoteFileName,
                                     _hostname, _username);
-    if (status)
-      throw RunTimeException("Cannot copy command file on host " + _hostname);
+    if (status.hasErrors())
+      throw RunTimeException(status.errorMessage());
 
     return remoteFileName;
   }
