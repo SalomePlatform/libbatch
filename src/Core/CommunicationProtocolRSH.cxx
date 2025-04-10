@@ -117,7 +117,7 @@ namespace Batch {
   }
 
 #ifdef WIN32
-  int CommunicationProtocolRSH::copyFile(const std::string & sourcePath,
+  Status CommunicationProtocolRSH::copyFile(const std::string & sourcePath,
                                          const std::string & sourceHost,
                                          const std::string & sourceUser,
                                          const std::string & destinationPath,
@@ -166,7 +166,7 @@ namespace Batch {
       _chdir(newdir);
     }
 
-    int status = CommunicationProtocol::copyFile(sourcePathWithoutDrive, sourceHost, sourceUser,
+    Status status = CommunicationProtocol::copyFile(sourcePathWithoutDrive, sourceHost, sourceUser,
                                                  destinationPathWithoutDrive, destinationHost, destinationUser);
 
     // Go back to previous directory if necessary

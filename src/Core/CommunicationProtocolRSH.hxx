@@ -57,7 +57,7 @@ namespace Batch {
 
     // On Windows, we must reimplement copyFile because there are problems with absolute
     // paths containing a colon.
-    int copyFile(const std::string & sourcePath,
+    Status copyFile(const std::string & sourcePath,
                  const std::string & sourceHost,
                  const std::string & sourceUser,
                  const std::string & destinationPath,
