@@ -20,7 +20,11 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8 FATAL_ERROR)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "4.0.0")
+  set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+endif()
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+
 PROJECT(LibBatch C CXX)
 
 # Versioning
