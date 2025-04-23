@@ -726,13 +726,13 @@ namespace Batch {
       //close(STDERR_FILENO);
 
       // On execute la commande du fils
-      execv(argv[0], argv);
+      execvp(argv[0], argv);
       UNDER_LOCK( LOG("*** debug_command = " << strerror(errno)) );
       // No need to deallocate since nothing happens after a successful exec
 
       // Normalement on ne devrait jamais arriver ici
       ofstream file_err("error.log");
-      UNDER_LOCK( file_err << "Echec de l'appel a execve" << endl );
+      UNDER_LOCK( file_err << "Echec de l'appel a execvp" << endl );
 
     } catch (GenericException & e) {
 
